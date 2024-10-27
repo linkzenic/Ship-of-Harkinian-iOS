@@ -410,7 +410,7 @@ namespace Rando {
 
 //RANDOTODO quantity is a placeholder for proper ammo use calculation logic. in time will want updating to account for ammo capacity
 //Can we kill this enemy
-    bool Logic::CanKillEnemy(RandomizerEnemy enemy, EnemyDistance distance, bool wallOrFloor, uint8_t quantity) {
+    bool Logic::CanKillEnemy(RandomizerEnemy enemy, EnemyDistance distance, bool wallOrFloor, uint8_t quantity, bool timer) {
         bool killed = false;
         switch(enemy) {
             case RE_GOLD_SKULLTULA:
@@ -424,9 +424,14 @@ namespace Rando {
                         //hammer jumpslash cannot damage these, but hammer swing can
                         killed = killed || CanUse(RG_MEGATON_HAMMER);
                         [[fallthrough]];
-                    case ED_HAMMER_JUMPSLASH:
+                    case ED_SHORT_JUMPSLASH:
+                        killed = killed || CanUse(RG_MEGATON_HAMMER) || CanUse(RG_KOKIRI_SWORD);
+                        [[fallthrough]];
                     case ED_MASTER_SWORD_JUMPSLASH:
-                        killed = killed || CanJumpslashExceptHammer();
+                        killed = killed || CanUse(RG_MASTER_SWORD);
+                        [[fallthrough]];
+                    case ED_LONG_JUMPSLASH:
+                        killed = killed || CanUse(RG_BIGGORON_SWORD) || CanUse(RG_STICKS);
                         [[fallthrough]];
                     case ED_RANG_OR_HOOKSHOT:
                         //RANDOTODO test dins, bomb and chu range in a practical example
@@ -461,7 +466,7 @@ namespace Rando {
             case RE_STALFOS:
                 //RANDOTODO Add trick to kill stalfos with sticks, and a second one for bombs without stunning. Higher ammo logic for bombs is also plausible
                 return CanUse(RG_KOKIRI_SWORD) || CanUse(RG_MASTER_SWORD) || CanUse(RG_BIGGORON_SWORD) || CanUse(RG_MEGATON_HAMMER) || CanUse(RG_FAIRY_BOW) || CanUse(RG_BOMBCHU_5) || 
-                       (quantity <= 2 && (CanUse(RG_NUTS) || HookshotOrBoomerang()) && CanUse(RG_BOMB_BAG)) || (quantity <= 1 && CanUse(RG_STICKS));
+                       (quantity <= 2 && !timer && (CanUse(RG_NUTS) || HookshotOrBoomerang()) && CanUse(RG_BOMB_BAG)) || (quantity <= 1 && CanUse(RG_STICKS));
             //Needs 16 bombs, but is in default logic in N64, probably because getting the hits is quite easy.
             //bow and sling can wake them and damage after they shed their armour, so could reduce ammo requirements for explosives to 10.
             //requires 8 sticks to kill so would be a trick unless we apply higher stick bag logic
@@ -474,7 +479,8 @@ namespace Rando {
             case RE_FLARE_DANCER:
                 return CanUse(RG_MEGATON_HAMMER) || CanUse(RG_HOOKSHOT) || (HasExplosives() && (CanJumpslashExceptHammer() || CanUse(RG_FAIRY_BOW) || CanUse(RG_FAIRY_SLINGSHOT) || CanUse(RG_BOOMERANG)));
             case RE_WOLFOS:
-                return CanJumpslash() || CanUse(RG_FAIRY_BOW) || CanUse(RG_FAIRY_SLINGSHOT) || CanUse(RG_BOMBCHU_5) || (CanUse(RG_BOMB_BAG) && (CanUse(RG_NUTS) || CanUse(RG_HOOKSHOT) || CanUse(RG_BOOMERANG)));
+            case RE_WHITE_WOLFOS:
+                return CanJumpslash() || CanUse(RG_FAIRY_BOW) || CanUse(RG_FAIRY_SLINGSHOT) || CanUse(RG_BOMBCHU_5) || CanUse(RG_DINS_FIRE) || (CanUse(RG_BOMB_BAG) && (CanUse(RG_NUTS) || CanUse(RG_HOOKSHOT) || CanUse(RG_BOOMERANG)));
             case RE_REDEAD:
                 return CanJumpslash() || CanUse(RG_DINS_FIRE);
             case RE_MEG:
@@ -487,9 +493,13 @@ namespace Rando {
                 return CanJumpslash() || CanUse(RG_FAIRY_BOW) || CanUse(RG_FAIRY_SLINGSHOT) || HasExplosives()/* || (CanUse(RG_DINS_FIRE) && (CanUse(RG_NUTS) || CanUse(RG_HOOKSHOT) || CanUse(RG_BOOMERANG)))*/;
             case RE_DINOLFOS:
                 //stunning + bombs is possible but painful, as it loves to dodge the bombs and hookshot. it also dodges chus but if you cook it so it detonates under the dodge it usually gets caught on landing
-                return CanJumpslash() || CanUse(RG_FAIRY_BOW) || CanUse(RG_BOMBCHU_5) || CanUse(RG_FAIRY_SLINGSHOT);
+                return CanJumpslash() || CanUse(RG_FAIRY_BOW) || CanUse(RG_FAIRY_SLINGSHOT) || (!timer && CanUse(RG_BOMBCHU_5));
             case RE_TORCH_SLUG:
                 return CanJumpslash() || HasExplosives() || CanUse(RG_FAIRY_BOW);
+            case RE_FREEZARD:
+                return CanUse(RG_MASTER_SWORD) || CanUse(RG_BIGGORON_SWORD) || CanUse(RG_MEGATON_HAMMER) || CanUse(RG_STICKS) || HasExplosives() || CanUse(RG_HOOKSHOT) || CanUse(RG_DINS_FIRE) || CanUse(RG_FIRE_ARROWS);
+            case RE_SPIKE:
+                return CanUse(RG_MASTER_SWORD) || CanUse(RG_BIGGORON_SWORD) || CanUse(RG_MEGATON_HAMMER) || CanUse(RG_STICKS) || HasExplosives() || CanUse(RG_HOOKSHOT) || CanUse(RG_FAIRY_BOW) || CanUse(RG_DINS_FIRE);
             default:
                 SPDLOG_ERROR("CanKillEnemy reached `default`.");
                 assert(false);
@@ -519,9 +529,12 @@ namespace Rando {
             case RE_STALFOS:
             case RE_FLARE_DANCER:
             case RE_WOLFOS:
+            case RE_WHITE_WOLFOS:
             case RE_FLOORMASTER:
             case RE_MEG:
             case RE_ARMOS:
+            case RE_FREEZARD:
+            case RE_SPIKE:
                 return true;
             case RE_BIG_SKULLTULA:
                 //hammer jumpslash can pass, but only on flat land where you can kill with hammer swing
@@ -561,11 +574,14 @@ namespace Rando {
             case RE_IRON_KNUCKLE:
             case RE_FLARE_DANCER:
             case RE_WOLFOS:
+            case RE_WHITE_WOLFOS:
             case RE_FLOORMASTER:
             case RE_REDEAD:
             case RE_MEG:
             case RE_ARMOS:
             case RE_GREEN_BUBBLE:
+            case RE_FREEZARD:
+            case RE_SPIKE:
                 return true;
             case RE_MAD_SCRUB:
             case RE_KEESE:
@@ -591,7 +607,7 @@ namespace Rando {
         switch(enemy) {
             case RE_GOLD_SKULLTULA:
                 //RANDOTODO double check all jumpslash kills that might be out of jump/backflip range
-                return distance <= ED_HAMMER_JUMPSLASH || (distance <= ED_RANG_OR_HOOKSHOT && (CanUse(RG_HOOKSHOT) || CanUse(RG_BOOMERANG))) || (distance == ED_LONGSHOT && CanUse(RG_LONGSHOT));
+                return distance <= ED_SHORT_JUMPSLASH || (distance <= ED_RANG_OR_HOOKSHOT && (CanUse(RG_HOOKSHOT) || CanUse(RG_BOOMERANG))) || (distance == ED_LONGSHOT && CanUse(RG_LONGSHOT));
             case RE_KEESE:
             case RE_FIRE_KEESE:
                 return true;
@@ -660,8 +676,31 @@ namespace Rando {
         return CanJumpslashExceptHammer() || CanUse(RG_MEGATON_HAMMER);
     }
 
-    bool Logic::CanHitSwitch() {
-        return CanUse(RG_FAIRY_SLINGSHOT) || CanJumpslash() || HasExplosives() || CanUse(RG_FAIRY_BOW) || CanUse(RG_BOOMERANG) || CanUse(RG_HOOKSHOT);
+    bool Logic::CanHitSwitch(EnemyDistance distance) {
+        bool hit = false;
+        switch (distance){
+            case ED_CLOSE:
+            case ED_SHORT_JUMPSLASH:
+                hit = hit || CanUse(RG_KOKIRI_SWORD) || CanUse(RG_MEGATON_HAMMER);
+                [[fallthrough]];
+            case ED_MASTER_SWORD_JUMPSLASH:
+                hit = hit || CanUse(RG_MASTER_SWORD);
+                [[fallthrough]];
+            case ED_LONG_JUMPSLASH:
+                hit = hit || CanUse(RG_BIGGORON_SWORD) || CanUse(RG_STICKS);
+                [[fallthrough]];
+            case ED_RANG_OR_HOOKSHOT:
+                //RANDOTODO test bomb and chu range in a practical example
+                hit = hit || HookshotOrBoomerang() || HasExplosives() ;
+                [[fallthrough]];
+            case ED_LONGSHOT:
+                hit = hit || CanUse(RG_LONGSHOT);
+                [[fallthrough]];
+            case ED_FAR:
+                hit = CanUse(RG_FAIRY_SLINGSHOT) || CanUse(RG_FAIRY_BOW);
+                break;
+        }
+        return hit;
     }
 
     bool Logic::CanDamage() {
@@ -1905,6 +1944,8 @@ namespace Rando {
         ForestClearBelowBowChest  = false;
         ForestOpenBossCorridor    = false;
         ShadowTrialFirstChest     = false;
+        MQGTGMazeSwitch           = false;
+        GTGPlatformSilverRupees   = false;
 
         StopPerformanceTimer(PT_LOGIC_RESET);
     }
