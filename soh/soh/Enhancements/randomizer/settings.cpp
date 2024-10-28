@@ -302,7 +302,7 @@ void Settings::CreateOptions() {
     mOptions[RSK_STARTING_NOCTURNE_OF_SHADOW] = Option::Bool("Start with Nocturne of Shadow", CVAR_RANDOMIZER_SETTING("StartingNocturneOfShadow"), "", IMFLAG_NONE);
     mOptions[RSK_STARTING_PRELUDE_OF_LIGHT] = Option::Bool("Start with Prelude of Light", CVAR_RANDOMIZER_SETTING("StartingPreludeOfLight"));
     mOptions[RSK_STARTING_SKULLTULA_TOKEN] = Option::U8("Gold Skulltula Tokens", {NumOpts(0, 100)}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("StartingSkulltulaToken"), "", WidgetType::Slider);
-    mOptions[RSK_STARTING_HEARTS] = Option::U8("Hearts", {NumOpts(1, 20)}, OptionCategory::Setting, "gRandomizeStartingHearts", "", WidgetType::Slider, 2);
+    mOptions[RSK_STARTING_HEARTS] = Option::U8("Hearts", {NumOpts(1, 20)}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("StartingHearts"), "", WidgetType::Slider, 2);
     // TODO: Remainder of Starting Items
     mOptions[RSK_LOGIC_RULES] = Option::U8("Logic", {"Glitchless", "Glitched", "No Logic", "Vanilla"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("LogicRules"), mOptionDescriptions[RSK_LOGIC_RULES], WidgetType::Combobox, RO_LOGIC_GLITCHLESS);
     mOptions[RSK_ALL_LOCATIONS_REACHABLE] = Option::Bool("All Locations Reachable", {"Off", "On"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("AllLocationsReachable"), mOptionDescriptions[RSK_ALL_LOCATIONS_REACHABLE], WidgetType::Checkbox, RO_GENERIC_ON);
@@ -3147,6 +3147,12 @@ void Settings::ParseJson(nlohmann::json spoilerFileJson) {
     for (auto it = enabledTricksJson.begin(); it != enabledTricksJson.end(); ++it) {
         const RandomizerTrick rt = mTrickNameToEnum[it.value()];
         GetTrickOption(rt).SetSelectedIndex(RO_GENERIC_ON);
+    }
+}
+
+void Settings::ReloadOptions() {
+    for (int i = 0; i < RSK_MAX; i++) {
+        mOptions[i].SetFromCVar();
     }
 }
 } // namespace Rando
