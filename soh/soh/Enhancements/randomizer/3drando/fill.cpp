@@ -617,8 +617,8 @@ void LookForExternalArea(Region* currentRegion, std::set<Region*> &alreadyChecke
     //if this entrance does not pass areas, only process it if we are in low priority mode
     if ((LowPriorityMode || entrance->DoesSpreadAreas()) && !alreadyChecked.contains(entrance->GetParentRegion())){
       std::set<RandomizerArea> otherAreas = entrance->GetParentRegion()->GetAllAreas();
-      alreadyChecked.insert(entrance->GetParentRegion());
       if (otherAreas.size() == 0) {
+        alreadyChecked.insert(entrance->GetParentRegion());
         LookForExternalArea(entrance->GetParentRegion(), alreadyChecked, areas, LowPriorityMode);
       //If we find a valid area we should add it.
       //If it's Links Pocket or RA_NONE, do not propagate those, they are not real areas.
