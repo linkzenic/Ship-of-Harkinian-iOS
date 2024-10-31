@@ -530,9 +530,9 @@ void TimeSplitsItemSplitEvent(uint32_t type, u8 item) {
         }
     }
     if (type == SPLIT_ENTRANCE) {
-        if ((item == SCENE_ZORAS_RIVER && gSaveContext.entranceIndex == ENTR_ZORAS_RIVER_4) ||
+        if ((item == SCENE_ZORAS_RIVER && gSaveContext.entranceIndex == ENTR_ZORAS_RIVER_UNDERWATER_SHORTCUT) ||
             (item == SCENE_LOST_WOODS &&
-             (gSaveContext.entranceIndex == ENTR_LOST_WOODS_9 || gSaveContext.entranceIndex == ENTR_LOST_WOODS_0))) {
+             (gSaveContext.entranceIndex == ENTR_LOST_WOODS_BRIDGE_EAST_EXIT || gSaveContext.entranceIndex == ENTR_LOST_WOODS_SOUTH_EXIT))) {
             type = SPLIT_MISC;
         }
     }

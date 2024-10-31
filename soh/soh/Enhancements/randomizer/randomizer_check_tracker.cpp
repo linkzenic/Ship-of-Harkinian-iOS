@@ -103,19 +103,19 @@ std::map<SceneID, RandomizerCheckArea> DungeonRCAreasBySceneID = {
 
 // Dungeon entrances with obvious visual differences between MQ and vanilla qualifying as spoiling on sight
 std::vector<uint32_t> spoilingEntrances = {
-    0x0000, // ENTR_DEKU_TREE_0
-    0x0467, // ENTR_DODONGOS_CAVERN_1
-    0x0028, // ENTR_JABU_JABU_0
-    0x0407, // ENTR_JABU_JABU_1
-    0x0169, // ENTR_FOREST_TEMPLE_0
-    0x0165, // ENTR_FIRE_TEMPLE_0
-    0x0175, // ENTR_FIRE_TEMPLE_1
-    0x0423, // ENTR_WATER_TEMPLE_1
-    0x0082, // ENTR_SPIRIT_TEMPLE_0
-    0x02B2, // ENTR_SHADOW_TEMPLE_1
-    0x0088, // ENTR_ICE_CAVERN_0
-    0x0008, // ENTR_GERUDO_TRAINING_GROUNDS_0
-    0x0467  // ENTR_INSIDE_GANONS_CASTLE_0
+    ENTR_DEKU_TREE_ENTRANCE,
+    ENTR_DODONGOS_CAVERN_BOSS_DOOR,
+    ENTR_JABU_JABU_BOSS_DOOR,
+    ENTR_JABU_JABU_BOSS_DOOR,
+    ENTR_FOREST_TEMPLE_ENTRANCE,
+    ENTR_FIRE_TEMPLE_ENTRANCE,
+    ENTR_FIRE_TEMPLE_BOSS_DOOR,
+    ENTR_WATER_TEMPLE_BOSS_DOOR,
+    ENTR_SPIRIT_TEMPLE_ENTRANCE,
+    ENTR_SHADOW_TEMPLE_BOSS_DOOR,
+    ENTR_ICE_CAVERN_ENTRANCE,
+    ENTR_GERUDO_TRAINING_GROUND_ENTRANCE,
+    ENTR_INSIDE_GANONS_CASTLE_ENTRANCE
 };
 
 std::map<RandomizerCheckArea, std::vector<RandomizerCheck>> checksByArea;
@@ -385,7 +385,7 @@ RandomizerCheckArea AreaFromEntranceGroup[] = {
 RandomizerCheckArea GetCheckArea() {
     auto scene = static_cast<SceneID>(gPlayState->sceneNum);
     bool grottoScene = (scene == SCENE_GROTTOS || scene == SCENE_FAIRYS_FOUNTAIN);
-    const EntranceData* ent = GetEntranceData(grottoScene ? ENTRANCE_RANDO_GROTTO_EXIT_START + GetCurrentGrottoId() : gSaveContext.entranceIndex);
+    const EntranceData* ent = GetEntranceData(grottoScene ? ENTRANCE_GROTTO_EXIT_START + GetCurrentGrottoId() : gSaveContext.entranceIndex);
     RandomizerCheckArea area = RCAREA_INVALID;
     if (ent != nullptr && !IsAreaScene(scene) && ent->type != ENTRANCE_TYPE_DUNGEON) {
         if (ent->source == "Desert Colossus" || ent->destination == "Desert Colossus") {

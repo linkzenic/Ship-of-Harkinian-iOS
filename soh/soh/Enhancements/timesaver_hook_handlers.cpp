@@ -122,7 +122,7 @@ void TimeSaverOnVanillaBehaviorHandler(GIVanillaBehavior id, bool* should, va_li
         case VB_PLAY_TRANSITION_CS: {
             if (CVarGetInteger(CVAR_ENHANCEMENT("TimeSavers.SkipCutscene.LearnSong"), IS_RANDO) || IS_RANDO) {
                 // Song of Time
-                if (gSaveContext.entranceIndex == ENTR_TEMPLE_OF_TIME_0 && gSaveContext.cutsceneIndex == 0xFFF7) {
+                if (gSaveContext.entranceIndex == ENTR_TEMPLE_OF_TIME_ENTRANCE && gSaveContext.cutsceneIndex == 0xFFF7) {
                     gSaveContext.entranceIndex = ENTR_HYRULE_FIELD_16;
                     gSaveContext.cutsceneIndex = 0;
                     gSaveContext.nextTransitionType = 3;
@@ -130,7 +130,7 @@ void TimeSaverOnVanillaBehaviorHandler(GIVanillaBehavior id, bool* should, va_li
                 }
 
                 // Requiem of Spirit
-                if ((gSaveContext.entranceIndex == ENTR_DESERT_COLOSSUS_1) && !Flags_GetEventChkInf(EVENTCHKINF_LEARNED_REQUIEM_OF_SPIRIT)) {
+                if ((gSaveContext.entranceIndex == ENTR_DESERT_COLOSSUS_OUTSIDE_TEMPLE) && !Flags_GetEventChkInf(EVENTCHKINF_LEARNED_REQUIEM_OF_SPIRIT)) {
                     Flags_SetEventChkInf(EVENTCHKINF_LEARNED_REQUIEM_OF_SPIRIT);
                     // Normally happens in the cutscene
                     gSaveContext.dayTime = gSaveContext.skyboxTime = 0xAC60;
@@ -142,7 +142,7 @@ void TimeSaverOnVanillaBehaviorHandler(GIVanillaBehavior id, bool* should, va_li
                 
                 u8 meetsBurningKakRequirements = 
                     LINK_IS_ADULT &&
-                    gSaveContext.entranceIndex == ENTR_KAKARIKO_VILLAGE_0 &&
+                    gSaveContext.entranceIndex == ENTR_KAKARIKO_VILLAGE_FRONT_GATE &&
                     Flags_GetEventChkInf(EVENTCHKINF_USED_FOREST_TEMPLE_BLUE_WARP) &&
                     Flags_GetEventChkInf(EVENTCHKINF_USED_FIRE_TEMPLE_BLUE_WARP) &&
                     Flags_GetEventChkInf(EVENTCHKINF_USED_WATER_TEMPLE_BLUE_WARP) &&
@@ -436,7 +436,7 @@ void TimeSaverOnVanillaBehaviorHandler(GIVanillaBehavior id, bool* should, va_li
                             Player* player = GET_PLAYER(gPlayState);
                             // SOH [Randomizer] In entrance rando have impa bring link back to the front of castle grounds
                             if (IS_RANDO && RAND_GET_OPTION(RSK_SHUFFLE_OVERWORLD_ENTRANCES)) {
-                                gPlayState->nextEntranceIndex = ENTR_HYRULE_CASTLE_0;
+                                gPlayState->nextEntranceIndex = ENTR_CASTLE_GROUNDS_SOUTH_EXIT;
                             } else {
                                 gPlayState->nextEntranceIndex = ENTR_HYRULE_FIELD_17;
                             }

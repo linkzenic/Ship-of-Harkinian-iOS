@@ -349,7 +349,7 @@ void RandomizerOnItemReceiveHandler(GetItemEntry receivedItemEntry) {
                 return;
             }
 
-            gPlayState->nextEntranceIndex = ENTR_DESERT_COLOSSUS_0;
+            gPlayState->nextEntranceIndex = ENTR_DESERT_COLOSSUS_EAST_EXIT;
             gPlayState->transitionTrigger = TRANS_TRIGGER_START;
             gSaveContext.nextCutsceneIndex = 0xFFF1;
             gPlayState->transitionType = TRANS_TYPE_SANDSTORM_END;
@@ -1922,31 +1922,31 @@ std::map<s32, SpecialRespawnInfo> swimSpecialRespawnInfo = {
         { { 5730.209, -20, 3725.911 }, -20025 }
     },
     {
-        ENTR_LOST_WOODS_7,//zr to lw
+        ENTR_LOST_WOODS_UNDERWATER_SHORTCUT,//zr to lw
         { { 1978.718, -36.908, -855 }, -16384 }
     },
     {
-        ENTR_ZORAS_RIVER_4,//lw to zr
+        ENTR_ZORAS_RIVER_UNDERWATER_SHORTCUT,//lw to zr
         { { 4082.366, 860.442, -1018.949 }, -32768 }
     },
     {
-        ENTR_LAKE_HYLIA_1,//gv to lh
+        ENTR_LAKE_HYLIA_RIVER_EXIT,//gv to lh
         { { -3276.416, -1033, 2908.421 }, 11228 }
     },
     {
-        ENTR_WATER_TEMPLE_0,//lh to water temple
+        ENTR_WATER_TEMPLE_ENTRANCE,//lh to water temple
         { { -182, 780, 759.5 }, -32768 }
     },
     {
-        ENTR_LAKE_HYLIA_2,//water temple to lh
+        ENTR_LAKE_HYLIA_OUTSIDE_TEMPLE,//water temple to lh
         { { -955.028, -1306.9, 6768.954 }, -32768 }
     },
     {
-        ENTR_ZORAS_DOMAIN_4,//lh to zd
+        ENTR_ZORAS_DOMAIN_UNDERWATER_SHORTCUT,//lh to zd
         { { -109.86, 11.396, -9.933 }, -29131 }
     },
     {
-        ENTR_LAKE_HYLIA_7,//zd to lh
+        ENTR_LAKE_HYLIA_UNDERWATER_SHORTCUT,//zd to lh
         { { -912, -1326.967, 3391 }, 0 }
     },
     {
@@ -1954,11 +1954,11 @@ std::map<s32, SpecialRespawnInfo> swimSpecialRespawnInfo = {
         { { -424, -2051, -74 }, 16384 }
     },
     {
-        ENTR_HYRULE_FIELD_7,//mk to hf (can be a problem when it then turns night)
+        ENTR_HYRULE_FIELD_ON_BRIDGE_SPAWN,//mk to hf (can be a problem when it then turns night)
         { { 0, 0, 1100 }, 0 }
     },
     {
-        ENTR_ZORAS_FOUNTAIN_0,//jabu blue warp to zf
+        ENTR_ZORAS_FOUNTAIN_JABU_JABU_BLUE_WARP,//jabu blue warp to zf
         { { -1580, 150, 1670 }, 8000 }
     },
 };
@@ -1973,7 +1973,7 @@ void RandomizerOnPlayerUpdateHandler() {
     ) {
         //if you void out in water temple without swim you get instantly kicked out to prevent softlocks
         if (gPlayState->sceneNum == SCENE_WATER_TEMPLE) {
-            GameInteractor::RawAction::TeleportPlayer(Entrance_OverrideNextIndex(ENTR_LAKE_HYLIA_2));//lake hylia from water temple
+            GameInteractor::RawAction::TeleportPlayer(Entrance_OverrideNextIndex(ENTR_LAKE_HYLIA_OUTSIDE_TEMPLE));//lake hylia from water temple
         } else {
             if (swimSpecialRespawnInfo.find(gSaveContext.entranceIndex) != swimSpecialRespawnInfo.end()) {
                 SpecialRespawnInfo* respawnInfo = &swimSpecialRespawnInfo.at(gSaveContext.entranceIndex);

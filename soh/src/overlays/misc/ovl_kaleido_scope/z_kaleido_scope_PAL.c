@@ -4429,45 +4429,45 @@ void KaleidoScope_Update(PlayState* play)
                     Play_SaveSceneFlags(play);
 
                     switch (gSaveContext.entranceIndex) {
-                        case ENTR_DEKU_TREE_0:
-                        case ENTR_DODONGOS_CAVERN_0:
-                        case ENTR_JABU_JABU_0:
-                        case ENTR_FOREST_TEMPLE_0:
-                        case ENTR_FIRE_TEMPLE_0:
-                        case ENTR_WATER_TEMPLE_0:
-                        case ENTR_SPIRIT_TEMPLE_0:
-                        case ENTR_SHADOW_TEMPLE_0:
+                        case ENTR_DEKU_TREE_ENTRANCE:
+                        case ENTR_DODONGOS_CAVERN_ENTRANCE:
+                        case ENTR_JABU_JABU_ENTRANCE:
+                        case ENTR_FOREST_TEMPLE_ENTRANCE:
+                        case ENTR_FIRE_TEMPLE_ENTRANCE:
+                        case ENTR_WATER_TEMPLE_ENTRANCE:
+                        case ENTR_SPIRIT_TEMPLE_ENTRANCE:
+                        case ENTR_SHADOW_TEMPLE_ENTRANCE:
                         case ENTR_GANONS_TOWER_0:
-                        case ENTR_GERUDO_TRAINING_GROUND_0:
-                        case ENTR_ICE_CAVERN_0:
+                        case ENTR_GERUDO_TRAINING_GROUND_ENTRANCE:
+                        case ENTR_ICE_CAVERN_ENTRANCE:
                         case ENTR_THIEVES_HIDEOUT_0:
-                        case ENTR_BOTTOM_OF_THE_WELL_0:
-                        case ENTR_INSIDE_GANONS_CASTLE_0:
+                        case ENTR_BOTTOM_OF_THE_WELL_ENTRANCE:
+                        case ENTR_INSIDE_GANONS_CASTLE_ENTRANCE:
                         case ENTR_GANONS_TOWER_COLLAPSE_INTERIOR_0:
                             break;
-                        case ENTR_DEKU_TREE_BOSS_0:
-                            gSaveContext.entranceIndex = ENTR_DEKU_TREE_0;
+                        case ENTR_DEKU_TREE_BOSS_ENTRANCE:
+                            gSaveContext.entranceIndex = ENTR_DEKU_TREE_ENTRANCE;
                             break;
-                        case ENTR_DODONGOS_CAVERN_BOSS_0:
-                            gSaveContext.entranceIndex = ENTR_DODONGOS_CAVERN_0;
+                        case ENTR_DODONGOS_CAVERN_BOSS_ENTRANCE:
+                            gSaveContext.entranceIndex = ENTR_DODONGOS_CAVERN_ENTRANCE;
                             break;
-                        case ENTR_JABU_JABU_BOSS_0:
-                            gSaveContext.entranceIndex = ENTR_JABU_JABU_0;
+                        case ENTR_JABU_JABU_BOSS_ENTRANCE:
+                            gSaveContext.entranceIndex = ENTR_JABU_JABU_ENTRANCE;
                             break;
-                        case ENTR_FOREST_TEMPLE_BOSS_0:
-                            gSaveContext.entranceIndex = ENTR_FOREST_TEMPLE_0;
+                        case ENTR_FOREST_TEMPLE_BOSS_ENTRANCE:
+                            gSaveContext.entranceIndex = ENTR_FOREST_TEMPLE_ENTRANCE;
                             break;
-                        case ENTR_FIRE_TEMPLE_BOSS_0:
-                            gSaveContext.entranceIndex = ENTR_FIRE_TEMPLE_0;
+                        case ENTR_FIRE_TEMPLE_BOSS_ENTRANCE:
+                            gSaveContext.entranceIndex = ENTR_FIRE_TEMPLE_ENTRANCE;
                             break;
-                        case ENTR_WATER_TEMPLE_BOSS_0:
-                            gSaveContext.entranceIndex = ENTR_WATER_TEMPLE_0;
+                        case ENTR_WATER_TEMPLE_BOSS_ENTRANCE:
+                            gSaveContext.entranceIndex = ENTR_WATER_TEMPLE_ENTRANCE;
                             break;
-                        case ENTR_SPIRIT_TEMPLE_BOSS_0:
-                            gSaveContext.entranceIndex = ENTR_SPIRIT_TEMPLE_0;
+                        case ENTR_SPIRIT_TEMPLE_BOSS_ENTRANCE:
+                            gSaveContext.entranceIndex = ENTR_SPIRIT_TEMPLE_ENTRANCE;
                             break;
-                        case ENTR_SHADOW_TEMPLE_BOSS_0:
-                            gSaveContext.entranceIndex = ENTR_SHADOW_TEMPLE_0;
+                        case ENTR_SHADOW_TEMPLE_BOSS_ENTRANCE:
+                            gSaveContext.entranceIndex = ENTR_SHADOW_TEMPLE_ENTRANCE;
                             break;
                         case ENTR_GANONDORF_BOSS_0:
                             gSaveContext.entranceIndex = ENTR_GANONS_TOWER_0;

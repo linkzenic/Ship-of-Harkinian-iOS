@@ -2152,7 +2152,7 @@ void Play_LoadToLastEntrance(PlayState* play) {
         Item_Give(play, ITEM_SWORD_MASTER);
     } else if ((gSaveContext.entranceIndex == ENTR_HYRULE_FIELD_11) || (gSaveContext.entranceIndex == ENTR_HYRULE_FIELD_12) ||
                (gSaveContext.entranceIndex == ENTR_HYRULE_FIELD_13) || (gSaveContext.entranceIndex == ENTR_HYRULE_FIELD_15)) {
-        play->nextEntranceIndex = ENTR_HYRULE_FIELD_6;
+        play->nextEntranceIndex = ENTR_HYRULE_FIELD_CENTER_EXIT;
     } else {
         play->nextEntranceIndex = gSaveContext.entranceIndex;
     }
