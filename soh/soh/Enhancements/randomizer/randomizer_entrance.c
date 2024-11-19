@@ -9,6 +9,8 @@
 
 #include "randomizer_entrance.h"
 #include "randomizer_grotto.h"
+#include "soh/OTRGlobals.h"
+#include "soh/SaveManager.h"
 #include <string.h>
 
 #include "global.h"
