@@ -33,6 +33,12 @@ void Settings::CreateOptionDescriptions() {
                                               "\n"
                                               "Open - King Zora has already mweeped out of the way in both "
                                               "time periods. Ruto's Letter is removed from the item pool.";
+    mOptionDescriptions[RSK_SLEEPING_WATERFALL] = "Closed - Sleeping Waterfall obstructs the entrance to Zora's "
+                                                  "Domain. Zelda's Lullaby must be played in order to open it "
+                                                  "(but only once; then it stays open in both time periods).\n"
+                                                  "\n"
+                                                  "Open - Sleeping Waterfall is always open. "
+                                                  "Link may always enter Zora's Domain.";
     mOptionDescriptions[RSK_STARTING_AGE] =
         "Choose which age Link will start as.\n\n"
         "Starting as adult means you start with the Master Sword in your inventory.\n"

@@ -83,6 +83,7 @@ static const char* imguiScaleOptions[4] = { "Small", "Normal", "Large", "X-Large
     static const char* chestStyleMatchesContentsOptions[4] = { "Disabled", "Both", "Texture Only", "Size Only" };
     static const char* skipGetItemAnimationOptions[3] = { "Disabled", "Junk Items", "All Items" };
     static const char* skipForcedDialogOptions[4] = { "None", "Navi Only", "NPCs Only", "All" };
+    static const char* sleepingWaterfallOptions[3] = { "Always", "Once", "Never" };
     static const char* bunnyHoodOptions[3] = { "Disabled", "Faster Run & Longer Jump", "Faster Run" };
     static const char* mirroredWorldModes[9] = {
         "Disabled",           "Always",        "Random",          "Random (Seeded)",          "Dungeons",
@@ -123,7 +124,7 @@ static const char* imguiScaleOptions[4] = { "Small", "Normal", "Large", "X-Large
         CVAR_ENHANCEMENT("InjectItemCounts.HeartPiece"),
         CVAR_ENHANCEMENT("InjectItemCounts.HeartContainer"),
     };
-    static const char* itemCountMessageOptions[sizeof(itemCountMessageCVars) / sizeof(const char*)] = {
+    static const char* itemCountMessageOptions[ARRAY_COUNT(itemCountMessageCVars)] = {
         "Gold Skulltula Tokens",
         "Pieces of Heart",
         "Heart Containers",
@@ -796,7 +797,23 @@ void DrawEnhancementsMenu() {
                 UIWidgets::PaddedEnhancementCheckbox("Skip Scarecrow Song", CVAR_ENHANCEMENT("InstantScarecrow"), true, false,
                                                         forceSkipScarecrow, forceSkipScarecrowText, UIWidgets::CheckboxGraphics::Checkmark);
                 UIWidgets::Tooltip("Pierre appears when Ocarina is pulled out. Requires learning scarecrow song.");
-
+                bool forceSleepingWaterfallEnhancement =
+                    IS_RANDO && OTRGlobals::Instance->gRandomizer->GetRandoSettingValue(RSK_SLEEPING_WATERFALL) == RO_WATERFALL_OPEN;
+                uint8_t forceSleepingWaterfallValue = OTRGlobals::Instance->gRandomizer->GetRandoSettingValue(RSK_SLEEPING_WATERFALL) + 1;
+                static const char* forceSleepingWaterfallText =
+                    "This setting is forcefully enabled because a randomizer savefile with \"Sleeping Waterfall: Open\" is loaded.";
+                UIWidgets::PaddedText("Play Zelda's Lullaby to open Sleeping Waterfall", true, false);
+                UIWidgets::EnhancementCombobox(CVAR_ENHANCEMENT("TimeSavers.SleepingWaterfall"),
+                                               sleepingWaterfallOptions, 0, forceSleepingWaterfallEnhancement,
+                                               forceSleepingWaterfallText, forceSleepingWaterfallValue);
+                UIWidgets::Tooltip(
+                    "Always: Link must always play Zelda's Lullaby to open "
+                    "the waterfall entrance to Zora's Domain.\n"
+                    "Once: Link only needs to play Zelda's Lullaby once to "
+                    "open the waterfall; after that, it stays open permanently.\n"
+                    "Never: Link never needs to play Zelda's Lullaby to open the "
+                    "waterfall; he only needs to have learned it and have an ocarina."
+                );
                 
                 ImGui::EndTable();
                 ImGui::EndMenu();
@@ -867,7 +884,7 @@ void DrawEnhancementsMenu() {
             UIWidgets::Spacer(0);
 
             if (ImGui::BeginMenu("Item Count Messages")) {
-                int numOptions = sizeof(itemCountMessageCVars) / sizeof(const char*);
+                int numOptions = ARRAY_COUNT(itemCountMessageCVars);
                 bool allItemCountsChecked = std::all_of(itemCountMessageCVars, itemCountMessageCVars + numOptions,
                                                         [](const char* cvar) { return CVarGetInteger(cvar, 0); });
                 bool someItemCountsChecked = std::any_of(itemCountMessageCVars, itemCountMessageCVars + numOptions,

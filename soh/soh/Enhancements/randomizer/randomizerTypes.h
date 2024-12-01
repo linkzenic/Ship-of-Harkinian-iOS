@@ -3947,6 +3947,7 @@ typedef enum {
     RSK_KAK_GATE,
     RSK_DOOR_OF_TIME,
     RSK_ZORAS_FOUNTAIN,
+    RSK_SLEEPING_WATERFALL,
     RSK_STARTING_AGE,
     RSK_GERUDO_FORTRESS,
     RSK_RAINBOW_BRIDGE,
@@ -4183,6 +4184,12 @@ typedef enum {
     RO_ZF_CLOSED_CHILD,
     RO_ZF_OPEN,
 } RandoOptionZorasFountain;
+
+//Sleeping Waterfall settings (closed, open)
+typedef enum {
+    RO_WATERFALL_CLOSED,
+    RO_WATERFALL_OPEN,
+} RandoOptionSleepingWaterfall;
 
 //Starting Age settings (child, adult, random)
 typedef enum {
