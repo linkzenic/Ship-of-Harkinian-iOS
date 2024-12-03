@@ -288,7 +288,8 @@ void Settings::CreateOptions() {
     mOptions[RSK_STARTING_DEKU_SHIELD] = Option::Bool("Start with Deku Shield", CVAR_RANDOMIZER_SETTING("StartingDekuShield"));
     mOptions[RSK_STARTING_KOKIRI_SWORD] = Option::Bool("Start with Kokiri Sword", CVAR_RANDOMIZER_SETTING("StartingKokiriSword"));
     mOptions[RSK_STARTING_MASTER_SWORD] = Option::Bool("Start with Master Sword", CVAR_RANDOMIZER_SETTING("StartingMasterSword"));
-    mOptions[RSK_STARTING_CONSUMABLES] = Option::Bool("Start with Consumables", {"No", "Yes"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("StartingConsumables"), "", WidgetType::Checkbox, RO_GENERIC_OFF);
+    mOptions[RSK_STARTING_STICKS] = Option::Bool("Start with Stick Ammo", {"No", "Yes"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("StartingSticks"), "", WidgetType::Checkbox, RO_GENERIC_OFF);
+    mOptions[RSK_STARTING_NUTS] = Option::Bool("Start with Nut Ammo", {"No", "Yes"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("StartingNuts"), "", WidgetType::Checkbox, RO_GENERIC_OFF);
     mOptions[RSK_FULL_WALLETS] = Option::Bool("Full Wallets", {"No", "Yes"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("FullWallets"), mOptionDescriptions[RSK_FULL_WALLETS], WidgetType::Checkbox, RO_GENERIC_OFF);
     mOptions[RSK_STARTING_ZELDAS_LULLABY] = Option::Bool("Start with Zelda's Lullaby", CVAR_RANDOMIZER_SETTING("StartingZeldasLullaby"), "", IMFLAG_NONE);
     mOptions[RSK_STARTING_EPONAS_SONG] = Option::Bool("Start with Epona's Song", CVAR_RANDOMIZER_SETTING("StartingEponasSong"), "", IMFLAG_NONE);
@@ -913,7 +914,8 @@ void Settings::CreateOptions() {
     }, false, WidgetContainerType::COLUMN);
     mOptionGroups[RSG_STARTING_ITEMS_IMGUI] = OptionGroup::SubGroup("Starting Items", {
         &mOptions[RSK_STARTING_OCARINA],
-        &mOptions[RSK_STARTING_CONSUMABLES],
+        &mOptions[RSK_STARTING_STICKS],
+        &mOptions[RSK_STARTING_NUTS],
         &mOptions[RSK_STARTING_SKULLTULA_TOKEN],
         &mOptions[RSK_STARTING_HEARTS],
     }, false, WidgetContainerType::COLUMN);
@@ -1104,7 +1106,8 @@ void Settings::CreateOptions() {
         &mOptions[RSK_STARTING_PRELUDE_OF_LIGHT],
     }, false);
     mOptionGroups[RSG_STARTING_OTHER] = OptionGroup::SubGroup("Other", {
-        &mOptions[RSK_STARTING_CONSUMABLES],
+        &mOptions[RSK_STARTING_STICKS],
+        &mOptions[RSK_STARTING_NUTS],
         &mOptions[RSK_FULL_WALLETS],
         &mOptions[RSK_STARTING_SKULLTULA_TOKEN],
         &mOptions[RSK_STARTING_HEARTS],
@@ -1368,7 +1371,8 @@ void Settings::CreateOptions() {
         { "Shuffle Dungeon Items:Ganon's Boss Key", RSK_GANONS_BOSS_KEY },
         { "Timesaver Settings:Skip Child Stealth", RSK_SKIP_CHILD_STEALTH },
         { "Timesaver Settings:Skip Child Zelda", RSK_SKIP_CHILD_ZELDA },
-        { "Start with Consumables", RSK_STARTING_CONSUMABLES },
+        { "Start with Sticks", RSK_STARTING_STICKS },
+        { "Start with Nuts", RSK_STARTING_NUTS },
         { "Full Wallets", RSK_FULL_WALLETS },
         { "Timesaver Settings:Cuccos to return", RSK_CUCCO_COUNT },
         { "Timesaver Settings:Big Poe Target Count", RSK_BIG_POE_COUNT },
@@ -1836,6 +1840,17 @@ void Settings::UpdateOptionProperties() {
             lastKey = RSK_MIX_GROTTO_ENTRANCES;
         }
         mOptions[lastKey].AddFlag(IMFLAG_SEPARATOR_BOTTOM);
+    }
+
+    if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleDekuStickBag"), 0)) {
+        mOptions[RSK_STARTING_STICKS].Disable("Disabled because Shuffle Deku Stick Bag is On");
+    } else {
+        mOptions[RSK_STARTING_STICKS].Enable();
+    }
+    if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleDekuNutBag"), 0)) {
+        mOptions[RSK_STARTING_NUTS].Disable("Disabled because Shuffle Deku Nut Bag is On");
+    } else {
+        mOptions[RSK_STARTING_NUTS].Enable();
     }
 
     // Shuffle Weird Egg - Disabled when Skip Child Zelda is active
@@ -2310,6 +2325,13 @@ void Settings::FinalizeSettings(const std::set<RandomizerCheck>& excludedLocatio
                 }
             }
         }
+    }
+
+    if (mOptions[RSK_SHUFFLE_DEKU_STICK_BAG]) {
+        mOptions[RSK_STARTING_STICKS].SetContextIndex(false);
+    }
+    if (mOptions[RSK_SHUFFLE_DEKU_NUT_BAG]) {
+        mOptions[RSK_STARTING_NUTS].SetContextIndex(false);
     }
 
     // RANDOTODO implement chest shuffle with keysanity
@@ -3068,7 +3090,8 @@ void Settings::ParseJson(nlohmann::json spoilerFileJson) {
                         mOptions[index].SetContextIndex(RO_MQ_DUNGEONS_SELECTION);
                     }
                     break;
-                case RSK_STARTING_CONSUMABLES:
+                case RSK_STARTING_STICKS:
+                case RSK_STARTING_NUTS:
                 case RSK_FULL_WALLETS:
                     if (it.value() == "No") {
                         mOptions[index].SetContextIndex(RO_GENERIC_NO);
