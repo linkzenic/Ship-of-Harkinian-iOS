@@ -404,6 +404,14 @@ void TimeSaverOnVanillaBehaviorHandler(GIVanillaBehavior id, bool* should, va_li
             }
             break;
         }
+        case VB_PLAY_MWEEP_CS: {
+            if (CVarGetInteger(CVAR_ENHANCEMENT("TimeSavers.SkipCutscene.Story"), 0)) {
+                *should = false;
+                Inventory_ReplaceItem(gPlayState, ITEM_LETTER_RUTO, ITEM_BOTTLE);
+                Flags_SetEventChkInf(EVENTCHKINF_KING_ZORA_MOVED);
+            }
+            break;
+        }
         case VB_PLAY_EYEDROP_CREATION_ANIM:
         case VB_PLAY_EYEDROPS_CS:
         case VB_PLAY_DROP_FISH_FOR_JABU_CS:
