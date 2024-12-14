@@ -302,6 +302,10 @@ typedef enum {
     /*** Play Cutscenes ***/
 
     VB_PLAY_TRANSITION_CS,
+    VB_PLAY_GORON_FREE_CS,
+    VB_PLAY_FIRE_ARROW_CS,
+    // Vanilla condition: INV_CONTENT(ITEM_ARROW_FIRE) == ITEM_NONE
+    VB_SPAWN_FIRE_ARROW,
     // Opt: *EventChkInf flag
     VB_PLAY_ENTRANCE_CS,
     // Opt: *cutsceneId
@@ -329,8 +333,6 @@ typedef enum {
     VB_PLAY_BOLERO_OF_FIRE_CS,
     VB_PLAY_SERENADE_OF_WATER_CS,
     VB_PLAY_EYEDROPS_CS,
-    // Opt: *EnGo2
-    VB_PLAY_GORON_FREE_CS,
     // Opt: *EnOkarinaTag
     VB_PLAY_DRAIN_WELL_CS,
     // Opt: *EnOkarinaTag
@@ -371,6 +373,7 @@ typedef enum {
 
     /*** Give Items ***/
 
+    VB_FREEZE_ON_SKULL_TOKEN,
     // Opt: *EnBox
     VB_GIVE_ITEM_FROM_CHEST,
     // Opt: ItemID
@@ -379,7 +382,6 @@ typedef enum {
     VB_GIVE_ITEM_FROM_ITEM_00,
     // Opt: *EnSi
     VB_GIVE_ITEM_SKULL_TOKEN,
-    VB_FREEZE_ON_SKULL_TOKEN,
     // Opt: *EnCow
     VB_GIVE_ITEM_FROM_COW,
     // Opt: *EnDns
