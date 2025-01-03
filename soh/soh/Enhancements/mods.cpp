@@ -775,6 +775,42 @@ void RegisterResetNaviTimer() {
 	});
 }
 
+void RegisterBrokenGiantsKnifeFix() {
+    GameInteractor::Instance->RegisterGameHook<GameInteractor::OnItemReceive>([](GetItemEntry itemEntry) {
+        if (itemEntry.itemId != ITEM_SWORD_BGS) {
+            return;
+        }
+
+        int32_t bypassEquipmentChecks = 0;
+
+        if (IS_RANDO || CVarGetInteger(CVAR_ENHANCEMENT("FixBrokenGiantsKnife"), 0)) {
+            // Flag wasn't reset because Kokiri or Master Sword was missing, so we need to
+            // bypass those checks
+            bypassEquipmentChecks |= (1 << EQUIP_INV_SWORD_KOKIRI) | (1 << EQUIP_INV_SWORD_MASTER);
+        } else {
+            // If enhancement is off, flag should be handled exclusively by vanilla behaviour
+            return;
+        }
+
+        int32_t allSwordsInEquipment = bypassEquipmentChecks | ALL_EQUIP_VALUE(EQUIP_TYPE_SWORD);
+        int32_t allSwordFlags = (1 << EQUIP_INV_SWORD_KOKIRI) | (1 << EQUIP_INV_SWORD_MASTER) |
+                                (1 << EQUIP_INV_SWORD_BIGGORON) | (1 << EQUIP_INV_SWORD_BROKENGIANTKNIFE);
+
+        if (allSwordsInEquipment != allSwordFlags) {
+            return;
+        }
+
+        gSaveContext.inventory.equipment ^= OWNED_EQUIP_FLAG_ALT(EQUIP_TYPE_SWORD, EQUIP_INV_SWORD_BROKENGIANTKNIFE);
+
+        if (gSaveContext.equips.buttonItems[0] == ITEM_SWORD_KNIFE) {
+            gSaveContext.equips.buttonItems[0] = ITEM_SWORD_BGS;
+            if (gPlayState != NULL) {
+                Interface_LoadItemIcon1(gPlayState, 0);
+            }
+        }
+    });
+}
+
 //this map is used for enemies that can be uniquely identified by their id
 //and that are always counted
 //enemies that can't be uniquely identified by their id
@@ -1429,6 +1465,7 @@ void InitMods() {
     RegisterMenuPathFix();
     RegisterMirrorModeHandler();
     RegisterResetNaviTimer();
+    RegisterBrokenGiantsKnifeFix();
     RegisterEnemyDefeatCounts();
     RegisterBossDefeatTimestamps();
     RegisterAltTrapTypes();
