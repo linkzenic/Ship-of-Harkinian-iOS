@@ -111,7 +111,7 @@ void RandomizerCheckObjects::UpdateImGuiVisibility() {
         auto itemLoc = ctx->GetItemLocation(location.GetRandomizerCheck());
         itemLoc->SetVisible(
             (location.GetRandomizerCheck() != RC_UNKNOWN_CHECK) &&
-            (!RandomizerCheckObjects::AreaIsDungeon(location.GetArea()) || location.GetQuest() == RCQUEST_BOTH ||
+            (location.GetQuest() == RCQUEST_BOTH ||
              location.GetQuest() == RCQUEST_MQ &&
                  ((CVarGetInteger(CVAR_RANDOMIZER_SETTING("MQDungeons"), RO_MQ_DUNGEONS_NONE) == RO_MQ_DUNGEONS_SET_NUMBER &&
                        (CVarGetInteger(CVAR_RANDOMIZER_SETTING("MQDungeonCount"), 12) > 0) || // at least one MQ dungeon
