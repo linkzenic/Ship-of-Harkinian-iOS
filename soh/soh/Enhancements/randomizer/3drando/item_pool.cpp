@@ -1473,10 +1473,8 @@ void GenerateItemPool() {
     for (auto dungeon : ctx->GetDungeons()->GetDungeonList()) {
       if (dungeon->HasKeyRing() && ctx->GetOption(RSK_KEYSANITY).IsNot(RO_DUNGEON_ITEM_LOC_STARTWITH)) {
         AddItemToMainPool(dungeon->GetKeyRing());
-      } else {
-        if (dungeon->GetSmallKeyCount() > 0) {
-          AddItemToMainPool(dungeon->GetSmallKey(), dungeon->GetSmallKeyCount());
-        }
+      } else if (dungeon->GetSmallKeyCount() > 0) {
+        AddItemToMainPool(dungeon->GetSmallKey(), dungeon->GetSmallKeyCount());
       }
     }
   }

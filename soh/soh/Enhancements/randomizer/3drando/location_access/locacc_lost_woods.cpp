@@ -55,8 +55,8 @@ void RegionTable_Init_LostWoods() {
 
   areaTable[RR_KF_OUTSIDE_DEKU_TREE] = Region("KF Outside Deku Tree", "Kokiri Forest", {RA_KOKIRI_FOREST}, NO_DAY_NIGHT_CYCLE, {
                   //Events
-                  EventAccess(&logic->DekuBabaSticks,           {[]{return logic->DekuBabaSticks || ((logic->IsAdult && (logic->CanUse(RG_MASTER_SWORD) || logic->CanUse(RG_BIGGORON_SWORD) || logic->CanUse(RG_KOKIRI_SWORD)) && !ctx->GetOption(RSK_SHUFFLE_DUNGEON_ENTRANCES)) || (logic->IsChild && (logic->CanUse(RG_KOKIRI_SWORD) || logic->CanUse(RG_BIGGORON_SWORD) || logic->CanUse(RG_MASTER_SWORD) || logic->CanUse(RG_BOOMERANG))));}}),
-                  EventAccess(&logic->DekuBabaNuts,             {[]{return logic->DekuBabaNuts   || ((logic->IsAdult && (logic->CanUse(RG_MASTER_SWORD) || logic->CanUse(RG_BIGGORON_SWORD) || logic->CanUse(RG_KOKIRI_SWORD)) && !ctx->GetOption(RSK_SHUFFLE_DUNGEON_ENTRANCES)) || (logic->IsChild && (logic->CanJumpslashExceptHammer() || logic->CanUse(RG_FAIRY_SLINGSHOT) || logic->HasExplosives() || logic->CanUse(RG_DINS_FIRE))));}}),
+                  EventAccess(&logic->DekuBabaSticks,           {[]{return logic->CanKillEnemy(RE_WITHERED_DEKU_BABA);}}),
+                  EventAccess(&logic->DekuBabaNuts,             {[]{return logic->CanGetDekuBabaNuts();}}),
                   EventAccess(&logic->ShowedMidoSwordAndShield, {[]{return logic->ShowedMidoSwordAndShield || (logic->IsChild && logic->CanUse(RG_KOKIRI_SWORD) && logic->CanUse(RG_DEKU_SHIELD));}}),
                 }, {
                   //Locations
@@ -311,7 +311,7 @@ void RegionTable_Init_LostWoods() {
 
   areaTable[RR_SFM_WOLFOS_GROTTO] = Region("SFM Wolfos Grotto", "SFM Wolfos Grotto", {}, NO_DAY_NIGHT_CYCLE, {}, {
                   //Locations
-                  LOCATION(RC_SFM_WOLFOS_GROTTO_CHEST, logic->IsAdult || logic->CanUse(RG_FAIRY_SLINGSHOT) || logic->CanUse(RG_STICKS) || logic->CanUse(RG_KOKIRI_SWORD) || logic->CanUse(RG_DINS_FIRE) || logic->CanUse(RG_MEGATON_HAMMER) || logic->CanUse(RG_MASTER_SWORD) || logic->CanUse(RG_BIGGORON_SWORD)), //RANDOTODO is this meant to auto-pass as adult?
+                  LOCATION(RC_SFM_WOLFOS_GROTTO_CHEST, logic->CanKillEnemy(RE_WOLFOS, ED_CLOSE, true, 2)),
                 }, {
                   //Exits
                   Entrance(RR_SFM_ENTRYWAY, {[]{return true;}}),
