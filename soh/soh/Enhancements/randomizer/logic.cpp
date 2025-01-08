@@ -822,8 +822,7 @@ namespace Rando {
     }
 
     bool Logic::CanBreakMudWalls() {
-        //RANDOTODO blue fire tricks
-        return BlastOrSmash();
+        return BlastOrSmash() || (ctx->GetTrickOption(RT_BLUE_FIRE_MUD_WALLS) && BlueFire());
     }
 
     bool Logic::CanGetDekuBabaSticks() {
