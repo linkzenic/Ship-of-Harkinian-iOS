@@ -1631,6 +1631,12 @@ void RandomizerOnVanillaBehaviorHandler(GIVanillaBehavior id, bool* should, va_l
             }
             break;
         }
+        case VB_HEALTH_METER_BE_CRITICAL: {
+            if (gSaveContext.health == gSaveContext.healthCapacity) {
+                *should = false;
+            }
+            break;
+        }
         case VB_FREEZE_ON_SKULL_TOKEN:
         case VB_TRADE_TIMER_ODD_MUSHROOM:
         case VB_TRADE_TIMER_FROG:
