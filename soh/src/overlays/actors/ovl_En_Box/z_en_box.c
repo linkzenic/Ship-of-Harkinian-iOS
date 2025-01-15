@@ -582,6 +582,7 @@ void EnBox_UpdateSizeAndTexture(EnBox* this, PlayState* play) {
         (play->sceneNum == SCENE_TREASURE_BOX_SHOP && this->dyna.actor.room != 6); // Exclude treasure game chests except for the final room
 
     if (!isVanilla) {
+        GetItemEntry test = this->getItemEntry;
         getItemCategory = this->getItemEntry.getItemCategory;
         // If they have bombchus, don't consider the bombchu item major
         if (

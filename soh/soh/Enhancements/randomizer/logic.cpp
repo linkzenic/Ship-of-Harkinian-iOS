@@ -649,7 +649,7 @@ namespace Rando {
             //RANDOTODO Dark link is buggy right now, retest when he is not
                 return CanJumpslash() || CanUse(RG_FAIRY_BOW);
             case RE_ANUBIS:
-                //there's a restoration that allows beating them with mirror shield + some way to trigger thier attack
+                //there's a restoration that allows beating them with mirror shield + some way to trigger their attack
                 return HasFireSource();
             case RE_BEAMOS:
                 return HasExplosives();
@@ -964,7 +964,7 @@ namespace Rando {
     }
 
     bool Logic::BombchusEnabled(){
-        return ctx->GetOption(RSK_BOMBCHUS_IN_LOGIC) ? CheckInventory(ITEM_BOMBCHU, true) : HasItem(RG_BOMB_BAG);
+        return ctx->GetOption(RSK_BOMBCHU_BAG) ? CheckInventory(ITEM_BOMBCHU, true) : HasItem(RG_BOMB_BAG);
     }
 
     // TODO: Implement Ammo Drop Setting in place of bombchu drops

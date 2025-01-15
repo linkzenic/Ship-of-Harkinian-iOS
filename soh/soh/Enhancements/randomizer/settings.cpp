@@ -143,7 +143,7 @@ void Settings::CreateOptions() {
     mOptions[RSK_MIX_INTERIOR_ENTRANCES] = Option::Bool("Mix Interiors", CVAR_RANDOMIZER_SETTING("MixInteriors"), mOptionDescriptions[RSK_MIX_INTERIOR_ENTRANCES], IMFLAG_NONE);
     mOptions[RSK_MIX_GROTTO_ENTRANCES] = Option::Bool("Mix Grottos", CVAR_RANDOMIZER_SETTING("MixGrottos"), mOptionDescriptions[RSK_MIX_GROTTO_ENTRANCES]);
     mOptions[RSK_DECOUPLED_ENTRANCES] = Option::Bool("Decouple Entrances", CVAR_RANDOMIZER_SETTING("DecoupleEntrances"), mOptionDescriptions[RSK_DECOUPLED_ENTRANCES]);
-    mOptions[RSK_BOMBCHUS_IN_LOGIC] = Option::Bool("Bombchus in Logic", CVAR_RANDOMIZER_SETTING("BombchusInLogic"), mOptionDescriptions[RSK_BOMBCHUS_IN_LOGIC]);
+    mOptions[RSK_BOMBCHU_BAG] = Option::Bool("Bombchu Bag", CVAR_RANDOMIZER_SETTING("BombchuBag"), mOptionDescriptions[RSK_BOMBCHU_BAG]);
     mOptions[RSK_ENABLE_BOMBCHU_DROPS] = Option::U8("Bombchu Drops", {"No", "Yes"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("EnableBombchuDrops"), mOptionDescriptions[RSK_ENABLE_BOMBCHU_DROPS], WidgetType::Combobox, RO_AMMO_DROPS_ON);
     // TODO: AmmoDrops and/or HeartDropRefill, combine with/separate Ammo Drops from Bombchu Drops?
     mOptions[RSK_TRIFORCE_HUNT] = Option::Bool("Triforce Hunt", CVAR_RANDOMIZER_SETTING("TriforceHunt"), mOptionDescriptions[RSK_TRIFORCE_HUNT], IMFLAG_NONE);
@@ -921,7 +921,7 @@ void Settings::CreateOptions() {
     }, WidgetContainerType::COLUMN);
     mOptionGroups[RSG_ADDITIONAL_FEATURES_IMGUI] = OptionGroup::SubGroup("Additional Features", {
         &mOptions[RSK_FULL_WALLETS],
-        &mOptions[RSK_BOMBCHUS_IN_LOGIC],
+        &mOptions[RSK_BOMBCHU_BAG],
         &mOptions[RSK_ENABLE_BOMBCHU_DROPS],
         &mOptions[RSK_BLUE_FIRE_ARROWS],
         &mOptions[RSK_SUNLIGHT_ARROWS],
@@ -1006,7 +1006,7 @@ void Settings::CreateOptions() {
         &mOptions[RSK_MIX_INTERIOR_ENTRANCES],
         &mOptions[RSK_MIX_GROTTO_ENTRANCES],
         &mOptions[RSK_DECOUPLED_ENTRANCES],
-        &mOptions[RSK_BOMBCHUS_IN_LOGIC],
+        &mOptions[RSK_BOMBCHU_BAG],
         &mOptions[RSK_ENABLE_BOMBCHU_DROPS],
         &mOptions[RSK_TRIFORCE_HUNT],
         &mOptions[RSK_TRIFORCE_HUNT_PIECES_TOTAL],
