@@ -1546,7 +1546,7 @@ void DrawLocation(RandomizerCheck rc) {
             SaveManager::Instance->SaveSection(gSaveContext.fileNum, sectionId, true);
         }
     } else {
-        ImGui::InvisibleButton("", ImVec2(20.0f, 10.0f));
+        ImGui::Dummy(ImVec2(20.0f, 10.0f));
     }
     ImGui::SameLine();
 
