@@ -1360,7 +1360,7 @@ bool IsVisibleInCheckTracker(RandomizerCheck rc) {
                 OTRGlobals::Instance->gRandoContext->IsQuestOfLocationActive(rc)
             ) || (loc->GetRCType() == RCTYPE_SHOP && showShops && !hideShopUnshuffledChecks);
     } else {
-        return loc->IsVanillaCompletion() && (!loc->IsDungeon() || (loc->IsDungeon() && loc->GetQuest() == gSaveContext.questId));
+        return loc->IsVanillaCompletion() && (!loc->IsDungeon() || (loc->IsDungeon() && loc->GetQuest() == gSaveContext.ship.quest.id));
     }
 }
 
