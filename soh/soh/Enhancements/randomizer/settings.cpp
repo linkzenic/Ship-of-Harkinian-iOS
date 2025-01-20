@@ -533,7 +533,8 @@ void Settings::CreateOptions() {
     });
     // TODO: Exclude Locations Menus
     mTricksByArea.clear();
-    std::vector<Option*> tricksOption(mTrickOptions.size());
+    std::vector<Option*> tricksOption;
+    tricksOption.reserve(mTrickOptions.size());
     for (int i = 0; i < RT_MAX; i++) {
         auto trick = &mTrickOptions[i];
         if (!trick->GetName().empty()) {
