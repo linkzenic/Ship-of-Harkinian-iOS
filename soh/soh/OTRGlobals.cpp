@@ -2432,6 +2432,10 @@ void SoH_ProcessDroppedFiles(std::string filePath) {
             }
         }
 
+        auto randoCtx = Rando::Context::GetInstance();
+        randoCtx->GetSettings()->UpdateOptionProperties();
+        randoCtx->GetSettings()->SetAllFromCVar();
+
         auto gui = Ship::Context::GetInstance()->GetWindow()->GetGui();
         gui->GetGuiWindow("Console")->Hide();
         gui->GetGuiWindow("Actor Viewer")->Hide();
