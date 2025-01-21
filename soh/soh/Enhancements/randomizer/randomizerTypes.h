@@ -5131,7 +5131,6 @@ typedef enum {
     RSK_SKIP_EPONA_RACE,
     RSK_COMPLETE_MASK_QUEST,
     RSK_SKIP_SCARECROWS_SONG,
-    RSK_ENABLE_GLITCH_CUTSCENES,
     RSK_SKULLS_SUNS_SONG,
     RSK_SHUFFLE_ADULT_TRADE,
     RSK_SHUFFLE_MERCHANTS,
@@ -5575,7 +5574,6 @@ typedef enum {
 // Logic (glitchless/no logic)
 typedef enum {
     RO_LOGIC_GLITCHLESS,
-    RO_LOGIC_GLITCHED,
     RO_LOGIC_NO_LOGIC,
     RO_LOGIC_VANILLA,
 } RandoOptionLogic;
