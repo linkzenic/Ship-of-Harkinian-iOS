@@ -5388,6 +5388,7 @@ typedef enum {
 
 //Dungeon reward settings
 typedef enum {
+    RO_DUNGEON_REWARDS_VANILLA,
     RO_DUNGEON_REWARDS_END_OF_DUNGEON,
     RO_DUNGEON_REWARDS_ANY_DUNGEON,
     RO_DUNGEON_REWARDS_OVERWORLD,

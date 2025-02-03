@@ -8,8 +8,8 @@ std::multimap<std::tuple<s16, s16, s32>, RandomizerCheck> Rando::StaticData::Che
 
 std::vector<RandomizerCheck> Rando::StaticData::dungeonRewardLocations = {
     // Bosses
-    RC_QUEEN_GOHMA, RC_KING_DODONGO, RC_BARINADE,    RC_PHANTOM_GANON, RC_VOLVAGIA,
-    RC_MORPHA,      RC_TWINROVA,     RC_BONGO_BONGO, RC_LINKS_POCKET,
+    RC_QUEEN_GOHMA,   RC_KING_DODONGO, RC_BARINADE,
+    RC_PHANTOM_GANON, RC_VOLVAGIA,     RC_MORPHA,   RC_TWINROVA, RC_BONGO_BONGO,
 };
 
 using namespace Rando;
