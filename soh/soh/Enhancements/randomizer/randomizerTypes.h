@@ -5724,6 +5724,7 @@ typedef enum {
     RE_DINOLFOS,
     RE_TORCH_SLUG,
     RE_FREEZARD,
+    RE_SHELL_BLADE,
     RE_SPIKE,
     RE_WHITE_WOLFOS,
     RE_STINGER,
