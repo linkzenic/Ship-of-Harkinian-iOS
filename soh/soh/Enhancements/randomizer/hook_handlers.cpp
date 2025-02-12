@@ -232,7 +232,7 @@ void RandomizerOnFlagSetHandler(int16_t flagType, int16_t flag) {
     if (rc == RC_UNKNOWN_CHECK) return;
 
     auto loc = Rando::Context::GetInstance()->GetItemLocation(rc);
-    if (loc == nullptr || loc->HasObtained()) return;
+    if (loc == nullptr || loc->HasObtained() || loc->GetPlacedRandomizerGet() == RG_NONE) return;
 
     SPDLOG_INFO("Queuing RC: {}", static_cast<uint32_t>(rc));
     randomizerQueuedChecks.push(rc);
@@ -250,7 +250,7 @@ void RandomizerOnSceneFlagSetHandler(int16_t sceneNum, int16_t flagType, int16_t
     if (rc == RC_UNKNOWN_CHECK) return;
 
     auto loc = Rando::Context::GetInstance()->GetItemLocation(rc);
-    if (loc == nullptr || loc->HasObtained()) return;
+    if (loc == nullptr || loc->HasObtained() || loc->GetPlacedRandomizerGet() == RG_NONE) return;
 
     SPDLOG_INFO("Queuing RC: {}", static_cast<uint32_t>(rc));
     randomizerQueuedChecks.push(rc);
@@ -813,7 +813,10 @@ void RandomizerOnVanillaBehaviorHandler(GIVanillaBehavior id, bool* should, va_l
         case VB_GIVE_ITEM_FROM_CHEST: {
             EnBox* chest = va_arg(args, EnBox*);
             RandomizerCheck rc = OTRGlobals::Instance->gRandomizer->GetCheckFromActor(chest->dyna.actor.id, gPlayState->sceneNum, chest->dyna.actor.params);
-            
+            if (!OTRGlobals::Instance->gRandoContext->IsLocationShuffled(rc)) {
+                break;
+            }
+
             // if this is a treasure chest game chest then set the appropriate rando inf
             RandomizerSetChestGameRandomizerInf(rc);
 
