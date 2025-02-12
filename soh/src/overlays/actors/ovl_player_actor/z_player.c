@@ -7381,7 +7381,7 @@ s32 Player_ActionHandler_2(Player* this, PlayState* play) {
             }
 
             if ((this->heldActor == NULL) || Player_HoldsHookshot(this)) {
-                if ((interactedActor->id == ACTOR_BG_TOKI_SWD) && LINK_IS_ADULT) {
+                if (GameInteractor_Should(VB_SHOW_MASTER_SWORD_TO_PLACE_IN_PEDESTAL, (interactedActor->id == ACTOR_BG_TOKI_SWD) && LINK_IS_ADULT)) {
                     s32 sp24 = this->itemAction;
 
                     this->itemAction = PLAYER_IA_NONE;
@@ -10853,7 +10853,9 @@ void Player_Init(Actor* thisx, PlayState* play2) {
         }
     }
 
-    sStartModeFuncs[startMode](play, this);
+    if (GameInteractor_Should(VB_EXECUTE_PLAYER_STARTMODE_FUNC, true, startMode)) {
+        sStartModeFuncs[startMode](play, this);
+    }
 
     if (startMode != PLAYER_START_MODE_NOTHING) {
         if ((gSaveContext.gameMode == 0) || (gSaveContext.gameMode == 3)) {
