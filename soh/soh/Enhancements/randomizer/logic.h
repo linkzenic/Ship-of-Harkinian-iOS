@@ -36,7 +36,6 @@ class Logic {
 
     // Adult logic
     bool FreedEpona = false;
-    //bool BigPoe = false; //unused
 
     // Trade Quest Events
     bool WakeUpAdultTalon = false;
@@ -101,6 +100,7 @@ class Logic {
     bool IsChild = false;
     bool IsAdult = false;
     bool BigPoeKill = false;
+    uint8_t BigPoes = 0;
     uint8_t BaseHearts = 0;
 
     // Bridge and LACS Requirements
