@@ -26,7 +26,6 @@ extern "C" {
 #include "soh/Enhancements/randomizer/randomizer_grotto.h"
 #include "src/overlays/actors/ovl_Bg_Treemouth/z_bg_treemouth.h"
 #include "src/overlays/actors/ovl_En_Si/z_en_si.h"
-#include "src/overlays/actors/ovl_En_Cow/z_en_cow.h"
 #include "src/overlays/actors/ovl_En_Shopnuts/z_en_shopnuts.h"
 #include "src/overlays/actors/ovl_En_Dns/z_en_dns.h"
 #include "src/overlays/actors/ovl_En_Gb/z_en_gb.h"
@@ -509,33 +508,6 @@ void ItemEtcetera_UpdateRandomizedFireArrow(ItemEtcetera* itemEtcetera, PlayStat
         itemEtcetera->actor.gravity = -0.1f;
         itemEtcetera->actor.minVelocityY = -4.0f;
         itemEtcetera->actionFunc = ItemEtcetera_MoveRandomizedFireArrowDown;
-    }
-}
-
-void EnCow_MoveForRandomizer(EnCow* enCow, PlayState* play) {
-    bool moved = false;
-
-    // Don't reposition the tail
-    if (enCow->actor.params != 0) {
-        return;
-    }
-
-    // Move left cow in lon lon tower
-    if (play->sceneNum == SCENE_LON_LON_BUILDINGS && enCow->actor.world.pos.x == -108 &&
-        enCow->actor.world.pos.z == -65) {
-        enCow->actor.world.pos.x = -229.0f;
-        enCow->actor.world.pos.z = 157.0f;
-        enCow->actor.shape.rot.y = 15783.0f;
-        moved = true;
-        // Move right cow in lon lon stable
-    } else if (play->sceneNum == SCENE_STABLE && enCow->actor.world.pos.x == -3 && enCow->actor.world.pos.z == -254) {
-        enCow->actor.world.pos.x += 119.0f;
-        moved = true;
-    }
-
-    if (moved) {
-        // Reposition collider
-        func_809DEE9C(enCow);
     }
 }
 
@@ -1060,23 +1032,6 @@ void RandomizerOnVanillaBehaviorHandler(GIVanillaBehavior id, bool* should, va_l
             *should = !Flags_GetEventChkInf(EVENTCHKINF_LEARNED_SARIAS_SONG);
             break;
         }
-        case VB_GIVE_ITEM_FROM_COW: {
-            if (!RAND_GET_OPTION(RSK_SHUFFLE_COWS)) {
-                break;
-            }
-            EnCow* enCow = va_arg(args, EnCow*);
-            CowIdentity cowIdentity = OTRGlobals::Instance->gRandomizer->IdentifyCow(gPlayState->sceneNum, enCow->actor.world.pos.x, enCow->actor.world.pos.z);
-            // Has this cow already rewarded an item?
-            if (Flags_GetRandomizerInf(cowIdentity.randomizerInf)) {
-                break;
-            }
-            Flags_SetRandomizerInf(cowIdentity.randomizerInf);
-            // setting the ocarina mode here prevents intermittent issues
-            // with the item get not triggering until walking away
-            gPlayState->msgCtx.ocarinaMode = OCARINA_MODE_00;
-            *should = false;
-            break;
-        }
         case VB_GIVE_ITEM_FROM_GRANNYS_SHOP: {
             if (!EnDs_RandoCanGetGrannyItem()) {
                 break;
@@ -1255,15 +1210,6 @@ void RandomizerOnVanillaBehaviorHandler(GIVanillaBehavior id, bool* should, va_l
         case VB_TRADE_FROG: {
             Randomizer_ConsumeAdultTradeItem(gPlayState, ITEM_FROG);
             *should = false;
-            break;
-        }
-        case VB_DESPAWN_HORSE_RACE_COW: {
-            if (!RAND_GET_OPTION(RSK_SHUFFLE_COWS)) {
-                break;
-            }
-            EnCow* enCow = va_arg(args, EnCow*);
-            // If this is a cow we have to move, then move it now.
-            EnCow_MoveForRandomizer(enCow, gPlayState);
             break;
         }
         case VB_BUSINESS_SCRUB_DESPAWN: {
