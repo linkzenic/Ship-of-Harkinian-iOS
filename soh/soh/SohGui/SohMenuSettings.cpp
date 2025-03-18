@@ -201,18 +201,10 @@ void SohMenu::AddMenuSettings() {
     AddWidget(path, "Audio API (Needs reload)", WIDGET_AUDIO_BACKEND);
 
     // Graphics Settings
-    static int32_t maxFps;
-    const char* tooltip = "";
-    if (Ship::Context::GetInstance()->GetWindow()->GetWindowBackend() == Ship::WindowBackend::FAST3D_DXGI_DX11) {
-        maxFps = 360;
-        tooltip = "Uses Matrix Interpolation to create extra frames, resulting in smoother graphics. This is "
-                  "purely visual and does not impact game logic, execution of glitches etc.\n\nA higher target "
-                  "FPS than your monitor's refresh rate will waste resources, and might give a worse result.";
-    } else {
-        maxFps = Ship::Context::GetInstance()->GetWindow()->GetCurrentRefreshRate();
-        tooltip = "Uses Matrix Interpolation to create extra frames, resulting in smoother graphics. This is "
-                  "purely visual and does not impact game logic, execution of glitches etc.";
-    }
+    static int32_t maxFps = 360;
+    const char* tooltip = "Uses Matrix Interpolation to create extra frames, resulting in smoother graphics. This is "
+                          "purely visual and does not impact game logic, execution of glitches etc.\n\nA higher target "
+                          "FPS than your monitor's refresh rate will waste resources, and might give a worse result.";
     path.sidebarName = "Graphics";
     AddSidebarEntry("Settings", "Graphics", 3);
     AddWidget(path, "Toggle Fullscreen", WIDGET_CVAR_CHECKBOX)
@@ -276,25 +268,14 @@ void SohMenu::AddMenuSettings() {
             info.activeDisables.push_back(DISABLE_FOR_MATCH_REFRESH_RATE_ON);
             })
         .Options(IntSliderOptions().Tooltip(tooltip).Min(20).Max(maxFps).DefaultValue(20).Format(fpsFormat));
-    AddWidget(path, "Match Refresh Rate", WIDGET_BUTTON)
-        .Callback([](WidgetInfo& info) {
-            int hz = Ship::Context::GetInstance()->GetWindow()->GetCurrentRefreshRate();
-            if (hz >= 20 && hz <= 360) {
-                CVarSetInteger(CVAR_SETTING("InterpolationFPS"), hz);
-                Ship::Context::GetInstance()->GetWindow()->GetGui()->SaveConsoleVariablesNextFrame();
-            }
-        })
-        .PreFunc([](WidgetInfo& info) { info.isHidden = mSohMenu->disabledMap.at(DISABLE_FOR_NOT_DIRECTX).active; })
-        .Options(ButtonOptions().Tooltip("Matches interpolation value to the current game's window refresh rate."));
     AddWidget(path, "Match Refresh Rate", WIDGET_CVAR_CHECKBOX)
-        .CVar("gMatchRefreshRate")
-        .PreFunc([](WidgetInfo& info) { info.isHidden = mSohMenu->disabledMap.at(DISABLE_FOR_DIRECTX).active; })
-        .Options(CheckboxOptions().Tooltip("Matches interpolation value to the current game's window refresh rate."));
+        .CVar(CVAR_SETTING("MatchRefreshRate"))
+        .Options(CheckboxOptions().Tooltip("Matches interpolation value to the refresh rate of your display."));
     AddWidget(path, "Renderer API (Needs reload)", WIDGET_VIDEO_BACKEND);
     AddWidget(path, "Enable Vsync", WIDGET_CVAR_CHECKBOX)
         .CVar(CVAR_VSYNC_ENABLED)
         .PreFunc([](WidgetInfo& info) { info.isHidden = mSohMenu->disabledMap.at(DISABLE_FOR_NO_VSYNC).active; })
-        .Options(CheckboxOptions().Tooltip("Enables Vsync."));
+        .Options(CheckboxOptions().Tooltip("Removes tearing, but clamps your max FPS to your displays refresh rate."));
     AddWidget(path, "Windowed Fullscreen", WIDGET_CVAR_CHECKBOX)
         .CVar(CVAR_SDL_WINDOWED_FULLSCREEN)
         .PreFunc([](WidgetInfo& info) {
