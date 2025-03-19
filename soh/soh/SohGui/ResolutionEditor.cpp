@@ -360,10 +360,10 @@ void RegisterResolutionWidgets() {
                     WIDGET_TEXT)
         .PreFunc(
             [](WidgetInfo& info) { info.isHidden = !(!CVarGetInteger(CVAR_LOW_RES_MODE, 0) && IsDroppingFrames()); })
-        .Options(WidgetOptions().Color(Colors::Orange));
+        .Options(TextOptions().Color(Colors::Orange));
     mSohMenu->AddWidget(path, ICON_FA_QUESTION_CIRCLE " \"N64 Mode\" is overriding these settings.", WIDGET_TEXT)
         .PreFunc([](WidgetInfo& info) { info.isHidden = !CVarGetInteger(CVAR_LOW_RES_MODE, 0); })
-        .Options(WidgetOptions().Color(Colors::LightBlue));
+        .Options(TextOptions().Color(Colors::LightBlue));
     mSohMenu->AddWidget(path, "Click to disable N64 mode", WIDGET_BUTTON)
         .PreFunc([](WidgetInfo& info) { info.isHidden = !CVarGetInteger(CVAR_LOW_RES_MODE, 0); })
         .Callback([](WidgetInfo& info) {
@@ -391,7 +391,7 @@ void RegisterResolutionWidgets() {
             }
         })
         .SameLine(true)
-        .Options(WidgetOptions().Color(Colors::Gray));
+        .Options(TextOptions().Color(Colors::Gray));
     // Presets
     mSohMenu->AddWidget(path, "Aspect Ratio", WIDGET_COMBOBOX)
         .ValuePointer(&item_aspectRatio)

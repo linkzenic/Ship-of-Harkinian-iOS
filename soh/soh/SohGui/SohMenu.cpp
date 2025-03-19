@@ -64,10 +64,12 @@ WidgetInfo& SohMenu::AddWidget(WidgetPath& pathInfo, std::string widgetName, Wid
         case WIDGET_COLOR_24:
         case WIDGET_COLOR_32:
             break;
-        case WIDGET_SEARCH:
-        case WIDGET_SEPARATOR:
         case WIDGET_SEPARATOR_TEXT:
         case WIDGET_TEXT:
+            widget.options = std::make_shared<TextOptions>();
+            break;
+        case WIDGET_SEARCH:
+        case WIDGET_SEPARATOR:
         default:
             widget.options = std::make_shared<WidgetOptions>();
     }

@@ -193,8 +193,8 @@ bool WindowButton(const char* label, const char* cvarName, std::shared_ptr<Ship:
     } else {
         buttonText = ICON_FA_EXTERNAL_LINK_SQUARE " " + buttonText;
     }
-    if (Button(buttonText.c_str(), {{ options.tooltip, options.disabled, options.disabledTooltip, options.color },
-                                      options.size, options.padding })) {
+    if (Button(buttonText.c_str(), {{ options.tooltip, options.disabled, options.disabledTooltip },
+                                      options.size, options.padding, options.color })) {
         windowPtr->ToggleVisibility();
         dirty = true;
     }

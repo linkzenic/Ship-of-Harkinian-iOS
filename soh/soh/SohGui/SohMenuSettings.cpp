@@ -132,7 +132,7 @@ void SohMenu::AddMenuSettings() {
         .CVar(CVAR_SETTING("A11yDisableIdleCam"))
         .Options(CheckboxOptions().Tooltip("Disables the automatic re-centering of the camera when idle."));
     AddWidget(path, "EXPERIMENTAL", WIDGET_SEPARATOR_TEXT)
-        .Options(WidgetOptions().Color(Colors::Orange));
+        .Options(TextOptions().Color(Colors::Orange));
     AddWidget(path, "ImGui Menu Scaling", WIDGET_CVAR_COMBOBOX)
         .CVar(CVAR_SETTING("ImGuiScale"))
         .Options(ComboboxOptions().ComboMap(imguiScaleOptions).Tooltip("Changes the scaling of the ImGui menu elements.").DefaultIndex(1)

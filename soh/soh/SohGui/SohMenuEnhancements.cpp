@@ -1684,7 +1684,7 @@ void SohMenu::AddMenuEnhancements() {
     path.column = SECTION_COLUMN_3;
     AddWidget(path, "Save States", WIDGET_SEPARATOR_TEXT);
     AddWidget(path, ICON_FA_EXCLAMATION_TRIANGLE " WARNING!!!! " ICON_FA_EXCLAMATION_TRIANGLE, WIDGET_TEXT)
-        .Options(WidgetOptions().Color(Colors::Orange));
+        .Options(TextOptions().Color(Colors::Orange));
     AddWidget(path,
               "These are NOT like emulator states. They do not save your game progress "
               "and they WILL break across transitions and load zones (like doors). "
