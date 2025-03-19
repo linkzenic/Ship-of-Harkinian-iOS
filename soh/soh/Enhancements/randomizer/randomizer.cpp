@@ -2749,10 +2749,10 @@ CustomMessage Randomizer::GetMapGetItemMessageWithHint(GetItemEntry itemEntry) {
 }
 
 template<size_t N>
-void CreateGetItemMessages(const std::array<GetItemMessage, N>* messageEntries) {
+void CreateGetItemMessages(const std::array<GetItemMessage, N>& messageEntries) {
     CustomMessageManager* customMessageManager = CustomMessageManager::Instance;
     customMessageManager->AddCustomMessageTable(Randomizer::getItemMessageTableID);
-    for (const GetItemMessage& messageEntry : *messageEntries) {
+    for (const GetItemMessage& messageEntry : messageEntries) {
         customMessageManager->CreateGetItemMessage(
             Randomizer::getItemMessageTableID, messageEntry.giid, messageEntry.iid,
             CustomMessage(messageEntry.english, messageEntry.german, messageEntry.french, TEXTBOX_TYPE_BLUE,
@@ -3816,7 +3816,7 @@ void Randomizer::CreateCustomMessages() {
             "You found the %rDeku Nut Bag%w!&You can now hold deku nuts!",
             "Vous avez trouvé le %rSac de Noix& Mojo%w!&Vous pouvez maintenant porter des&Noix Mojo!"),
     }};
-    CreateGetItemMessages(&getItemMessages);
+    CreateGetItemMessages(getItemMessages);
     CreateRupeeMessages();
     CreateTriforcePieceMessages();
     CreateNaviRandoMessages();
