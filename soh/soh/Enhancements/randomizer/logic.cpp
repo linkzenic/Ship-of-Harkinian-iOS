@@ -671,7 +671,7 @@ namespace Rando {
                 }
                 return killed;
             case RE_BIG_OCTO:
-                //If chasing octo is annoying but with rolls you can catch him, and you need rang to get into this room without shenanigains anyway. Bunny makes it free
+                //If chasing octo is annoying but with rolls you can catch him, and you need rang to get into this room without shenanigans anyway. Bunny makes it free
                 return CanUse(RG_KOKIRI_SWORD) || CanUse(RG_STICKS) || CanUse(RG_MASTER_SWORD);
             case RE_GOHMA:
                 return HasBossSoul(RG_GOHMA_SOUL) && CanJumpslash() &&
@@ -2338,7 +2338,6 @@ namespace Rando {
         MQSpiritMapRoomEnemies    = false;
         MQSpirit3SunsEnemies      = false;
         Spirit1FSilverRupees      = false;
-        JabuRutoInB1              = false;
         JabuRutoIn1F              = false;
 
         StopPerformanceTimer(PT_LOGIC_RESET);
