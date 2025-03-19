@@ -2045,8 +2045,8 @@ void CosmeticsEditorWindow::DrawElement() {
                              UIWidgets::ComboboxOptions()
                                  .DefaultIndex(COLORSCHEME_N64)
                                  .Color(THEME_COLOR)
-                                 .LabelPosition(UIWidgets::LabelPosition::Near)
-                                 .ComponentAlignment(UIWidgets::ComponentAlignment::Right));
+                                 .LabelPosition(UIWidgets::LabelPositions::Near)
+                                 .ComponentAlignment(UIWidgets::ComponentAlignments::Right));
     UIWidgets::CVarCheckbox("Sync Rainbow colors", CVAR_COSMETIC("RainbowSync"),
                              UIWidgets::CheckboxOptions()
                                  .Color(THEME_COLOR));
