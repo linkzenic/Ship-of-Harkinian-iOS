@@ -1066,6 +1066,11 @@ void TimeSaverOnSceneInitHandler(int16_t sceneNum) {
 static GetItemEntry vanillaQueuedItemEntry = GET_ITEM_NONE;
 
 void TimeSaverOnFlagSetHandler(int16_t flagType, int16_t flag) {
+    // Do nothing when in a boss rush
+    if (IS_BOSS_RUSH) {
+        return;
+    }
+
     if (CVarGetInteger(CVAR_ENHANCEMENT("TimeSavers.SkipCutscene.Story"), IS_RANDO)) {
         switch (flagType) {
             case FLAG_EVENT_CHECK_INF:
