@@ -113,6 +113,7 @@ namespace SohGui {
             gui->GetGameOverlay()->TextDrawNotification(30.0f, true, "Press - to access enhancements menu");
 #else
             gui->GetGameOverlay()->TextDrawNotification(30.0f, true, "Press F1 to access enhancements menu");
+            gui->GetGameOverlay()->TextDrawNotification(30.0f, true, "Press F2 to enable the mouse cursor");
 #endif
         }*/
 
