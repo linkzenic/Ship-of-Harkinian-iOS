@@ -1639,6 +1639,14 @@ typedef enum {
     // true
     // ```
     // #### `args`
+    // - `int32_t` (button - promoted from `s16`)
+    VB_SET_BUTTON_ITEM_FROM_C_BUTTON_SLOT,
+
+    // #### `result`
+    // ```c
+    // true
+    // ```
+    // #### `args`
     // - `*EnNiwLady`
     VB_SET_CUCCO_COUNT,
 
@@ -1907,6 +1915,15 @@ typedef enum {
     // #### `args`
     // - `*PauseContext`
     VB_TRANSITION_TO_SAVE_SCREEN_ON_DEATH,
+
+    // #### `result`
+    // ```c
+    // true
+    // ```
+    // #### `args`
+    // - `int32_t` (button - promoted from `u8`)
+    // - `int32_t` (item - promoted from `u8`)
+    VB_UPDATE_BOTTLE_ITEM,
 
     // #### `result`
     // ```c
