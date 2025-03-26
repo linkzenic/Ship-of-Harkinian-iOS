@@ -126,6 +126,10 @@ void StaticData::HintTable_Init_Exclude_Dungeon() {
     hintTextTable[RHT_DEKU_TREE_GRASS] = HintText(CustomMessage("They say that some #grass in the Deku Tree# hides #[[1]]#.",
                                                      /*german*/ "",
                                                      /*french*/ "", {QM_RED, QM_GREEN}));
+													 
+    hintTextTable[RHT_CRATE_DEKU_TREE] = HintText(CustomMessage("They say that a #crate in the Deku Tree# contains #[[1]]#.",
+                                                     /*german*/ "",
+                                                     /*french*/ "Selon moi, une #caisse dans l'Arbre Mojo# contient #[[1]]#.", {QM_RED, QM_GREEN}));
 
   /*--------------------------
   |     DODONGOS CAVERN      |
@@ -304,7 +308,10 @@ void StaticData::HintTable_Init_Exclude_Dungeon() {
     hintTextTable[RHT_DODONGOS_CAVERN_GRASS] = HintText(CustomMessage("They say that some #grass in Dodongo's Cavern# hides #[[1]]#.",
                                                                             /*german*/ "!!!",
                                                                             /*french*/ "", {QM_RED, QM_GREEN}));
-
+																			
+    hintTextTable[RHT_CRATE_DODONGOS_CAVERN] = HintText(CustomMessage("They say that a #crate in Dodongo's Cavern# contains #[[1]]#.",
+                                                     /*german*/ "",
+                                                     /*french*/ "Selon moi, une #caisse dans la Caverne Dodongo# contient #[[1]]#.", {QM_RED, QM_GREEN}));
 
   /*--------------------------
   |     JABU JABUS BELLY     |
@@ -468,6 +475,10 @@ void StaticData::HintTable_Init_Exclude_Dungeon() {
     hintTextTable[RHT_JABU_JABUS_BELLY_GRASS] = HintText(CustomMessage("They say that some #grass in Jabu Jabu's Belly# hides #[[1]]#.",
                                                      /*german*/ "",
                                                      /*french*/ "", {QM_RED, QM_GREEN}));
+													 
+    hintTextTable[RHT_CRATE_JABU_JABU] = HintText(CustomMessage("They say that a #crate in Jabu Jabu's Belly# contains #[[1]]#.",
+                                                     /*german*/ "",
+                                                     /*french*/ "Selon moi, une #caisse dans le Ventre de Jabu-Jabu# contient #[[1]]#.", {QM_RED, QM_GREEN}));
 
   /*--------------------------
   |      FOREST TEMPLE       |
@@ -699,6 +710,10 @@ void StaticData::HintTable_Init_Exclude_Dungeon() {
                                                        /*german*/ "Man erzählt sich, daß ein #Herz im Waldtempel# #[[1]]# verstecke.",
                                                        /*french*/ "Selon moi, un #coeur dans le Temple de la Fôret# cache #[[1]]#.", {QM_RED, QM_GREEN}));
 
+    hintTextTable[RHT_CRATE_FOREST_TEMPLE] = HintText(CustomMessage("They say that a #crate in Forest Temple# contains #[[1]]#.",
+                                                     /*german*/ "",
+                                                     /*french*/ "Selon moi, une #caisse dans le Temple de la Fôret# contient #[[1]]#.", {QM_RED, QM_GREEN}));
+
   /*--------------------------
   |       FIRE TEMPLE        |
   ---------------------------*/
@@ -903,6 +918,10 @@ void StaticData::HintTable_Init_Exclude_Dungeon() {
                                                                                 /*german*/ "!!!",
                                                                                 /*french*/ "Selon moi, #appeler le soleil derrière le trône d’un chevalier dans un volcan# révèle #[[1]]#.", {QM_RED, QM_GREEN}));
 
+    hintTextTable[RHT_CRATE_FIRE_TEMPLE] = HintText(CustomMessage("They say that a #crate in Fire Temple# contains #[[1]]#.",
+                                                     /*german*/ "",
+                                                     /*french*/ "Selon moi, une #caisse dans le Temple du Feu# contient #[[1]]#.", {QM_RED, QM_GREEN}));
+
   /*--------------------------
   |       WATER TEMPLE       |
   ---------------------------*/
@@ -1049,6 +1068,10 @@ void StaticData::HintTable_Init_Exclude_Dungeon() {
     hintTextTable[RHT_WATER_TEMPLE_MQ_DARK_LINK_RIGHT_SUN_FAIRY] = HintText(CustomMessage("They say that #calling the sun before a duel with one's shadow# reveals #[[1]]#.",
                                                                                /*german*/ "!!!",
                                                                                /*french*/ "Selon moi, #appeler le soleil avant un duel avec son ombre# révèle #[[1]]#.", {QM_RED, QM_GREEN}));
+
+    hintTextTable[RHT_CRATE_WATER_TEMPLE] = HintText(CustomMessage("They say that a #crate in Water Temple# contains #[[1]]#.",
+                                                     /*german*/ "",
+                                                     /*french*/ "Selon moi, une #caisse dans le Temple de l'Eau# contient #[[1]]#.", {QM_RED, QM_GREEN}));
 
   /*--------------------------
   |      SPIRIT TEMPLE       |
@@ -1294,6 +1317,10 @@ void StaticData::HintTable_Init_Exclude_Dungeon() {
     hintTextTable[RHT_SPIRIT_TEMPLE_MQ_HEART] = HintText(CustomMessage("They say that guarded by a #ring of flame# in the Spirit Temple is #[[1]]#.",
                                                          /*german*/ "",
                                                          /*french*/ "Selon moi, protégé par un #cercle de flammes# dans le Temple de l'Esprit se trouve #[[1]]#.", {QM_RED, QM_GREEN}));
+
+    hintTextTable[RHT_CRATE_SPIRIT_TEMPLE] = HintText(CustomMessage("They say that a #crate in Spirit Temple# contains #[[1]]#.",
+                                                     /*german*/ "",
+                                                     /*french*/ "Selon moi, une #caisse dans le Temple de l'Esprit# contient #[[1]]#.", {QM_RED, QM_GREEN}));
 
   /*--------------------------
   |      SHADOW TEMPLE       |
@@ -1557,6 +1584,10 @@ void StaticData::HintTable_Init_Exclude_Dungeon() {
     hintTextTable[RHT_SHADOW_TEMPLE_WIND_HINT_SUN_FAIRY] = HintText(CustomMessage("They say that an #calling the sun near an invisible chest guarded by the dead# reveals #[[1]]#.",
                                                                        /*german*/ "!!!",
                                                                        /*french*/ "Selon moi, #appeler le soleil près d’un coffre invisible gardé par les morts# révèle #[[1]]#.", {QM_RED, QM_GREEN}));
+
+    hintTextTable[RHT_CRATE_SHADOW_TEMPLE] = HintText(CustomMessage("They say that a #crate in Shadow Temple# contains #[[1]]#.",
+                                                     /*german*/ "",
+                                                     /*french*/ "Selon moi, une #caisse dans le Temple de l'Ombre# contient #[[1]]#.", {QM_RED, QM_GREEN}));
 
   /*--------------------------
   |    BOTTOM OF THE WELL    |
@@ -1980,6 +2011,10 @@ void StaticData::HintTable_Init_Exclude_Dungeon() {
     hintTextTable[RHT_GERUDO_TRAINING_GROUNDS_HEART] = HintText(CustomMessage("They say that a watching a #trial with Dinolfos# is #[[1]]#.",
                                                                    /*german*/ "Man erzählt sich, daß das Sehen einer #Prüfung mit Dinodorus# #[[1]]# enthülle.",
                                                                    /*french*/ "Selon moi, dans #une épreuve avec un Dinolfos# révèle #[[1]]#.", {QM_RED, QM_GREEN}));
+
+    hintTextTable[RHT_CRATE_GERUDO_TRAINING_GROUND] = HintText(CustomMessage("They say that a #crate in Gerudo Training Ground# contains #[[1]]#.",
+                                                     /*german*/ "",
+                                                     /*french*/ "Selon moi, une #caisse dans le Gymnase Gerudo# contient #[[1]]#.", {QM_RED, QM_GREEN}));
 
   /*--------------------------
   |      GANONS CASTLE       |
