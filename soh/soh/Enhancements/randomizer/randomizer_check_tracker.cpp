@@ -59,6 +59,8 @@ bool showWeirdEgg;
 bool showGerudoCard;
 bool showOverworldPots;
 bool showDungeonPots;
+bool showOverworldGrass;
+bool showDungeonGrass;
 bool showFrogSongRupees;
 bool showFairies;
 bool showStartingMapsCompasses;
@@ -1269,11 +1271,32 @@ void LoadSettings() {
                 showDungeonPots = false;
                 break;
         }
+
+        switch (OTRGlobals::Instance->gRandomizer->GetRandoSettingValue(RSK_SHUFFLE_GRASS)) {
+            case RO_SHUFFLE_GRASS_ALL:
+                showOverworldGrass = true;
+                showDungeonGrass = true;
+                break;
+            case RO_SHUFFLE_GRASS_OVERWORLD:
+                showOverworldGrass = true;
+                showDungeonGrass = false;
+                break;
+            case RO_SHUFFLE_GRASS_DUNGEONS:
+                showOverworldGrass = false;
+                showDungeonGrass = true;
+                break;
+            default:
+                showOverworldGrass = false;
+                showDungeonGrass = false;
+                break;
+        }
     } else { // Vanilla
         showOverworldTokens = true;
         showDungeonTokens = true;
         showOverworldPots = false;
         showDungeonPots = false;
+        showOverworldGrass = false;
+        showDungeonGrass = false;
     }
 
     fortressFast = false;
@@ -1354,6 +1377,9 @@ bool IsCheckShuffled(RandomizerCheck rc) {
             (loc->GetRCType() != RCTYPE_POT ||
                 (showOverworldPots && RandomizerCheckObjects::AreaIsOverworld(loc->GetArea())) ||
                 (showDungeonPots && RandomizerCheckObjects::AreaIsDungeon(loc->GetArea()))) &&
+            (loc->GetRCType() != RCTYPE_GRASS ||
+                (showOverworldGrass && RandomizerCheckObjects::AreaIsOverworld(loc->GetArea())) ||
+                (showDungeonGrass && RandomizerCheckObjects::AreaIsDungeon(loc->GetArea()))) &&
             (loc->GetRCType() != RCTYPE_COW || showCows) &&
             (loc->GetRCType() != RCTYPE_FISH || OTRGlobals::Instance->gRandoContext->GetFishsanity()->GetFishLocationIncluded(loc)) &&
             (loc->GetRCType() != RCTYPE_FREESTANDING ||

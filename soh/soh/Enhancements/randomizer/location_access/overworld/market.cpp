@@ -12,7 +12,17 @@ void RegionTable_Init_Market() {
         Entrance(RR_MARKET_GUARD_HOUSE, []{return logic->CanOpenOverworldDoor(RG_GUARD_HOUSE_KEY);}),
     });
 
-    areaTable[RR_THE_MARKET] = Region("Market", "Market", {RA_THE_MARKET}, NO_DAY_NIGHT_CYCLE, {}, {}, {
+    areaTable[RR_THE_MARKET] = Region("Market", "Market", {RA_THE_MARKET}, NO_DAY_NIGHT_CYCLE, {}, {
+        //Locations
+        LOCATION(RC_MARKET_GRASS_1, logic->IsChild && logic->CanCutShrubs()),
+        LOCATION(RC_MARKET_GRASS_2, logic->IsChild && logic->CanCutShrubs()),
+        LOCATION(RC_MARKET_GRASS_3, logic->IsChild && logic->CanCutShrubs()),
+        LOCATION(RC_MARKET_GRASS_4, logic->IsChild && logic->CanCutShrubs()),
+        LOCATION(RC_MARKET_GRASS_5, logic->IsChild && logic->CanCutShrubs()),
+        LOCATION(RC_MARKET_GRASS_6, logic->IsChild && logic->CanCutShrubs()),
+        LOCATION(RC_MARKET_GRASS_7, logic->IsChild && logic->CanCutShrubs()),
+        LOCATION(RC_MARKET_GRASS_8, logic->IsChild && logic->CanCutShrubs()),
+    }, {
         //Exits
         Entrance(RR_MARKET_ENTRANCE,            []{return true;}),
         Entrance(RR_TOT_ENTRANCE,               []{return true;}),

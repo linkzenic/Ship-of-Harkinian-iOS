@@ -123,6 +123,10 @@ void StaticData::HintTable_Init_Exclude_Dungeon() {
                                                      /*german*/ "Man erzählt sich, daß ein #Herz im Deku-Baum# #[[1]]# verstecke.",
                                                      /*french*/ "Selon moi, un #coeur dans l'Arbre Mojo# cache #[[1]]#.", {QM_RED, QM_GREEN}));
 
+    hintTextTable[RHT_DEKU_TREE_GRASS] = HintText(CustomMessage("They say that some #grass in the Deku Tree# hides #[[1]]#.",
+                                                     /*german*/ "",
+                                                     /*french*/ "", {QM_RED, QM_GREEN}));
+
   /*--------------------------
   |     DODONGOS CAVERN      |
   ---------------------------*/
@@ -297,6 +301,10 @@ void StaticData::HintTable_Init_Exclude_Dungeon() {
                                                                             /*german*/ "Man erzählt sich, daß das #Spielen einer stürmischen Melodie für einen seltsamen Stein in Dodongos Höhle# #[[1]]# enthülle.",
                                                                             /*french*/ "Selon moi, #jouer un air orageux pour une pierre étrange dans la Caverne Dodongo# révèle #[[1]]#.", {QM_RED, QM_GREEN}));
 
+    hintTextTable[RHT_DODONGOS_CAVERN_GRASS] = HintText(CustomMessage("They say that some #grass in Dodongo's Cavern# hides #[[1]]#.",
+                                                                            /*german*/ "!!!",
+                                                                            /*french*/ "", {QM_RED, QM_GREEN}));
+
 
   /*--------------------------
   |     JABU JABUS BELLY     |
@@ -456,6 +464,10 @@ void StaticData::HintTable_Init_Exclude_Dungeon() {
     hintTextTable[RHT_JABU_JABU_HEART] = HintText(CustomMessage("They say that near a #central lift in Jabu-Jabu's Belly# lies #[[1]]#.",
                                                      /*german*/ "Man erzählt sich, daß sich #nahe des zentralen Lifts in Jabu-Jabus Bauch# #[[1]]# befände.",
                                                      /*french*/ "Selon moi, près d'un #ascenceur central dans le Ventre de Jabu-Jabu# se trouve #[[1]]#.", {QM_RED, QM_GREEN}));
+
+    hintTextTable[RHT_JABU_JABUS_BELLY_GRASS] = HintText(CustomMessage("They say that some #grass in Jabu Jabu's Belly# hides #[[1]]#.",
+                                                     /*german*/ "",
+                                                     /*french*/ "", {QM_RED, QM_GREEN}));
 
   /*--------------------------
   |      FOREST TEMPLE       |
@@ -1687,6 +1699,10 @@ void StaticData::HintTable_Init_Exclude_Dungeon() {
     hintTextTable[RHT_BOTTOM_OF_THE_WELL_MQ_BASEMENT_SUN_FAIRY] = HintText(CustomMessage("They say that an #calling the sun a dead end# within the well reveals #[[1]]#.",
                                                                        /*german*/ "Man erzählt sich, daß das #Anrufen der Sonne in einer Sackgasse# innerhalb des Brunnens #[[1]]# enthülle.",
                                                                        /*french*/ "Selon moi, #appeler le soleil dans une impasse# à l’intérieur du puits révèle #[[1]]#.", {QM_RED, QM_GREEN}));
+
+    hintTextTable[RHT_BOTTOM_OF_THE_WELL_GRASS] = HintText(CustomMessage("They say that some #grass in the Bottom of the Well# hides #[[1]]#.",
+                                                     /*german*/ "",
+                                                     /*french*/ "", {QM_RED, QM_GREEN}));
 
 
   /*--------------------------
