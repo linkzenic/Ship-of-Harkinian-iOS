@@ -36,7 +36,7 @@ void Select_LoadGame(SelectContext* this, s32 entranceIndex) {
     for (int buttonIndex = 0; buttonIndex < ARRAY_COUNT(gSaveContext.buttonStatus); buttonIndex++) {
         gSaveContext.buttonStatus[buttonIndex] = BTN_ENABLED;
     }
-    gSaveContext.unk_13E7 = gSaveContext.unk_13E8 = gSaveContext.unk_13EA = gSaveContext.unk_13EC = 0;
+    gSaveContext.forceRisingButtonAlphas = gSaveContext.unk_13E8 = gSaveContext.unk_13EA = gSaveContext.unk_13EC = 0;
     Audio_QueueSeqCmd(SEQ_PLAYER_BGM_MAIN << 24 | NA_BGM_STOP);
     gSaveContext.entranceIndex = entranceIndex;
 
@@ -93,7 +93,7 @@ void Select_Grotto_LoadGame(SelectContext* this, s32 grottoIndex) {
     for (int buttonIndex = 0; buttonIndex < ARRAY_COUNT(gSaveContext.buttonStatus); buttonIndex++) {
         gSaveContext.buttonStatus[buttonIndex] = BTN_ENABLED;
     }
-    gSaveContext.unk_13E7 = gSaveContext.unk_13E8 = gSaveContext.unk_13EA = gSaveContext.unk_13EC = 0;
+    gSaveContext.forceRisingButtonAlphas = gSaveContext.unk_13E8 = gSaveContext.unk_13EA = gSaveContext.unk_13EC = 0;
     Audio_QueueSeqCmd(SEQ_PLAYER_BGM_MAIN << 24 | NA_BGM_STOP);
     // Entrance index and grotto content data to load the correct grotto and actors
     gSaveContext.entranceIndex = this->betterGrottos[grottoIndex].entranceIndex;
@@ -1092,6 +1092,9 @@ void Select_PrintMenu(SelectContext* this, GfxPrint* printer) {
                 case LANGUAGE_FRA:
                     name = this->scenes[scene].frenchName;
                     break;
+                case LANGUAGE_JPN:
+                    name = this->scenes[scene].japaneseName;
+                    break;
             }
         } else {
             name = this->scenes[scene].japaneseName;
@@ -1148,6 +1151,10 @@ void Better_Select_PrintMenu(SelectContext* this, GfxPrint* printer) {
                 case LANGUAGE_FRA:
                     name = this->betterScenes[scene].frenchName;
                     break;
+                // NTSC TODO: Support JPN Better Select
+                case LANGUAGE_JPN:
+                    name = this->betterScenes[scene].englishName;
+                    break;
             }
         } else {
             name = this->betterScenes[scene].englishName;
@@ -1173,6 +1180,10 @@ void Better_Select_PrintMenu(SelectContext* this, GfxPrint* printer) {
                 break;
             case LANGUAGE_FRA:
                 GfxPrint_Printf(printer, "%s", this->betterScenes[this->currentScene].entrancePairs[this->pageDownIndex].frenchName);
+                break;
+            // NTSC TODO: Support JPN Better Select
+            case LANGUAGE_JPN:
+                GfxPrint_Printf(printer, "%s", this->betterScenes[this->currentScene].entrancePairs[this->pageDownIndex].englishName);
                 break;
         }
     } else {
@@ -1214,6 +1225,9 @@ void Select_PrintLoadingMessage(SelectContext* this, GfxPrint* printer) {
             case LANGUAGE_FRA:
                 GfxPrint_Printf(printer, "%s", sLoadingMessages[randomMsg].frenchMessage);
                 break;
+            case LANGUAGE_JPN:
+                GfxPrint_Printf(printer, "%s", sLoadingMessages[randomMsg].japaneseMessage);
+                break;
         }
     } else {
         GfxPrint_Printf(printer, "%s", sLoadingMessages[randomMsg].japaneseMessage);
@@ -1226,8 +1240,8 @@ static SceneSelectAgeLabels sAgeLabels[] = {
 };
 
 static BetterSceneSelectAgeLabels sBetterAgeLabels[] = {
-    { "Adult", "Erwachsener", "Adulte" }, 
-    { "Child", "Kind", "Enfant" },
+    { "ﾜｶﾓﾉ", "Adult", "Erwachsener", "Adulte" }, 
+    { "ﾜｶｽｷﾞ", "Child", "Kind", "Enfant" },
 };
 
 void Select_PrintAgeSetting(SelectContext* this, GfxPrint* printer, s32 age) {
@@ -1245,6 +1259,9 @@ void Select_PrintAgeSetting(SelectContext* this, GfxPrint* printer, s32 age) {
             case LANGUAGE_FRA:
                 GfxPrint_Printf(printer, "Age:%s", sAgeLabels[age].frenchAge);
                 break;
+            case LANGUAGE_JPN:
+                GfxPrint_Printf(printer, "Age:%s", sAgeLabels[age].japaneseAge);
+                break;
         }
     } else {
         GfxPrint_Printf(printer, "Age:%s", sAgeLabels[age].japaneseAge);
@@ -1258,6 +1275,7 @@ void Better_Select_PrintAgeSetting(SelectContext* this, GfxPrint* printer, s32 a
         switch (gSaveContext.language) {
             case LANGUAGE_ENG:
             case LANGUAGE_FRA:
+            case LANGUAGE_JPN:
             default:
                 GfxPrint_Printf(printer, "(B)Age:");
                 break;
@@ -1281,6 +1299,9 @@ void Better_Select_PrintAgeSetting(SelectContext* this, GfxPrint* printer, s32 a
                 break;
             case LANGUAGE_FRA:
                 GfxPrint_Printf(printer, "%s", sBetterAgeLabels[age].frenchAge);
+                break;
+            case LANGUAGE_JPN:
+                GfxPrint_Printf(printer, "%s", sBetterAgeLabels[age].japaneseAge);
                 break;
         }
     } else {
@@ -1306,7 +1327,7 @@ void Select_PrintCutsceneSetting(SelectContext* this, GfxPrint* printer, u16 csI
     };
     
     char* label;
-    int lang = CVarGetInteger(CVAR_DEVELOPER_TOOLS("DebugWarpScreenTranslation"), 1) ? gSaveContext.language + 1 : 0;
+    int lang = CVarGetInteger(CVAR_DEVELOPER_TOOLS("DebugWarpScreenTranslation"), 1) ? (gSaveContext.language + 1) % 4 : 0;
 
     GfxPrint_SetPos(printer, 4, 25);
     GfxPrint_SetColor(printer, 255, 255, 55, 255);
@@ -1372,6 +1393,7 @@ void Better_Select_PrintTimeSetting(SelectContext* this, GfxPrint* printer) {
         if (CVarGetInteger(CVAR_DEVELOPER_TOOLS("DebugWarpScreenTranslation"), 1)) {
             switch (gSaveContext.language) {
                 case LANGUAGE_ENG:
+                case LANGUAGE_JPN:
                 default:
                     label = "Night";
                     break;
@@ -1389,6 +1411,7 @@ void Better_Select_PrintTimeSetting(SelectContext* this, GfxPrint* printer) {
         if (CVarGetInteger(CVAR_DEVELOPER_TOOLS("DebugWarpScreenTranslation"), 1)) {
             switch (gSaveContext.language) {
                 case LANGUAGE_ENG:
+                case LANGUAGE_JPN:
                 default:
                     label = "Day";
                     break;
@@ -1406,6 +1429,7 @@ void Better_Select_PrintTimeSetting(SelectContext* this, GfxPrint* printer) {
     if (CVarGetInteger(CVAR_DEVELOPER_TOOLS("DebugWarpScreenTranslation"), 1)) {
         switch (gSaveContext.language) {
             case LANGUAGE_ENG:
+            case LANGUAGE_JPN:
             default:
                 GfxPrint_Printf(printer, "(Z/R)Time:");
                 break;
@@ -1441,6 +1465,7 @@ void Better_Select_PrintMQSetting(SelectContext* this, GfxPrint* printer) {
         if (CVarGetInteger(CVAR_DEVELOPER_TOOLS("DebugWarpScreenTranslation"), 1)) {
             switch (gSaveContext.language) {
                 case LANGUAGE_ENG:
+                case LANGUAGE_JPN:
                 default:
                     label = this->opt ? "ON" : "OFF";
                     break;
