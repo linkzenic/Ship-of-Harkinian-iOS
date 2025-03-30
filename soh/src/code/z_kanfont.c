@@ -4140,7 +4140,7 @@ const char* msgStaticTbl[] =
     gFadingMessageBackgroundTex,
     gMessageContinueTriangleTex,
     gMessageEndSquareTex,
-    gMessageArrowTex
+    gMessageArrowTex,
 };
 // #endregion
 
