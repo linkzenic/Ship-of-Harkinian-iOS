@@ -407,7 +407,7 @@ namespace UIWidgets {
     struct RadioButtonsOptions : WidgetOptions {
         std::unordered_map<int32_t, const char*> buttonMap;
         Colors color = Colors::LightBlue;
-        
+
         RadioButtonsOptions& ButtonMap(std::unordered_map<int32_t, const char*> buttonMap_) {
             buttonMap = buttonMap_;
             return *this;
@@ -470,7 +470,7 @@ namespace UIWidgets {
             defaultValue = defaultValue_;
             return *this;
         }
-        
+
         InputOptions& IsSecret(bool secret_ = false) {
             secret = secret_;
             return *this;
