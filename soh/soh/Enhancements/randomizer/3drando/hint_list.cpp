@@ -1663,11 +1663,11 @@ void StaticData::HintTable_Init() {
 
     hintTextTable[RHT_JUNK52] = HintText(CustomMessage("They say that the Nocturne of Shadow can bring you very close to Ganon.",
                                             /*german*/ TODO_TRANSLATE,
-                                            /*french*/ "Selon moi, le nocturne de l'ombre peut t'amener très près de Ganon."));
+                                            /*french*/ "Selon moi, le Nocturne de l'Ombre peut t'amener très près de Ganon."));
 
     hintTextTable[RHT_JUNK53] = HintText(CustomMessage("They say that Twinrova always casts the same spell the first three times.",
                                             /*german*/ TODO_TRANSLATE,
-                                            /*french*/ "Selon moi, Twinrova lance toujours les mêmes trois premiers sorts."));
+                                            /*french*/ "Selon moi, le Duo Maléfique lance toujours les mêmes trois premiers sorts."));
 
     hintTextTable[RHT_JUNK54] = HintText(CustomMessage("They say that the nightly builds may be unstable.",
                                             /*german*/ TODO_TRANSLATE,
@@ -1722,11 +1722,11 @@ void StaticData::HintTable_Init() {
     
     hintTextTable[RHT_JUNK64] = HintText(CustomMessage("They say Greg is special.",
                                             /*german*/ TODO_TRANSLATE,
-                                            /*french*/ HINT_TEXT_NEEDS_TRANSLATION_FR));
+                                            /*french*/ "Selon moi, Greg est spécial."));
 
     hintTextTable[RHT_JUNK65] = HintText(CustomMessage("They say the longer the Goron's neck, the wiser they are.",
                                             /*german*/ TODO_TRANSLATE,
-                                            /*french*/ HINT_TEXT_NEEDS_TRANSLATION_FR));
+                                            /*french*/ "Selon moi, plus le cou des Gorons est long, plus ils sont sage." ));
 
     hintTextTable[RHT_JUNK66] = HintText(CustomMessage("They say this ship is what all true gamers strive for.",
                                             /*german*/ TODO_TRANSLATE,
@@ -1734,23 +1734,23 @@ void StaticData::HintTable_Init() {
     
     hintTextTable[RHT_JUNK67] = HintText(CustomMessage("They say that Glowsticks can be found in the Raveyard.",
                                             /*german*/ TODO_TRANSLATE,
-                                            /*french*/ "On peut trouver des Bâtons Lumineux sur le dancefloor du cimetière."));
+                                            /*french*/ "Selon moi, on peut trouver des Bâtons Lumineux sur le dancefloor du cimetière."));
 
     hintTextTable[RHT_JUNK68] = HintText(CustomMessage("They say @'s uncle works for Nintendo.",
                                             /*german*/ TODO_TRANSLATE,
-                                            /*french*/ HINT_TEXT_NEEDS_TRANSLATION_FR));
+                                            /*french*/ "Selon moi, l'oncle de @ travaille chez Nintendo."));
 
     hintTextTable[RHT_JUNK69] = HintText(CustomMessage("They say pulling all gravestones in the graveyard leads to something magical.",
                                             /*german*/ TODO_TRANSLATE,
-                                            /*french*/ HINT_TEXT_NEEDS_TRANSLATION_FR));
+                                            /*french*/ "Selon moi, tirer toutes les tombes du Cimetière déclanche un truc magique."));
 
     hintTextTable[RHT_JUNK70] = HintText(CustomMessage("They say holding L while pausing makes you win the game.",
                                             /*german*/ TODO_TRANSLATE,
-                                            /*french*/ HINT_TEXT_NEEDS_TRANSLATION_FR));
+                                            /*french*/ "Selon moi, maintenir L pendant que vous appuyez sur START vous permet de terminer le jeu."));
 
     hintTextTable[RHT_JUNK71] = HintText(CustomMessage("They say @'s body is ready.",
                                             /*german*/ TODO_TRANSLATE,
-                                            /*french*/ HINT_TEXT_NEEDS_TRANSLATION_FR));
+                                            /*french*/ "Selon moi, ce junk hint ne se traduirait pas bien en français."));
 
     /*--------------------------
     |     DUNGEON HINT TEXT    |
@@ -2219,13 +2219,16 @@ void StaticData::HintTable_Init() {
                                                                        {QM_RED}));
                                                          // /*spanish*/Ja, ja, ja... Nunca me derrotarás reflejando mis esferas de energía y desplegando la flecha de luz de #[[1]]#!
 
-    hintTextTable[RHT_GANONDORF_HINT_MS_ONLY] = HintText(CustomMessage("Ha ha ha... You'll never defeat me, drop a castle on me and finish me off with the sacred blade from #[[2]]#!", {QM_RED})); // TODO_TRANSLATE
+    hintTextTable[RHT_GANONDORF_HINT_MS_ONLY] = HintText(CustomMessage("Ha ha ha... You'll never defeat me, drop a castle on me and finish me off with the sacred blade from #[[2]]#!",
+                                                            /*german*/ TODO_TRANSLATE,
+                                                            /*french*/ "Ha ha ha... Pauvre fou! Tu ne pourras jamais me vaincre sans l'Épée de Légende cachée dans #[[2]]#!",
+                                                                       {QM_RED}));
 
     hintTextTable[RHT_GANONDORF_HINT_LA_AND_MS] = HintText(CustomMessage("Ha ha ha... You'll never beat me by reflecting my lightning bolts and unleashing the arrows from #[[1]]#!"
                                                                          "^And even if you do, you'll never find the legendary blade hidden in #[[2]]#!",
                                                               /*german*/ TODO_TRANSLATE,
                                                               /*french*/ "Ha ha ha... Pauvre fou! Tu ne pourras jamais me vaincre sans les flèches que j'ai cachées dans #[[1]]#!"
-                                                                         "^Et même si tu les trouves, tu ne touveras jamais l'épée de légende cachée dans #[[2]]#!",
+                                                                         "^Et même si tu les trouves, tu ne touveras jamais l'Épée de Légende cachée dans #[[2]]#!",
                                                                          {QM_RED, QM_RED}));
                                                            // /*spanish*/Ja, ja, ja... Nunca me derrotarás reflejando mis esferas de energía y desplegando la flecha de luz de #[[1]]#!
                                                                       // ^E incluso si lo haces, nunca encontrarás la espada legendaria escondida en #[[2]]#!
