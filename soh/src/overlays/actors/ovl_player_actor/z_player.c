@@ -14752,6 +14752,8 @@ static AnimSfxEntry D_80854A34[] = {
 void Player_Action_8084EFC0(Player* this, PlayState* play) {
     Player_DecelerateToZero(this);
 
+    GameInteractor_Should(VB_EMPTYING_BOTTLE, true, this);
+
     if (LinkAnimation_Update(play, &this->skelAnime)) {
         func_8083C0E8(this, play);
         func_8005B1A4(Play_GetCamera(play, 0));

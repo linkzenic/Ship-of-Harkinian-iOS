@@ -464,6 +464,14 @@ typedef enum {
 
     // #### `result`
     // ```c
+    // true
+    // ```
+    // #### `args`
+    // - Player*
+    VB_EMPTYING_BOTTLE,
+
+    // #### `result`
+    // ```c
     // (Message_GetState(&play->msgCtx) == TEXT_STATE_EVENT) && Message_ShouldAdvance(play)
     // ```
     // #### `args`
@@ -1826,6 +1834,14 @@ typedef enum {
     // #### `args`
     // - `*ObjBean`
     VB_SPAWN_BEAN_STALK_FAIRIES,
+
+    // #### `result`
+    // ```c
+    // this->timer >= 60
+    // ```
+    // #### `args`
+    // - `None`
+    VB_SPAWN_BEAN_SKULLTULA,
 
     // #### `result`
     // ```c
