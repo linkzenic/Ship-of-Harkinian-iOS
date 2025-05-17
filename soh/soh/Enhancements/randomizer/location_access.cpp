@@ -12,7 +12,6 @@
 #include <fstream>
 
 extern "C" {
-extern SaveContext gSaveContext;
 extern PlayState* gPlayState;
 }
 
@@ -275,7 +274,7 @@ bool BeanPlanted(const RandomizerRegion region) {
     if (gPlayState != nullptr && gPlayState->sceneNum == sceneID) {
         swch = gPlayState->actorCtx.flags.swch;
     } else if (sceneID != SCENE_ID_MAX) {
-        swch = gSaveContext.sceneFlags[sceneID].swch;
+        swch = Rando::Context::GetInstance()->GetLogic()->GetSaveContext()->sceneFlags[sceneID].swch;
     } else {
         swch = 0;
     }
