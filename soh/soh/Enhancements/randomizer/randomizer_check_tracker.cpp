@@ -1967,7 +1967,7 @@ void RecalculateAvailableChecks() {
     StartPerformanceTimer(PT_RECALCULATE_AVAILABLE_CHECKS);
 
     std::vector<RandomizerCheck> targetLocations;
-    targetLocations.reserve(RR_MAX);
+    targetLocations.reserve(RC_MAX);
     for (auto& location : Rando::StaticData::GetLocationTable()) {
         RandomizerCheck rc = location.GetRandomizerCheck();
         Rando::ItemLocation* itemLocation = OTRGlobals::Instance->gRandoContext->GetItemLocation(rc);
@@ -1979,15 +1979,8 @@ void RecalculateAvailableChecks() {
 
     std::vector<RandomizerCheck> availableChecks = ReachabilitySearch(targetLocations, RG_NONE, true);
     for (auto& rc : availableChecks) {
-        const auto& location = Rando::StaticData::GetLocation(rc);
         const auto& itemLocation = OTRGlobals::Instance->gRandoContext->GetItemLocation(rc);
-        if (location->GetRCType() == RCTYPE_SHOP && itemLocation->GetCheckStatus() == RCSHOW_IDENTIFIED) {
-            if (CanBuyAnother(rc)) {
-                itemLocation->SetAvailable(true);
-            }
-        } else {
-            itemLocation->SetAvailable(true);
-        }
+        itemLocation->SetAvailable(true);
     }
 
     totalChecksAvailable = 0;
