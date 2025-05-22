@@ -43,7 +43,6 @@ extern "C" {
 #include "src/overlays/actors/ovl_En_Box/z_en_box.h"
 #include "src/overlays/actors/ovl_En_Skj/z_en_skj.h"
 #include "src/overlays/actors/ovl_En_Hy/z_en_hy.h"
-#include "src/overlays/actors/ovl_Obj_Comb/z_obj_comb.h"
 #include "src/overlays/actors/ovl_En_Bom_Bowl_Pit/z_en_bom_bowl_pit.h"
 #include "src/overlays/actors/ovl_En_Ge1/z_en_ge1.h"
 #include "src/overlays/actors/ovl_En_Ds/z_en_ds.h"
@@ -1832,65 +1831,6 @@ void EnDns_RandomizerPurchase(EnDns* enDns) {
     Flags_SetRandomizerInf(enDns->sohScrubIdentity.randomizerInf);
 }
 
-void ObjComb_RandomizerChooseItemDrop(ObjComb* objComb, PlayState* play) {
-    s16 params = objComb->actor.params & 0x1F;
-
-    if (RAND_GET_OPTION(RSK_SHUFFLE_BEEHIVES) && !Flags_GetRandomizerInf(objComb->beehiveIdentity.randomizerInf)) {
-        EnItem00* item00 = (EnItem00*)Item_DropCollectible2(play, &objComb->actor.world.pos, ITEM00_SOH_DUMMY);
-        item00->randoInf = objComb->beehiveIdentity.randomizerInf;
-        item00->itemEntry =
-            OTRGlobals::Instance->gRandomizer->GetItemFromKnownCheck(objComb->beehiveIdentity.randomizerCheck, GI_NONE);
-        item00->actor.draw = (ActorFunc)EnItem00_DrawRandomizedItem;
-        return;
-    }
-
-    if ((params > 0) || (params < 0x1A)) {
-        if (params == 6) {
-            if (Flags_GetCollectible(play, (objComb->actor.params >> 8) & 0x3F)) {
-                params = -1;
-            } else {
-                params = (params | (((objComb->actor.params >> 8) & 0x3F) << 8));
-            }
-        } else if (Rand_ZeroOne() < 0.5f) {
-            params = -1;
-        }
-        if (params >= 0 && !CVarGetInteger(CVAR_ENHANCEMENT("NoRandomDrops"), 0)) {
-            Item_DropCollectible(play, &objComb->actor.world.pos, params);
-        }
-    }
-}
-
-void ObjComb_RandomizerWait(ObjComb* objComb, PlayState* play) {
-    s32 dmgFlags;
-
-    objComb->unk_1B0 -= 50;
-    if (RAND_GET_OPTION(RSK_SHUFFLE_BEEHIVES) && !Flags_GetRandomizerInf(objComb->beehiveIdentity.randomizerInf)) {
-        if (objComb->unk_1B0 <= -5000) {
-            objComb->unk_1B0 = 1500;
-        }
-    } else if (objComb->unk_1B0 < 0) {
-        objComb->unk_1B0 = 0;
-    }
-
-    if ((objComb->collider.base.acFlags & AC_HIT) != 0) {
-        objComb->collider.base.acFlags &= ~AC_HIT;
-        dmgFlags = objComb->collider.elements[0].info.acHitInfo->toucher.dmgFlags;
-        if (dmgFlags & 0x4001F866) {
-            objComb->unk_1B0 = 1500;
-        } else {
-            ObjComb_Break(objComb, play);
-            ObjComb_RandomizerChooseItemDrop(objComb, play);
-            Actor_Kill(&objComb->actor);
-        }
-    } else {
-        CollisionCheck_SetAC(play, &play->colChkCtx, &objComb->collider.base);
-    }
-
-    if (objComb->actor.update != NULL) {
-        CollisionCheck_SetOC(play, &play->colChkCtx, &objComb->collider.base);
-    }
-}
-
 void RandomizerOnActorInitHandler(void* actorRef) {
     Actor* actor = static_cast<Actor*>(actorRef);
 
@@ -1981,14 +1921,6 @@ void RandomizerOnActorInitHandler(void* actorRef) {
                 break;
             }
         }
-    }
-
-    if (actor->id == ACTOR_OBJ_COMB) {
-        ObjComb* objComb = static_cast<ObjComb*>(actorRef);
-        s16 respawnData = gSaveContext.respawn[RESPAWN_MODE_RETURN].data & ((1 << 8) - 1);
-        objComb->beehiveIdentity = OTRGlobals::Instance->gRandomizer->IdentifyBeehive(
-            gPlayState->sceneNum, (s16)actor->world.pos.x, respawnData);
-        objComb->actionFunc = (ObjCombActionFunc)ObjComb_RandomizerWait;
     }
 
     if (actor->id == ACTOR_EN_EX_ITEM) {
@@ -2198,13 +2130,6 @@ void RandomizerOnActorUpdateHandler(void* refActor) {
     if (RAND_GET_OPTION(RSK_SHUFFLE_ENTRANCES) && actor->id == ACTOR_DEMO_KANKYO &&
         actor->params == 0x000F) { // Warp Song particles
         Entrance_SetWarpSongEntrance();
-    }
-
-    if (actor->id == ACTOR_OBJ_COMB) {
-        ObjComb* combActor = reinterpret_cast<ObjComb*>(actor);
-        combActor->actor.shape.rot.x =
-            static_cast<int16_t>(Math_SinS(combActor->unk_1B2)) * CLAMP_MIN(combActor->unk_1B0, 0) +
-            combActor->actor.home.rot.x;
     }
 }
 
