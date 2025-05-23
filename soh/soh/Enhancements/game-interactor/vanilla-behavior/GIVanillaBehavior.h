@@ -341,6 +341,14 @@ typedef enum {
 
     // #### `result`
     // ```c
+    // this->actionTimer == 0 && Rand_ZeroOne() < 0.03f
+    // ```
+    // #### `args`
+    // - `*EnPoRelay`
+    VB_DAMPE_DROP_FLAME,
+
+    // #### `result`
+    // ```c
     // !Flags_GetItemGetInf(ITEMGETINF_1C)
     // ```
     // #### `args`
