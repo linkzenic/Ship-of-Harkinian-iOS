@@ -230,6 +230,14 @@ typedef enum {
 
     // #### `result`
     // ```c
+    // true
+    // ```
+    // #### `args`
+    // - `*EnPoField`
+    VB_BOTTLE_BIG_POE,
+
+    // #### `result`
+    // ```c
     // ((this->actor.params == DNS_TYPE_HEART_PIECE) && (Flags_GetItemGetInf(ITEMGETINF_DEKU_SCRUB_HEART_PIECE))) ||
     // ((this->actor.params == DNS_TYPE_DEKU_STICK_UPGRADE) && (Flags_GetInfTable(INFTABLE_BOUGHT_STICK_UPGRADE))) ||
     // ((this->actor.params == DNS_TYPE_DEKU_NUT_UPGRADE) && (Flags_GetInfTable(INFTABLE_BOUGHT_NUT_UPGRADE)))
@@ -1732,6 +1740,14 @@ typedef enum {
     // #### `args`
     // - `*EnRu1`
     VB_RUTO_WANT_TO_BE_TOSSED_TO_SAPPHIRE,
+
+    // #### `result`
+    // ```c
+    // true
+    // ```
+    // #### `args`
+    // - `*EnGb`
+    VB_SELL_POES_TO_POE_COLLECTOR,
 
     // #### `result`
     // ```c
