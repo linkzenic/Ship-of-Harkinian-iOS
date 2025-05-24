@@ -137,7 +137,6 @@ class Region {
     bool adultDay = false;
     bool adultNight = false;
     bool addedToPool = false;
-    ;
 
     void ApplyTimePass();
 
