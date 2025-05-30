@@ -6149,6 +6149,7 @@ typedef enum {
 
 // Song shuffle Settings (Song locations, Dungeon rewards, anywhere)
 typedef enum {
+    RO_SONG_SHUFFLE_OFF,
     RO_SONG_SHUFFLE_SONG_LOCATIONS,
     RO_SONG_SHUFFLE_DUNGEON_REWARDS,
     RO_SONG_SHUFFLE_ANYWHERE,
