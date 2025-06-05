@@ -1312,6 +1312,11 @@ void SohMenu::AddMenuEnhancements() {
                      .Format("%d notes")
                      .Tooltip("Adjust the number of notes you need to play to end the third round."));
 
+    AddWidget(path, "Forest Temple", WIDGET_SEPARATOR_TEXT);
+    AddWidget(path, "Solve Amy's Puzzle", WIDGET_CVAR_CHECKBOX)
+        .CVar(CVAR_ENHANCEMENT("SkipAmyPuzzle"))
+        .Options(CheckboxOptions().Tooltip("Amy's block pushing puzzle instantly solved."));
+
     path.column = SECTION_COLUMN_3;
     AddWidget(path, "Fishing", WIDGET_SEPARATOR_TEXT);
     AddWidget(path, "Customize Behavior##Fishing", WIDGET_CVAR_CHECKBOX)
