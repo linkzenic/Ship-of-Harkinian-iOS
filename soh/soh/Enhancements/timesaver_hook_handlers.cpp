@@ -49,8 +49,6 @@ extern void EnRu2_SetEncounterSwitchFlag(EnRu2* enRu2, PlayState* play);
 extern void EnDaiku_EscapeSuccess(EnDaiku* enDaiku, PlayState* play);
 }
 
-#define RAND_GET_OPTION(option) Rando::Context::GetInstance()->GetOption(option).Get()
-
 void EnMa1_EndTeachSong(EnMa1* enMa1, PlayState* play) {
     if (Message_GetState(&gPlayState->msgCtx) == TEXT_STATE_CLOSING) {
         Flags_SetRandomizerInf(RAND_INF_LEARNED_EPONA_SONG);

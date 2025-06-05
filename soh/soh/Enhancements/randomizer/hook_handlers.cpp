@@ -71,8 +71,6 @@ extern void EnGe1_Wait_Archery(EnGe1* enGe1, PlayState* play);
 extern void EnGe1_SetAnimationIdle(EnGe1* enGe1);
 }
 
-#define RAND_GET_OPTION(option) Rando::Context::GetInstance()->GetOption(option).Get()
-
 bool LocMatchesQuest(Rando::Location loc) {
     if (loc.GetQuest() == RCQUEST_BOTH) {
         return true;
