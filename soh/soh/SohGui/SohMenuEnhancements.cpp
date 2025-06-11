@@ -1586,9 +1586,6 @@ void SohMenu::AddMenuEnhancements() {
         .Options(CheckboxOptions().Tooltip(
             "Keese and Guay no longer target you and simply ignore you as if you were wearing the "
             "Skull Mask."));
-    AddWidget(path, "No Dampe Fire", WIDGET_CVAR_CHECKBOX)
-        .CVar(CVAR_CHEAT("NoDampeFire"))
-        .Options(CheckboxOptions().Tooltip("Dampe won't drop fireballs during race."));
 
     AddWidget(path, "Glitch Aids", WIDGET_SEPARATOR_TEXT);
     AddWidget(path, "Easy Frame Advancing with Pause", WIDGET_CVAR_CHECKBOX)
