@@ -1699,6 +1699,15 @@ typedef enum {
 
     // #### `result`
     // ```c
+    // dropId == ITEM00_STICK
+    // ```
+    // #### `args`
+    // - None
+    VB_PREVENT_ADULT_STICK,
+
+    // #### `result`
+    // #### `result`
+    // ```c
     // true
     // ```
     // #### `args`
@@ -2073,6 +2082,13 @@ typedef enum {
     VB_TRANSITION_TO_SAVE_SCREEN_ON_DEATH,
 
     // #### `result`
+    // ```c
+    // true
+    // ```
+    // #### `args`
+    // - `*EnWood02`
+    VB_TREE_DROP_COLLECTIBLE,
+
     // ```c
     // true
     // ```
