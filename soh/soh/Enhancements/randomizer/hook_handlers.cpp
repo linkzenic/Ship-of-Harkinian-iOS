@@ -925,13 +925,6 @@ void RandomizerOnVanillaBehaviorHandler(GIVanillaBehavior id, bool* should, va_l
             *should = Flags_GetRandomizerInf(RAND_INF_LEARNED_EPONA_SONG);
             break;
         }
-        case VB_SET_CUCCO_COUNT: {
-            EnNiwLady* enNiwLady = va_arg(args, EnNiwLady*);
-            // Override starting Cucco count using setting value
-            enNiwLady->cuccosInPen = 7 - RAND_GET_OPTION(RSK_CUCCO_COUNT);
-            *should = false;
-            break;
-        }
         case VB_KING_ZORA_THANK_CHILD: {
             // Allow turning in Ruto's letter even if you have already rescued her
             if (!Flags_GetEventChkInf(EVENTCHKINF_KING_ZORA_MOVED)) {
