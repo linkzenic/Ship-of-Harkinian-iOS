@@ -58,6 +58,7 @@ struct GetAccessibleLocationsStruct {
 void ClearProgress();
 void VanillaFill();
 int Fill();
+void SetAreas();
 
 std::vector<RandomizerCheck> GetEmptyLocations(std::vector<RandomizerCheck> allowedLocations);
 
@@ -66,7 +67,8 @@ void ProcessRegion(Region* region, GetAccessibleLocationsStruct& gals, Randomize
 
 std::vector<RandomizerCheck> ReachabilitySearch(const std::vector<RandomizerCheck>& allowedLocations,
                                                 RandomizerGet ignore = RG_NONE,
-                                                bool calculatingAvailableChecks = false);
+                                                bool calculatingAvailableChecks = false,
+                                                RandomizerRegion startingRegion = RR_ROOT);
 
 void GeneratePlaythrough();
 
