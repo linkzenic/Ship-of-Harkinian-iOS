@@ -576,6 +576,14 @@ typedef enum {
     VB_GANON_HEAL_BEFORE_FIGHT,
 
     // #### `result`
+    // ```c
+    // true
+    // ```
+    // #### `args`
+    // - `*EnGe2`
+    VB_GERUDO_GUARD_SET_ACTION_AFTER_TALK,
+
+    // #### `result`
     // See logic in
     // ```c
     // EnGe1_CheckCarpentersFreed()
