@@ -2002,6 +2002,15 @@ typedef enum {
 
     // #### `result`
     // ```c
+    // varies, never set should to true
+    // ```
+    // #### `args`
+    // - `*Actor`
+    // - `*s16` - timer value
+    VB_SWITCH_TIMER_TICK,
+
+    // #### `result`
+    // ```c
     // (this->stateFlags1 & PLAYER_STATE1_CARRYING_ACTOR) && (this->heldActor != NULL) &&
     // CHECK_BTN_ANY(sControlInput->press.button, buttonsToCheck)
     // ```
