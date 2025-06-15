@@ -5688,6 +5688,7 @@ typedef enum {
     RSK_DOOR_OF_TIME,
     RSK_ZORAS_FOUNTAIN,
     RSK_SLEEPING_WATERFALL,
+    RSK_JABU_OPEN,
     RSK_STARTING_AGE,
     RSK_SELECTED_STARTING_AGE,
     RSK_GERUDO_FORTRESS,
@@ -5937,6 +5938,12 @@ typedef enum {
     RO_WATERFALL_CLOSED,
     RO_WATERFALL_OPEN,
 } RandoOptionSleepingWaterfall;
+
+// Jabu-Jabu settings (closed, open)
+typedef enum {
+    RO_JABU_CLOSED,
+    RO_JABU_OPEN,
+} RandoOptionJabu;
 
 // Starting Age settings (child, adult, random)
 typedef enum {
