@@ -1985,7 +1985,7 @@ void ImGuiDrawTwoColorPickerSection(const char* text, const char* cvarMainName, 
 }
 
 void RecalculateAvailableChecks(RandomizerRegion startingRegion /* = RR_ROOT */) {
-    if (!enableAvailableChecks) {
+    if (!enableAvailableChecks || !GameInteractor::IsSaveLoaded(true)) {
         return;
     }
 
@@ -2135,10 +2135,7 @@ void CheckTrackerSettingsWindow::DrawElement() {
                                                  "with your current progress.")
                                         .Color(THEME_COLOR))) {
             enableAvailableChecks = CVarGetInteger(CVAR_TRACKER_CHECK("EnableAvailableChecks"), 0);
-
-            if (GameInteractor::IsSaveLoaded(true)) {
-                RecalculateAvailableChecks();
-            }
+            RecalculateAvailableChecks();
         }
         ImGui::EndDisabled();
 
