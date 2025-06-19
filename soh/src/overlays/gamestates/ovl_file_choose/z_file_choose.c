@@ -3565,6 +3565,9 @@ void FileChoose_Main(GameState* thisx) {
     Input* input = &this->state.input[0];
 
     Color_RGB8 helpTextColor = { 100, 255, 255 };
+
+    GameInteractor_ExecuteOnFileChooseMain(thisx);
+
     if (CVarGetInteger(CVAR_COSMETIC("Title.FileChoose.Changed"), 0)) {
         Color_RGB8 backgroundColor =
             CVarGetColor24(CVAR_COSMETIC("Title.FileChoose.Value"), (Color_RGB8){ 100, 150, 255 });
