@@ -1808,6 +1808,15 @@ typedef enum {
 
     // #### `result`
     // ```c
+    // true
+    // ```
+    // #### `args`
+    // - BgHakaShip*
+    // - PlayState*
+    VB_SHADOW_SHIP_SET_SPEED,
+
+    // #### `result`
+    // ```c
     // (!CHECK_OWNED_EQUIP(EQUIP_TYPE_BOOTS, EQUIP_INV_BOOTS_IRON) &&
     // !Flags_GetEventChkInf(EVENTCHKINF_LEARNED_SERENADE_OF_WATER)) && LINK_IS_ADULT
     // ```
