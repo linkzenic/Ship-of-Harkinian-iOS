@@ -13,7 +13,6 @@
 #include "soh/Enhancements/cosmetics/authenticGfxPatches.h"
 #include <soh/Enhancements/item-tables/ItemTableManager.h>
 #include "soh/Enhancements/timesaver_hook_handlers.h"
-#include "soh/Enhancements/TimeSavers/TimeSavers.h"
 #include "soh/Enhancements/randomizer/hook_handlers.h"
 
 #include "src/overlays/actors/ovl_En_Bb/z_en_bb.h"
@@ -961,7 +960,6 @@ void InitMods() {
     BossRush_RegisterHooks();
     RandomizerRegisterHooks();
     TimeSaverRegisterHooks();
-    TimeSavers_Register();
     RegisterTTS();
     RegisterOcarinaTimeTravel();
     RegisterPermanentHeartLoss();
