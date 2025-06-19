@@ -30,7 +30,6 @@
 #include "soh/SohGui/UIWidgets.hpp"
 #include "static_data.h"
 #include "soh/Enhancements/game-interactor/GameInteractor.h"
-#include <boost_custom/container_hash/hash_32.hpp>
 #include "randomizer_settings_window.h"
 #include "savefile.h"
 #include "entrance.h"

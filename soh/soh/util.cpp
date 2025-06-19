@@ -398,3 +398,14 @@ bool SohUtils::IsStringEmpty(std::string str) {
     // Check if the string is empty after stripping spaces
     return start == std::string::npos || end == std::string::npos;
 }
+
+uint32_t SohUtils::Hash(std::string str) {
+    // FNV-1a
+    const size_t len = str.size();
+    uint32_t hval = 0x811c9dc5;
+    for (size_t pos = 0; pos < len; pos++) {
+        hval ^= (uint32_t)str[pos];
+        hval *= 0x01000193;
+    }
+    return hval;
+}

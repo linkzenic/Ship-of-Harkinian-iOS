@@ -46,7 +46,6 @@
 #include "Enhancements/custom-message/CustomMessageManager.h"
 #include "Enhancements/Presets/Presets.h"
 #include "util.h"
-#include <boost_custom/container_hash/hash_32.hpp>
 
 #if not defined(__SWITCH__) && not defined(__WIIU__)
 #include "Extractor/Extract.h"
@@ -2640,7 +2639,7 @@ void SoH_ProcessDroppedFiles(std::string filePath) {
         gui->SaveConsoleVariablesNextFrame();
         ShipInit::Init("*");
 
-        uint32_t finalHash = boost::hash_32<std::string>{}(configJson.dump());
+        uint32_t finalHash = SohUtils::Hash(configJson.dump());
         gui->GetGameOverlay()->TextDrawNotification(30.0f, true, "Configuration Loaded. Hash: %d", finalHash);
     } catch (std::exception& e) {
         SPDLOG_ERROR("Failed to load config file: {}", e.what());
