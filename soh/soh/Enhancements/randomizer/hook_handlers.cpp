@@ -971,7 +971,7 @@ void RandomizerOnVanillaBehaviorHandler(GIVanillaBehavior id, bool* should, va_l
             break;
         }
         case VB_BIGGORON_CONSIDER_TRADE_COMPLETE: {
-            // This being true will prevent other biggoron trades, there are already safegaurds in place to prevent
+            // This being true will prevent other biggoron trades, there are already safeguards in place to prevent
             // claim check from being traded multiple times, so we don't really need the quest to ever be considered
             // "complete"
             *should = false;
@@ -1982,6 +1982,10 @@ void RandomizerOnActorInitHandler(void* actorRef) {
         if (ge1Type == GE1_TYPE_TRAINING_GROUND_GUARD &&
             Flags_GetRandomizerInf(RAND_INF_GF_GTG_GATE_PERMANENTLY_OPEN)) {
             enGe1->actionFunc = (EnGe1ActionFunc)EnGe1_SetNormalText;
+        } else if (ge1Type == GE1_TYPE_GATE_OPERATOR && enGe1->actor.world.pos.x != -1358.0f) {
+            // When spawning the gate operator, also spawn an extra gate operator on the wasteland side
+            Actor_Spawn(&gPlayState->actorCtx, gPlayState, ACTOR_EN_GE1, -1358.0f, 88.0f, -3018.0f, 0, 0x95B0, 0,
+                        0x0300 | GE1_TYPE_GATE_OPERATOR, true);
         }
     }
 
