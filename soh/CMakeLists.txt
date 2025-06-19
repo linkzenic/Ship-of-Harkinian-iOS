@@ -142,16 +142,21 @@ endif()
 
 # handle Network removals
 if (!BUILD_REMOTE_CONTROL)
-    list(FILTER soh__ EXCLUDE REGEX "soh/Enhancements/crowd-control/*")
+    list(FILTER soh__ EXCLUDE REGEX "soh/Enhancements/crowd-control/")
 endif()
 
 # handle speechsynthesizer removals
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    list(FILTER soh__ EXCLUDE REGEX "soh/Enhancements/speechsynthesizer/Darwin*")
+    list(FILTER soh__ EXCLUDE REGEX "soh/Enhancements/speechsynthesizer/Darwin")
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-    list(FILTER soh__ EXCLUDE REGEX "soh/Enhancements/speechsynthesizer/SAPI*")
+    list(FILTER soh__ EXCLUDE REGEX "soh/Enhancements/speechsynthesizer/SAPI")
 else()
-    list(FILTER soh__ EXCLUDE REGEX "soh/Enhancements/speechsynthesizer/(Darwin|SAPI).*")
+    list(FILTER soh__ EXCLUDE REGEX "soh/Enhancements/speechsynthesizer/(Darwin|SAPI)")
+endif()
+
+find_library(ESPEAK espeak-ng)
+if (NOT ESPEAK)
+    list(FILTER soh__ EXCLUDE REGEX "soh/Enhancements/speechsynthesizer/ESpeak")
 endif()
 
 # soh/Extractor {{{
@@ -177,12 +182,12 @@ file(GLOB_RECURSE src__ RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/*.c" "src/*.h"
 set_source_files_properties(${src__} PROPERTIES COMPILE_OPTIONS "${WARNING_OVERRIDE}")
 
 list(APPEND src__ ${CMAKE_CURRENT_SOURCE_DIR}/Resource.rc)
-list(FILTER src__ EXCLUDE REGEX "src/dmadata/*")
-list(FILTER src__ EXCLUDE REGEX "src/elf_message/*")
-list(FILTER src__ EXCLUDE REGEX "src/libultra/io/*")
-list(FILTER src__ EXCLUDE REGEX "src/libultra/libc/*")
-list(FILTER src__ EXCLUDE REGEX "src/libultra/os/*")
-list(FILTER src__ EXCLUDE REGEX "src/libultra/rmon/*")
+list(FILTER src__ EXCLUDE REGEX "src/dmadata/")
+list(FILTER src__ EXCLUDE REGEX "src/elf_message/")
+list(FILTER src__ EXCLUDE REGEX "src/libultra/io/")
+list(FILTER src__ EXCLUDE REGEX "src/libultra/libc/")
+list(FILTER src__ EXCLUDE REGEX "src/libultra/os/")
+list(FILTER src__ EXCLUDE REGEX "src/libultra/rmon/")
 list(APPEND src__ "src/libultra/libc/sprintf.c")
 list(REMOVE_ITEM src__ "src/libultra/gu/cosf.c")
 list(REMOVE_ITEM src__ "src/libultra/gu/lookat.c")
@@ -290,6 +295,10 @@ if (BUILD_REMOTE_CONTROL)
     else()
         set(SDL2-NET-INCLUDE ${SDL_NET_INCLUDE_DIRS})
     endif()
+endif()
+
+if (ESPEAK)
+    add_compile_definitions(ESPEAK=1)
 endif()
 
 target_include_directories(${PROJECT_NAME} PRIVATE assets

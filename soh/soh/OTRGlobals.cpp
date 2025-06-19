@@ -1229,14 +1229,14 @@ extern "C" void InitOTR() {
     ActorDB::Instance = new ActorDB();
 #ifdef __APPLE__
     SpeechSynthesizer::Instance = new DarwinSpeechSynthesizer();
-    SpeechSynthesizer::Instance->Init();
 #elif defined(_WIN32)
     SpeechSynthesizer::Instance = new SAPISpeechSynthesizer();
-    SpeechSynthesizer::Instance->Init();
+#elif ESPEAK
+    SpeechSynthesizer::Instance = new ESpeakSpeechSynthesizer();
 #else
     SpeechSynthesizer::Instance = new SpeechLogger();
-    SpeechSynthesizer::Instance->Init();
 #endif
+    SpeechSynthesizer::Instance->Init();
 
 #ifdef ENABLE_REMOTE_CONTROL
     CrowdControl::Instance = new CrowdControl();
