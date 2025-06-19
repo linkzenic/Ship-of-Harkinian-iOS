@@ -1540,6 +1540,8 @@ void FileChoose_UpdateRandomizerMenu(GameState* thisx) {
             }
         }
 
+        GameInteractor_ExecuteOnUpdateFileRandomizerOptionSelection(this->randomizerIndex);
+
         Audio_PlaySoundGeneral(NA_SE_SY_FSEL_CURSOR, &gSfxDefaultPos, 4, &gSfxDefaultFreqAndVolScale,
                                &gSfxDefaultFreqAndVolScale, &gSfxDefaultReverb);
     }
