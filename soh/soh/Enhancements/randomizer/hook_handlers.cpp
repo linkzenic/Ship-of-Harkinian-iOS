@@ -14,7 +14,6 @@
 #include "soh/SohGui/ImGuiUtils.h"
 #include "soh/Notification/Notification.h"
 #include "soh/SaveManager.h"
-#include "soh/Enhancements/randomizer/ShuffleFairies.h"
 
 extern "C" {
 #include "macros.h"
@@ -2396,8 +2395,6 @@ void RandomizerRegisterHooks() {
 
         shuffleFreestandingOnVanillaBehaviorHook = 0;
 
-        ShuffleFairies_UnregisterHooks();
-
         if (!IS_RANDO)
             return;
 
@@ -2467,10 +2464,6 @@ void RandomizerRegisterHooks() {
             shuffleFreestandingOnVanillaBehaviorHook =
                 GameInteractor::Instance->RegisterGameHook<GameInteractor::OnVanillaBehavior>(
                     ShuffleFreestanding_OnVanillaBehaviorHandler);
-        }
-
-        if (RAND_GET_OPTION(RSK_SHUFFLE_FAIRIES)) {
-            ShuffleFairies_RegisterHooks();
         }
     });
 }
