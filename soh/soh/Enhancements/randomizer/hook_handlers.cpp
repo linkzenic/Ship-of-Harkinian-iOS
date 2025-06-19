@@ -8,7 +8,6 @@
 #include "soh/Enhancements/randomizer/dungeon.h"
 #include "soh/Enhancements/randomizer/fishsanity.h"
 #include "soh/Enhancements/randomizer/static_data.h"
-#include "soh/Enhancements/randomizer/ShufflePots.h"
 #include "soh/Enhancements/randomizer/ShuffleFreestanding.h"
 #include "soh/Enhancements/game-interactor/GameInteractor.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
@@ -2332,9 +2331,6 @@ void RandomizerRegisterHooks() {
     static uint32_t fishsanityOnVanillaBehaviorHook = 0;
     static uint32_t fishsanityOnItemReceiveHook = 0;
 
-    static uint32_t shufflePotsOnActorInitHook = 0;
-    static uint32_t shufflePotsOnVanillaBehaviorHook = 0;
-
     static uint32_t shuffleFreestandingOnVanillaBehaviorHook = 0;
 
     GameInteractor::Instance->RegisterGameHook<GameInteractor::OnLoadGame>([](int32_t fileNum) {
@@ -2370,10 +2366,6 @@ void RandomizerRegisterHooks() {
             fishsanityOnVanillaBehaviorHook);
         GameInteractor::Instance->UnregisterGameHook<GameInteractor::OnItemReceive>(fishsanityOnItemReceiveHook);
 
-        GameInteractor::Instance->UnregisterGameHookForID<GameInteractor::OnActorInit>(shufflePotsOnActorInitHook);
-        GameInteractor::Instance->UnregisterGameHook<GameInteractor::OnVanillaBehavior>(
-            shufflePotsOnVanillaBehaviorHook);
-
         GameInteractor::Instance->UnregisterGameHook<GameInteractor::OnVanillaBehavior>(
             shuffleFreestandingOnVanillaBehaviorHook);
 
@@ -2401,9 +2393,6 @@ void RandomizerRegisterHooks() {
         fishsanityOnSceneInitHook = 0;
         fishsanityOnVanillaBehaviorHook = 0;
         fishsanityOnItemReceiveHook = 0;
-
-        shufflePotsOnActorInitHook = 0;
-        shufflePotsOnVanillaBehaviorHook = 0;
 
         shuffleFreestandingOnVanillaBehaviorHook = 0;
 
@@ -2472,14 +2461,6 @@ void RandomizerRegisterHooks() {
                     Rando::Fishsanity::OnVanillaBehaviorHandler);
             fishsanityOnItemReceiveHook = GameInteractor::Instance->RegisterGameHook<GameInteractor::OnItemReceive>(
                 Rando::Fishsanity::OnItemReceiveHandler);
-        }
-
-        if (RAND_GET_OPTION(RSK_SHUFFLE_POTS) != RO_SHUFFLE_POTS_OFF) {
-            shufflePotsOnActorInitHook = GameInteractor::Instance->RegisterGameHookForID<GameInteractor::OnActorInit>(
-                ACTOR_OBJ_TSUBO, ObjTsubo_RandomizerInit);
-            shufflePotsOnVanillaBehaviorHook =
-                GameInteractor::Instance->RegisterGameHook<GameInteractor::OnVanillaBehavior>(
-                    ShufflePots_OnVanillaBehaviorHandler);
         }
 
         if (RAND_GET_OPTION(RSK_SHUFFLE_FREESTANDING) != RO_SHUFFLE_FREESTANDING_OFF) {
