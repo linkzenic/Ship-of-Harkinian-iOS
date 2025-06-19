@@ -11,9 +11,11 @@ void RegionTable_Init_GoronCity() {
         EventAccess(&logic->StickPot,                  []{return logic->IsChild;}),
         EventAccess(&logic->BugRock,                   []{return logic->BlastOrSmash() || logic->CanUse(RG_SILVER_GAUNTLETS);}),
         EventAccess(&logic->GoronCityChildFire,        []{return logic->IsChild && logic->CanUse(RG_DINS_FIRE);}),
-        EventAccess(&logic->GCWoodsWarpOpen,           []{return logic->BlastOrSmash() || logic->CanUse(RG_DINS_FIRE) || logic->CanUse(RG_FAIRY_BOW) || logic->HasItem(RG_GORONS_BRACELET) || logic->GoronCityChildFire;}),
+        EventAccess(&logic->GCWoodsWarpOpen,           []{return logic->CanDetonateUprightBombFlower() || logic->CanUse(RG_MEGATON_HAMMER) || logic->GoronCityChildFire;}),
         EventAccess(&logic->GCDaruniasDoorOpenChild,   []{return logic->IsChild && logic->CanUse(RG_ZELDAS_LULLABY);}),
-        EventAccess(&logic->StopGCRollingGoronAsAdult, []{return logic->IsAdult && (logic->HasItem(RG_GORONS_BRACELET) || logic->HasExplosives() || logic->CanUse(RG_FAIRY_BOW) || (ctx->GetTrickOption(RT_GC_LINK_GORON_DINS) && logic->CanUse(RG_DINS_FIRE)));}),
+        // bottle animation causes similar complications as stopping goron with Din's Fire, only put in logic when both din's & blue fire tricks enabled
+        EventAccess(&logic->StopGCRollingGoronAsAdult, []{return logic->IsAdult && (logic->HasItem(RG_GORONS_BRACELET) || logic->HasExplosives() || logic->CanUse(RG_FAIRY_BOW) ||
+                                                                                   (ctx->GetTrickOption(RT_GC_LINK_GORON_DINS) && (logic->CanUse(RG_DINS_FIRE) || (ctx->GetTrickOption(RT_BLUE_FIRE_MUD_WALLS) && logic->CanUse(RG_BOTTLE_WITH_BLUE_FIRE)))));}),
     }, {
         //Locations
         LOCATION(RC_GC_MAZE_LEFT_CHEST,             logic->CanUse(RG_MEGATON_HAMMER) || logic->CanUse(RG_SILVER_GAUNTLETS) || (ctx->GetTrickOption(RT_GC_LEFTMOST) && logic->HasExplosives() && logic->CanUse(RG_HOVER_BOOTS))),

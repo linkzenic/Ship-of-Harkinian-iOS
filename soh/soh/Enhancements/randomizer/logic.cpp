@@ -964,7 +964,9 @@ bool Logic::CanDetonateBombFlowers() {
 }
 
 bool Logic::CanDetonateUprightBombFlower() {
-    return CanDetonateBombFlowers() || HasItem(RG_GORONS_BRACELET);
+    return CanDetonateBombFlowers() || HasItem(RG_GORONS_BRACELET) ||
+           (ctx->GetTrickOption(RT_BLUE_FIRE_MUD_WALLS) && CanUse(RG_BOTTLE_WITH_BLUE_FIRE) &&
+            (EffectiveHealth() != 1 || CanUse(RG_NAYRUS_LOVE)));
 }
 
 bool Logic::MQWaterLevel(RandoWaterLevel level) {
