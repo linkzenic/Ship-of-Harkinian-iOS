@@ -587,7 +587,7 @@ void CheckTrackerLoadGame(int32_t fileNum) {
         Rando::Context::GetInstance()->GetEntranceShuffler()->ApplyEntranceOverrides();
     }
 
-    RecalculateAvailableChecks();
+    recalculateAvailable = true;
 }
 
 void CheckTrackerShopSlotChange(uint8_t cursorSlot, int16_t basePrice) {
@@ -992,6 +992,11 @@ void CheckTrackerWindow::DrawElement() {
         ImGui::Text("Waiting for file load..."); // TODO Language
         EndFloatWindows();
         return;
+    }
+
+    if (recalculateAvailable) {
+        recalculateAvailable = false;
+        RecalculateAvailableChecks();
     }
 
     SceneID sceneId = SCENE_ID_MAX;
@@ -1986,7 +1991,7 @@ void ImGuiDrawTwoColorPickerSection(const char* text, const char* cvarMainName, 
 }
 
 void RecalculateAvailableChecks(RandomizerRegion startingRegion /* = RR_ROOT */) {
-    if (!enableAvailableChecks || !GameInteractor::IsSaveLoaded(true)) {
+    if (!enableAvailableChecks || !GameInteractor::IsSaveLoaded()) {
         return;
     }
 
@@ -2052,10 +2057,6 @@ static std::unordered_map<int32_t, const char*> buttonStrings = {
 };
 
 void CheckTrackerSettingsWindow::DrawElement() {
-    if (recalculateAvailable) {
-        recalculateAvailable = false;
-        RecalculateAvailableChecks();
-    }
     ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, { 8.0f, 8.0f });
     if (ImGui::BeginTable("CheckTrackerSettingsTable", 2, ImGuiTableFlags_BordersH | ImGuiTableFlags_BordersV)) {
         ImGui::TableSetupColumn("General settings", ImGuiTableColumnFlags_WidthStretch, 200.0f);
