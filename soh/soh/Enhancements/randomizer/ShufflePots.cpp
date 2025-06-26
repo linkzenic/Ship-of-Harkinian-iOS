@@ -1,6 +1,7 @@
 #include "soh/OTRGlobals.h"
 #include "soh_assets.h"
 #include "static_data.h"
+#include "soh/ObjectExtension/ObjectExtension.h"
 
 extern "C" {
 #include "variables.h"
@@ -25,15 +26,19 @@ extern "C" void ObjTsubo_RandomizerDraw(Actor* thisx, PlayState* play) {
 }
 
 uint8_t ObjTsubo_RandomizerHoldsItem(ObjTsubo* potActor, PlayState* play) {
-    RandomizerCheck rc = potActor->potIdentity.randomizerCheck;
+    const auto potIdentity = ObjectExtension::GetInstance().Get<PotIdentity>(&potActor->actor);
+    if (potIdentity == nullptr) {
+        return false;
+    }
+
+    RandomizerCheck rc = potIdentity->randomizerCheck;
     uint8_t isDungeon = Rando::StaticData::GetLocation(rc)->IsDungeon();
     uint8_t potSetting = RAND_GET_OPTION(RSK_SHUFFLE_POTS);
 
     // Don't pull randomized item if pot isn't randomized or is already checked
     if (!IS_RANDO || (potSetting == RO_SHUFFLE_POTS_OVERWORLD && isDungeon) ||
-        (potSetting == RO_SHUFFLE_POTS_DUNGEONS && !isDungeon) ||
-        Flags_GetRandomizerInf(potActor->potIdentity.randomizerInf) ||
-        potActor->potIdentity.randomizerCheck == RC_UNKNOWN_CHECK) {
+        (potSetting == RO_SHUFFLE_POTS_DUNGEONS && !isDungeon) || Flags_GetRandomizerInf(potIdentity->randomizerInf) ||
+        potIdentity->randomizerCheck == RC_UNKNOWN_CHECK) {
         return false;
     } else {
         return true;
@@ -41,10 +46,14 @@ uint8_t ObjTsubo_RandomizerHoldsItem(ObjTsubo* potActor, PlayState* play) {
 }
 
 void ObjTsubo_RandomizerSpawnCollectible(ObjTsubo* potActor, PlayState* play) {
+    const auto potIdentity = ObjectExtension::GetInstance().Get<PotIdentity>(&potActor->actor);
+    if (potIdentity == nullptr) {
+        return;
+    }
+
     EnItem00* item00 = (EnItem00*)Item_DropCollectible2(play, &potActor->actor.world.pos, ITEM00_SOH_DUMMY);
-    item00->randoInf = potActor->potIdentity.randomizerInf;
-    item00->itemEntry =
-        Rando::Context::GetInstance()->GetFinalGIEntry(potActor->potIdentity.randomizerCheck, true, GI_NONE);
+    item00->randoInf = potIdentity->randomizerInf;
+    item00->itemEntry = Rando::Context::GetInstance()->GetFinalGIEntry(potIdentity->randomizerCheck, true, GI_NONE);
     item00->actor.draw = (ActorFunc)EnItem00_DrawRandomizedItem;
     item00->actor.velocity.y = 8.0f;
     item00->actor.speedXZ = 2.0f;
@@ -58,8 +67,9 @@ void RegisterShufflePots() {
         Actor* actor = static_cast<Actor*>(actorRef);
         ObjTsubo* potActor = static_cast<ObjTsubo*>(actorRef);
 
-        potActor->potIdentity = OTRGlobals::Instance->gRandomizer->IdentifyPot(
-            gPlayState->sceneNum, (s16)actor->world.pos.x, (s16)actor->world.pos.z);
+        auto potIdentity = OTRGlobals::Instance->gRandomizer->IdentifyPot(gPlayState->sceneNum, (s16)actor->world.pos.x,
+                                                                          (s16)actor->world.pos.z);
+        ObjectExtension::GetInstance().Set<PotIdentity>(actor, std::move(potIdentity));
     });
 
     // Draw custom model for pot to indicate it holding a randomized item.
@@ -649,5 +659,6 @@ void Rando::StaticData::RegisterPotLocations() {
     // clang-format on
 }
 
+static ObjectExtension::Register<PotIdentity> RegisterPotIdentity;
 static RegisterShipInitFunc registerShufflePots(RegisterShufflePots, { "IS_RANDO" });
 static RegisterShipInitFunc registerShufflePotLocations(Rando::StaticData::RegisterPotLocations);

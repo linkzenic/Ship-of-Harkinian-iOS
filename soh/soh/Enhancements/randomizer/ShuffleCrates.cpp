@@ -1,9 +1,10 @@
-#include "ShuffleCrates.h"
+#include <soh/OTRGlobals.h>
 #include "soh_assets.h"
 #include "static_data.h"
 #include <libultraship/libultra.h>
 #include "global.h"
 #include "soh/ResourceManagerHelpers.h"
+#include "soh/ObjectExtension/ObjectExtension.h"
 
 extern "C" {
 #include "variables.h"
@@ -31,8 +32,14 @@ extern "C" void ObjKibako2_RandomizerDraw(Actor* thisx, PlayState* play) {
         return;
     }
 
+    const auto crateIdentity = ObjectExtension::GetInstance().Get<CrateIdentity>(thisx);
+    if (crateIdentity == nullptr) {
+        Gfx_DrawDListOpa(play, (Gfx*)gLargeRandoCrateDL);
+        return;
+    }
+
     GetItemEntry crateItem =
-        Rando::Context::GetInstance()->GetFinalGIEntry(crateActor->crateIdentity.randomizerCheck, true, GI_NONE);
+        Rando::Context::GetInstance()->GetFinalGIEntry(crateIdentity->randomizerCheck, true, GI_NONE);
     getItemCategory = crateItem.getItemCategory;
 
     // If they have bombchus, don't consider the bombchu item major
@@ -99,8 +106,14 @@ extern "C" void ObjKibako_RandomizerDraw(Actor* thisx, PlayState* play) {
         return;
     }
 
-    GetItemEntry smallCrateItem = Rando::Context::GetInstance()->GetFinalGIEntry(
-        smallCrateActor->smallCrateIdentity.randomizerCheck, true, GI_NONE);
+    const auto crateIdentity = ObjectExtension::GetInstance().Get<SmallCrateIdentity>(thisx);
+    if (crateIdentity == nullptr) {
+        Gfx_DrawDListOpa(play, (Gfx*)gSmallRandoCrateDL);
+        return;
+    }
+
+    GetItemEntry smallCrateItem =
+        Rando::Context::GetInstance()->GetFinalGIEntry(crateIdentity->randomizerCheck, true, GI_NONE);
     getItemCategory = smallCrateItem.getItemCategory;
 
     // If they have bombchus, don't consider the bombchu item major
@@ -154,15 +167,19 @@ extern "C" void ObjKibako_RandomizerDraw(Actor* thisx, PlayState* play) {
 }
 
 uint8_t ObjKibako2_RandomizerHoldsItem(ObjKibako2* crateActor, PlayState* play) {
-    RandomizerCheck rc = crateActor->crateIdentity.randomizerCheck;
+    const auto crateIdentity = ObjectExtension::GetInstance().Get<CrateIdentity>(&crateActor->dyna.actor);
+    if (crateIdentity == nullptr) {
+        return false;
+    }
+
+    RandomizerCheck rc = crateIdentity->randomizerCheck;
     uint8_t isDungeon = Rando::StaticData::GetLocation(rc)->IsDungeon();
     uint8_t crateSetting = RAND_GET_OPTION(RSK_SHUFFLE_CRATES);
 
     // Don't pull randomized item if crate isn't randomized or is already checked
     if (!IS_RANDO || (crateSetting == RO_SHUFFLE_CRATES_OVERWORLD && isDungeon) ||
         (crateSetting == RO_SHUFFLE_CRATES_DUNGEONS && !isDungeon) ||
-        Flags_GetRandomizerInf(crateActor->crateIdentity.randomizerInf) ||
-        crateActor->crateIdentity.randomizerCheck == RC_UNKNOWN_CHECK) {
+        Flags_GetRandomizerInf(crateIdentity->randomizerInf) || crateIdentity->randomizerCheck == RC_UNKNOWN_CHECK) {
         return false;
     } else {
         return true;
@@ -170,15 +187,19 @@ uint8_t ObjKibako2_RandomizerHoldsItem(ObjKibako2* crateActor, PlayState* play) 
 }
 
 uint8_t ObjKibako_RandomizerHoldsItem(ObjKibako* smallCrateActor, PlayState* play) {
-    RandomizerCheck rc = smallCrateActor->smallCrateIdentity.randomizerCheck;
+    const auto crateIdentity = ObjectExtension::GetInstance().Get<SmallCrateIdentity>(&smallCrateActor->actor);
+    if (crateIdentity == nullptr) {
+        return false;
+    }
+
+    RandomizerCheck rc = crateIdentity->randomizerCheck;
     uint8_t isDungeon = Rando::StaticData::GetLocation(rc)->IsDungeon();
     uint8_t crateSetting = RAND_GET_OPTION(RSK_SHUFFLE_CRATES);
 
     // Don't pull randomized item if crate isn't randomized or is already checked
     if (!IS_RANDO || (crateSetting == RO_SHUFFLE_CRATES_OVERWORLD && isDungeon) ||
         (crateSetting == RO_SHUFFLE_CRATES_DUNGEONS && !isDungeon) ||
-        Flags_GetRandomizerInf(smallCrateActor->smallCrateIdentity.randomizerInf) ||
-        smallCrateActor->smallCrateIdentity.randomizerCheck == RC_UNKNOWN_CHECK) {
+        Flags_GetRandomizerInf(crateIdentity->randomizerInf) || crateIdentity->randomizerCheck == RC_UNKNOWN_CHECK) {
         return false;
     } else {
         return true;
@@ -186,10 +207,14 @@ uint8_t ObjKibako_RandomizerHoldsItem(ObjKibako* smallCrateActor, PlayState* pla
 }
 
 void ObjKibako2_RandomizerSpawnCollectible(ObjKibako2* crateActor, PlayState* play) {
+    const auto crateIdentity = ObjectExtension::GetInstance().Get<CrateIdentity>(&crateActor->dyna.actor);
+    if (crateIdentity == nullptr) {
+        return;
+    }
+
     EnItem00* item00 = (EnItem00*)Item_DropCollectible2(play, &crateActor->dyna.actor.world.pos, ITEM00_SOH_DUMMY);
-    item00->randoInf = crateActor->crateIdentity.randomizerInf;
-    item00->itemEntry =
-        Rando::Context::GetInstance()->GetFinalGIEntry(crateActor->crateIdentity.randomizerCheck, true, GI_NONE);
+    item00->randoInf = crateIdentity->randomizerInf;
+    item00->itemEntry = Rando::Context::GetInstance()->GetFinalGIEntry(crateIdentity->randomizerCheck, true, GI_NONE);
     item00->actor.draw = (ActorFunc)EnItem00_DrawRandomizedItem;
     item00->actor.velocity.y = 8.0f;
     item00->actor.speedXZ = 2.0f;
@@ -197,10 +222,14 @@ void ObjKibako2_RandomizerSpawnCollectible(ObjKibako2* crateActor, PlayState* pl
 }
 
 void ObjKibako_RandomizerSpawnCollectible(ObjKibako* smallCrateActor, PlayState* play) {
+    const auto crateIdentity = ObjectExtension::GetInstance().Get<SmallCrateIdentity>(&smallCrateActor->actor);
+    if (crateIdentity == nullptr) {
+        return;
+    }
+
     EnItem00* item00 = (EnItem00*)Item_DropCollectible2(play, &smallCrateActor->actor.world.pos, ITEM00_SOH_DUMMY);
-    item00->randoInf = smallCrateActor->smallCrateIdentity.randomizerInf;
-    item00->itemEntry = Rando::Context::GetInstance()->GetFinalGIEntry(
-        smallCrateActor->smallCrateIdentity.randomizerCheck, true, GI_NONE);
+    item00->randoInf = crateIdentity->randomizerInf;
+    item00->itemEntry = Rando::Context::GetInstance()->GetFinalGIEntry(crateIdentity->randomizerCheck, true, GI_NONE);
     item00->actor.draw = (ActorFunc)EnItem00_DrawRandomizedItem;
     item00->actor.velocity.y = 8.0f;
     item00->actor.speedXZ = 2.0f;
@@ -231,8 +260,9 @@ void ObjKibako2_RandomizerInit(void* actorRef) {
 
     ObjKibako2* crateActor = static_cast<ObjKibako2*>(actorRef);
 
-    crateActor->crateIdentity = OTRGlobals::Instance->gRandomizer->IdentifyCrate(
-        gPlayState->sceneNum, (s16)actor->world.pos.x, (s16)actor->world.pos.z);
+    auto crateIdentity = OTRGlobals::Instance->gRandomizer->IdentifyCrate(gPlayState->sceneNum, (s16)actor->world.pos.x,
+                                                                          (s16)actor->world.pos.z);
+    ObjectExtension::GetInstance().Set<CrateIdentity>(actor, std::move(crateIdentity));
 }
 
 void ObjKibako_RandomizerInit(void* actorRef) {
@@ -243,8 +273,9 @@ void ObjKibako_RandomizerInit(void* actorRef) {
 
     ObjKibako* smallCrateActor = static_cast<ObjKibako*>(actorRef);
 
-    smallCrateActor->smallCrateIdentity = OTRGlobals::Instance->gRandomizer->IdentifySmallCrate(
+    auto crateIdentity = OTRGlobals::Instance->gRandomizer->IdentifySmallCrate(
         gPlayState->sceneNum, (s16)actor->home.pos.x, (s16)actor->home.pos.z);
+    ObjectExtension::GetInstance().Set<SmallCrateIdentity>(actor, std::move(crateIdentity));
 }
 
 void RegisterShuffleCrates() {
@@ -564,5 +595,7 @@ void Rando::StaticData::RegisterCrateLocations() {
     // clang-format on
 }
 
+static ObjectExtension::Register<CrateIdentity> RegisterCrateIdentity;
+static ObjectExtension::Register<SmallCrateIdentity> RegisterSmallCrateIdentity;
 static RegisterShipInitFunc initFunc(RegisterShuffleCrates, { "IS_RANDO" });
 static RegisterShipInitFunc locFunc(Rando::StaticData::RegisterCrateLocations);
