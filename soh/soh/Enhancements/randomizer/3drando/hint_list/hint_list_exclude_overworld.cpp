@@ -1548,7 +1548,7 @@ void StaticData::HintTable_Init_Exclude_Overworld() {
                                                 /*german*/ "Man erzählt sich, daß eine #Krug auf dem Markt# #[[1]]# enthielte.",//TODO_TRANSLATE update to match
                                                 /*french*/ "Selon moi, une #jarre dans la Place du Marché# contient #[[1]]#.", {QM_RED, QM_GREEN}));//TODO_TRANSLATE update to match
 
-    hintTextTable[RHT_POT_ALLY_HOUSE] = HintText(CustomMessage("They say that a #bearded man's pot# contains #[[1]]#.",
+    hintTextTable[RHT_POT_ALLEY_HOUSE] = HintText(CustomMessage("They say that a #bearded man's pot# contains #[[1]]#.",
                                                 /*german*/ "Man erzählt sich, daß eine #Krug auf dem Markt# #[[1]]# enthielte.",//TODO_TRANSLATE update to match
                                                 /*french*/ "Selon moi, une #jarre dans la Place du Marché# contient #[[1]]#.", {QM_RED, QM_GREEN}));//TODO_TRANSLATE update to match
 
