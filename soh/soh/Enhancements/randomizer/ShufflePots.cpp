@@ -7,7 +7,7 @@ extern "C" {
 #include "variables.h"
 #include "overlays/actors/ovl_Obj_Tsubo/z_obj_tsubo.h"
 #include "overlays/actors/ovl_Door_Shutter/z_door_shutter.h"
-    extern PlayState* gPlayState;
+extern PlayState* gPlayState;
 }
 
 extern void EnItem00_DrawRandomizedItem(EnItem00* enItem00, PlayState* play);
@@ -19,7 +19,7 @@ extern "C" void ObjTsubo_RandomizerDraw(Actor* thisx, PlayState* play) {
     Gfx_SetupDL_25Opa(play->state.gfxCtx);
     Matrix_Scale(potSize, potSize, potSize, MTXMODE_APPLY);
     gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx, (char*)__FILE__, __LINE__),
-        G_MTX_MODELVIEW | G_MTX_LOAD);
+              G_MTX_MODELVIEW | G_MTX_LOAD);
 
     gSPDisplayList(POLY_OPA_DISP++, (Gfx*)gRandoPotDL);
     CLOSE_DISPS(play->state.gfxCtx);
@@ -68,37 +68,37 @@ void RegisterShufflePots() {
         ObjTsubo* potActor = static_cast<ObjTsubo*>(actorRef);
 
         auto potIdentity = OTRGlobals::Instance->gRandomizer->IdentifyPot(gPlayState->sceneNum, (s16)actor->world.pos.x,
-            (s16)actor->world.pos.z);
+                                                                          (s16)actor->world.pos.z);
         ObjectExtension::GetInstance().Set<PotIdentity>(actor, std::move(potIdentity));
-        });
+    });
 
     // Draw custom model for pot to indicate it holding a randomized item.
     COND_VB_SHOULD(VB_POT_SETUP_DRAW, shouldRegister, {
         ObjTsubo* potActor = va_arg(args, ObjTsubo*);
-    if (ObjTsubo_RandomizerHoldsItem(potActor, gPlayState)) {
-        potActor->actor.draw = (ActorFunc)ObjTsubo_RandomizerDraw;
-        *should = false;
-    }
-        });
+        if (ObjTsubo_RandomizerHoldsItem(potActor, gPlayState)) {
+            potActor->actor.draw = (ActorFunc)ObjTsubo_RandomizerDraw;
+            *should = false;
+        }
+    });
 
     // Do not spawn vanilla item from pot, instead spawn the ranomized item.
     COND_VB_SHOULD(VB_POT_DROP_ITEM, shouldRegister, {
         ObjTsubo* potActor = va_arg(args, ObjTsubo*);
-    if (ObjTsubo_RandomizerHoldsItem(potActor, gPlayState)) {
-        ObjTsubo_RandomizerSpawnCollectible(potActor, gPlayState);
-        *should = false;
-    }
-        });
+        if (ObjTsubo_RandomizerHoldsItem(potActor, gPlayState)) {
+            ObjTsubo_RandomizerSpawnCollectible(potActor, gPlayState);
+            *should = false;
+        }
+    });
 
     // Unlock early Ganon's Boss Key doors to allow access to the pots there when pots are shuffled in dungeon
     COND_VB_SHOULD(VB_LOCK_BOSS_DOOR, shouldRegister, {
         DoorShutter* doorActor = va_arg(args, DoorShutter*);
-    uint8_t shufflePotSetting = RAND_GET_OPTION(RSK_SHUFFLE_POTS);
-    if (gPlayState->sceneNum == SCENE_GANONS_TOWER && doorActor->dyna.actor.world.pos.y == 800 &&
-        (shufflePotSetting == RO_SHUFFLE_POTS_DUNGEONS || shufflePotSetting == RO_SHUFFLE_POTS_ALL)) {
-        *should = false;
-    }
-        });
+        uint8_t shufflePotSetting = RAND_GET_OPTION(RSK_SHUFFLE_POTS);
+        if (gPlayState->sceneNum == SCENE_GANONS_TOWER && doorActor->dyna.actor.world.pos.y == 800 &&
+            (shufflePotSetting == RO_SHUFFLE_POTS_DUNGEONS || shufflePotSetting == RO_SHUFFLE_POTS_ALL)) {
+            *should = false;
+        }
+    });
 }
 
 void Rando::StaticData::RegisterPotLocations() {
