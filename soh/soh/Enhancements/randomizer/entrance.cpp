@@ -45,8 +45,6 @@ std::string Entrance::GetName() const {
 }
 
 void Entrance::printAgeTimeAccess() {
-    // CitraPrint("Name: ");
-    // CitraPrint(name);
     auto message = "Child Day:   " + std::to_string(CheckConditionAtAgeTime(logic->IsChild, logic->AtDay)) +
                    "\t"
                    "Child Night: " +
@@ -57,7 +55,6 @@ void Entrance::printAgeTimeAccess() {
                    "\t"
                    "Adult Night: " +
                    std::to_string(CheckConditionAtAgeTime(logic->IsAdult, logic->AtNight));
-    // CitraPrint(message);
 }
 
 bool Entrance::ConditionsMet(bool allAgeTimes) const {
