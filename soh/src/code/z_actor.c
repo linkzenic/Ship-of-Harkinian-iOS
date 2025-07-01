@@ -5055,8 +5055,8 @@ void Flags_SetRandomizerInf(RandomizerInf flag) {
     */
 
     s32 previouslyOff = !Flags_GetRandomizerInf(flag);
-    gSaveContext.ship.randomizerInf[flag >> 4] |= (1 << (flag & 0xF));
     if (previouslyOff) {
+        gSaveContext.ship.randomizerInf[flag >> 4] |= (1 << (flag & 0xF));
         LUSLOG_INFO("RandomizerInf Flag Set - %#x", flag);
         GameInteractor_ExecuteOnFlagSet(FLAG_RANDOMIZER_INF, flag);
     }
@@ -5076,8 +5076,8 @@ void Flags_UnsetRandomizerInf(RandomizerInf flag) {
     */
 
     s32 previouslyOn = Flags_GetRandomizerInf(flag);
-    gSaveContext.ship.randomizerInf[flag >> 4] &= ~(1 << (flag & 0xF));
     if (previouslyOn) {
+        gSaveContext.ship.randomizerInf[flag >> 4] &= ~(1 << (flag & 0xF));
         LUSLOG_INFO("RandomizerInf Flag Unset - %#x", flag);
         GameInteractor_ExecuteOnFlagUnset(FLAG_RANDOMIZER_INF, flag);
     }
