@@ -299,49 +299,6 @@ void UpdateHyperEnemiesState() {
     }
 }
 
-void RegisterBonkDamage() {
-    GameInteractor::Instance->RegisterGameHook<GameInteractor::OnPlayerBonk>([]() {
-        uint8_t bonkOption = CVarGetInteger(CVAR_ENHANCEMENT("BonkDamageMult"), BONK_DAMAGE_NONE);
-        if (bonkOption == BONK_DAMAGE_NONE) {
-            return;
-        }
-
-        if (bonkOption == BONK_DAMAGE_OHKO) {
-            gSaveContext.health = 0;
-            return;
-        }
-
-        uint16_t bonkDamage = 0;
-        switch (bonkOption) {
-            case BONK_DAMAGE_QUARTER_HEART:
-                bonkDamage = 4;
-                break;
-            case BONK_DAMAGE_HALF_HEART:
-                bonkDamage = 8;
-                break;
-            case BONK_DAMAGE_1_HEART:
-                bonkDamage = 16;
-                break;
-            case BONK_DAMAGE_2_HEARTS:
-                bonkDamage = 32;
-                break;
-            case BONK_DAMAGE_4_HEARTS:
-                bonkDamage = 64;
-                break;
-            case BONK_DAMAGE_8_HEARTS:
-                bonkDamage = 128;
-                break;
-            default:
-                break;
-        }
-
-        Health_ChangeBy(gPlayState, -bonkDamage);
-        // Set invincibility to make Link flash red as a visual damage indicator.
-        Player* player = GET_PLAYER(gPlayState);
-        player->invincibilityTimer = 28;
-    });
-}
-
 void UpdateDirtPathFixState(int32_t sceneNum) {
     switch (sceneNum) {
         case SCENE_HYRULE_FIELD:
@@ -982,7 +939,6 @@ void InitMods() {
     RegisterDeleteFileOnDeath();
     RegisterHyperBosses();
     UpdateHyperEnemiesState();
-    RegisterBonkDamage();
     RegisterMenuPathFix();
     RegisterMirrorModeHandler();
     RegisterResetNaviTimer();
