@@ -434,12 +434,12 @@ void InitTrickNames() {
     };
     trickNameTable[RG_BROKEN_SWORD] = {
         Text{ "Broken Biggoron's Sword", "Épée brisée de Grogoron",
-              "zerbr. Biggoron-Schwert" },                                                // "Espada de Biggoron rota"
-        Text{ "Broken Giant's Knife", "Lame des Géants brisée", "zerbr. Langschwert" },   // "Daga gigante rota"
-        Text{ "Broken Noble Sword", "Épée noble brisée", "zerbr. Edelschwert" },          // "Espada noble rota"
-        Text{ "Broken Picori Blade", "Épée Minish brisée", "zerbr. Schwert der Minish" }, // "Espada minish rota"
+              "Zerbr. Biggoron-Schwert" },                                                // "Espada de Biggoron rota"
+        Text{ "Broken Giant's Knife", "Lame des Géants brisée", "Zerbr. Langschwert" },   // "Daga gigante rota"
+        Text{ "Broken Noble Sword", "Épée noble brisée", "Zerbr. Edelschwert" },          // "Espada noble rota"
+        Text{ "Broken Picori Blade", "Épée Minish brisée", "Zerbr. Schwert der Minish" }, // "Espada minish rota"
         Text{ "Decayed Master Sword", "Épée de légende pourrie",
-              "zerfr. Master-Schwert" }, // "Espada decadente de leyenda"
+              "Zerf. Master-Schwert" }, // "Espada decadente de leyenda"
     };
     trickNameTable[RG_PRESCRIPTION] = {
         Text{ "Biggoron's Prescription", "Ordonnance de Grogoron", "Biggorons Rezept" }, // "Receta de Biggoron"
@@ -772,21 +772,21 @@ void InitTrickNames() {
 
     trickNameTable[RG_KOKIRI_EMERALD] = {
         Text{ "Pendant of Courage", "Pendentif du courage", "Amulett des Mutes" }, // "Colgante del valor"
-        Text{ "Farore's Pearl", "Perle de Farore", "Farores Deamont" },            // "Orbe de Farore"
+        Text{ "Farore's Pearl", "Perle de Farore", "Farores Perle" },              // "Orbe de Farore"
         Text{ "Aquanine", "Smaragdine", "Smaragdstahl" },                          // "Yerbánida"
         Text{ "Farore's Emerald", "Émeraude de Farore", "Farore-Smaragd" },        // "Esmeralda de Farore"
         Text{ "Kokiri's Peridot", "Péridot Kokiri", "Kokiri-Peridot" },            // "Ágata de los Kokiri"
     };
     trickNameTable[RG_GORON_RUBY] = {
         Text{ "Pendant of Power", "Pendentif de la force", "Amulett der Stärke" }, // "Colgante del poder"
-        Text{ "Din's Pearl", "Perle de Din", "Dins Deamont" },                     // "Orbe de Din"
+        Text{ "Din's Pearl", "Perle de Din", "Dins Perle" },                       // "Orbe de Din"
         Text{ "Crimsonine", "Alzanine", "Scharlachstahl" },                        // "Bermellina"
         Text{ "Din's Ruby", "Rubis de Din", "Din-Rubin" },                         // "Rubí de Din"
         Text{ "Goron's Garnet", "Grenat Goron", "Goronen-Granat" },                // "Topacio de los Goron"
     };
     trickNameTable[RG_ZORA_SAPPHIRE] = {
         Text{ "Pendant of Wisdom", "Pendentif de la sagesse", "Amulett der Weisheit" }, // "Colgante de la sabiduría"
-        Text{ "Nayru's Pearl", "Perle de Nayru", "Nayrus Deamont" },                    // "Orbe de Nayru"
+        Text{ "Nayru's Pearl", "Perle de Nayru", "Nayrus Perle" },                      // "Orbe de Nayru"
         Text{ "Azurine", "Aquanine", "Azurstahl" },                                     // "Azurina"
         Text{ "Nayru's Sapphire", "Saphir de Nayru", "Nayru-Saphir" },                  // "Zafiro de Nayru"
         Text{ "Zora's Aquamarine", "Aquamarine Zora", "Zora-Aquamarin" },               // "Lapislázuli de los Zora"
