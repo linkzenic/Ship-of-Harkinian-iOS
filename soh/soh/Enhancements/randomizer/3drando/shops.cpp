@@ -691,7 +691,7 @@ void InitTrickNames() {
 
     trickNameTable[RG_RUTOS_LETTER] = {
         Text{ "Bottle with Maggie's Letter", "Flacon avec lettre de Maggy",
-              "Flasche (Dolores Brief)" }, // "Carta de Dolores"
+              "Flasche (Dolores' Brief)" }, // "Carta de Dolores"
         Text{ "Bottle with Letter to Kafei", "Flacon avec lettre pour Kafei",
               "Flasche (Brief an Kafei)" }, // "Carta para Kafei"
         Text{ "Bottle with Zelda's Letter", "Flacon avec Lettre de Zelda",
@@ -717,7 +717,7 @@ void InitTrickNames() {
     };
     trickNameTable[RG_SARIAS_SONG] = {
         Text{ "Mido's Song", "La chanson de Mido", "Midos Lied" },         // "La canción de Mido"
-        Text{ "Kass' Theme", "Le thème de Kass", "Kashiwa Thema" },        // "El tema de Kass"
+        Text{ "Kass' Theme", "Le thème de Kass", "Kashiwas Thema" },       // "El tema de Kass"
         Text{ "Tune of Echoes", "Chant des Échos ", "Melodie des Echos" }, // "Melodía del Eco"
     };
     trickNameTable[RG_SUNS_SONG] = {
@@ -772,21 +772,21 @@ void InitTrickNames() {
 
     trickNameTable[RG_KOKIRI_EMERALD] = {
         Text{ "Pendant of Courage", "Pendentif du courage", "Amulett des Mutes" }, // "Colgante del valor"
-        Text{ "Farore's Pearl", "Perle de Farore", "Farores Perle" },              // "Orbe de Farore"
+        Text{ "Farore's Pearl", "Perle de Farore", "Farores Deamont" },            // "Orbe de Farore"
         Text{ "Aquanine", "Smaragdine", "Smaragdstahl" },                          // "Yerbánida"
         Text{ "Farore's Emerald", "Émeraude de Farore", "Farore-Smaragd" },        // "Esmeralda de Farore"
         Text{ "Kokiri's Peridot", "Péridot Kokiri", "Kokiri-Peridot" },            // "Ágata de los Kokiri"
     };
     trickNameTable[RG_GORON_RUBY] = {
         Text{ "Pendant of Power", "Pendentif de la force", "Amulett der Stärke" }, // "Colgante del poder"
-        Text{ "Din's Pearl", "Perle de Din", "Dins Perle" },                       // "Orbe de Din"
+        Text{ "Din's Pearl", "Perle de Din", "Dins Deamont" },                     // "Orbe de Din"
         Text{ "Crimsonine", "Alzanine", "Scharlachstahl" },                        // "Bermellina"
         Text{ "Din's Ruby", "Rubis de Din", "Din-Rubin" },                         // "Rubí de Din"
         Text{ "Goron's Garnet", "Grenat Goron", "Goronen-Granat" },                // "Topacio de los Goron"
     };
     trickNameTable[RG_ZORA_SAPPHIRE] = {
         Text{ "Pendant of Wisdom", "Pendentif de la sagesse", "Amulett der Weisheit" }, // "Colgante de la sabiduría"
-        Text{ "Nayru's Pearl", "Perle de Nayru", "Nayrus Perle" },                      // "Orbe de Nayru"
+        Text{ "Nayru's Pearl", "Perle de Nayru", "Nayrus Deamont" },                    // "Orbe de Nayru"
         Text{ "Azurine", "Aquanine", "Azurstahl" },                                     // "Azurina"
         Text{ "Nayru's Sapphire", "Saphir de Nayru", "Nayru-Saphir" },                  // "Zafiro de Nayru"
         Text{ "Zora's Aquamarine", "Aquamarine Zora", "Zora-Aquamarin" },               // "Lapislázuli de los Zora"
@@ -916,7 +916,7 @@ void InitTrickNames() {
     };
     trickNameTable[RG_MORPHA_SOUL] = {
         Text{ "Dihydrogen Monoxide", "Monoxyde de Dihydrogène", "Dihydrogenmonoxid" },
-        Text{ "Morpha Molecules", "Molécule de Morpha", "Morphas Molekyle" },
+        Text{ "Morpha Molecules", "Molécule de Morpha", "Morphas Moleküle" },
         Text{ "Wet Stuff", "Truc Mouillé", "nasses Zeug" },
     };
     trickNameTable[RG_BONGO_BONGO_SOUL] = {
@@ -1114,7 +1114,7 @@ void InitTrickNames() {
     };
     trickNameTable[GI_CUCCO] = {
         Text{"D.I.Y. Alarm Clock", "Réveille-matin improvisé", "Improvisierter Wecker"}, // "Alarma emplumada"
-        Text{"Kakariko Cucco", "Cocotte Cocorico", "Kakariko Huhn" }, // "Cuco de Kakariko"
+        Text{"Kakariko Cucco", "Cocotte Cocorico", "Kakariko-Huhn" }, // "Cuco de Kakariko"
         Text{"Hatched Cucco", "Cocotte éclose", "Geschlüpftes Küken" }, // "Pollo"
     };
     trickNameTable[GI_MASK_KEATON] = {
