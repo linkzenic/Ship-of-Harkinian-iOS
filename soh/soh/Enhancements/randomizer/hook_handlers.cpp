@@ -1445,7 +1445,7 @@ void RandomizerOnVanillaBehaviorHandler(GIVanillaBehavior id, bool* should, va_l
             break;
         }
         case VB_GERUDO_GUARD_SET_ACTION_AFTER_TALK:
-            if (gPlayState->msgCtx.choiceIndex == 0) {
+            if (gPlayState->msgCtx.choiceIndex == 0 && gPlayState->sceneNum == SCENE_GERUDOS_FORTRESS) {
                 EnGe2* enGe2 = va_arg(args, EnGe2*);
                 EnGe2_SetupCapturePlayer(enGe2, gPlayState);
                 *should = false;
