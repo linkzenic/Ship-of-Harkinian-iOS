@@ -2220,8 +2220,8 @@ void CheckTrackerSettingsWindow::DrawElement() {
             "Checks that you saved the game while having collected.", THEME_COLOR);
 
         ImGui::PopStyleVar(1);
+        ImGui::EndTable();
     }
-    ImGui::EndTable();
 }
 
 void CheckTrackerWindow::InitElement() {
