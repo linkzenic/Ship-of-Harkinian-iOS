@@ -16,127 +16,6 @@ extern "C" {
 extern "C" PlayState* gPlayState;
 static bool sEnteredBlueWarp = false;
 
-/**
- * This will override the transitions into the blue warp cutscenes, set any appropriate flags, and
- * set the entrance index to where you would normally end up after the blue warp cutscene. This
- * should also account for the difference between your first and following visits to the blue warp.
- */
-void SkipBlueWarp_ShouldPlayTransitionCS(GIVanillaBehavior _, bool* should, va_list originalArgs) {
-    // Do nothing when in a boss rush
-    if (IS_BOSS_RUSH) {
-        return;
-    }
-
-    bool overrideBlueWarpDestinations =
-        IS_RANDO && (RAND_GET_OPTION(RSK_SHUFFLE_DUNGEON_ENTRANCES) != RO_DUNGEON_ENTRANCE_SHUFFLE_OFF ||
-                     RAND_GET_OPTION(RSK_SHUFFLE_BOSS_ENTRANCES) != RO_BOSS_ROOM_ENTRANCE_SHUFFLE_OFF);
-
-    // Force blue warp skip on when ER needs to place Link somewhere else.
-    // This is preferred over having story cutscenes play in the overworld and then reloading Link somewhere else after.
-    if (CVarGetInteger(CVAR_ENHANCEMENT("TimeSavers.SkipCutscene.Story"), IS_RANDO) || overrideBlueWarpDestinations) {
-        bool isBlueWarpCutscene = false;
-        // Deku Tree Blue warp
-        if (gSaveContext.entranceIndex == ENTR_KOKIRI_FOREST_0 && gSaveContext.cutsceneIndex == 0xFFF1) {
-            gSaveContext.entranceIndex = ENTR_KOKIRI_FOREST_DEKU_TREE_BLUE_WARP;
-            isBlueWarpCutscene = true;
-            // Dodongo's Cavern Blue warp
-        } else if (gSaveContext.entranceIndex == ENTR_DEATH_MOUNTAIN_TRAIL_BOTTOM_EXIT &&
-                   gSaveContext.cutsceneIndex == 0xFFF1) {
-            gSaveContext.entranceIndex = ENTR_DEATH_MOUNTAIN_TRAIL_DODONGO_BLUE_WARP;
-            isBlueWarpCutscene = true;
-            // Jabu Jabu's Blue warp
-        } else if (gSaveContext.entranceIndex == ENTR_ZORAS_FOUNTAIN_JABU_JABU_BLUE_WARP &&
-                   gSaveContext.cutsceneIndex == 0xFFF0) {
-            gSaveContext.entranceIndex = ENTR_ZORAS_FOUNTAIN_JABU_JABU_BLUE_WARP;
-            isBlueWarpCutscene = true;
-            // Forest Temple Blue warp
-        } else if (gSaveContext.entranceIndex == ENTR_CHAMBER_OF_THE_SAGES_0 && gSaveContext.cutsceneIndex == 0x0 &&
-                   gSaveContext.chamberCutsceneNum == CHAMBER_CS_FOREST) {
-            // Normally set in the blue warp cutscene
-            Flags_SetEventChkInf(EVENTCHKINF_SPOKE_TO_DEKU_TREE_SPROUT);
-
-            if (IS_RANDO) {
-                gSaveContext.entranceIndex = ENTR_SACRED_FOREST_MEADOW_FOREST_TEMPLE_BLUE_WARP;
-            } else {
-                gSaveContext.entranceIndex = ENTR_KOKIRI_FOREST_12;
-            }
-
-            isBlueWarpCutscene = true;
-            // Fire Temple Blue warp
-        } else if (gSaveContext.entranceIndex == ENTR_KAKARIKO_VILLAGE_FRONT_GATE &&
-                   gSaveContext.cutsceneIndex == 0xFFF3) {
-            // Normally set in the blue warp cutscene
-            Flags_SetEventChkInf(EVENTCHKINF_DEATH_MOUNTAIN_ERUPTED);
-
-            gSaveContext.entranceIndex = ENTR_DEATH_MOUNTAIN_CRATER_FIRE_TEMPLE_BLUE_WARP;
-            isBlueWarpCutscene = true;
-            // Water Temple Blue warp
-        } else if (gSaveContext.entranceIndex == ENTR_CHAMBER_OF_THE_SAGES_0 && gSaveContext.cutsceneIndex == 0x0 &&
-                   gSaveContext.chamberCutsceneNum == CHAMBER_CS_WATER) {
-            // Normally set in the blue warp cutscene
-            gSaveContext.dayTime = gSaveContext.skyboxTime = 0x4800;
-            Flags_SetEventChkInf(EVENTCHKINF_RAISED_LAKE_HYLIA_WATER);
-
-            gSaveContext.entranceIndex = ENTR_LAKE_HYLIA_WATER_TEMPLE_BLUE_WARP;
-            isBlueWarpCutscene = true;
-            // Spirit Temple Blue warp
-        } else if (gSaveContext.entranceIndex == ENTR_CHAMBER_OF_THE_SAGES_0 && gSaveContext.cutsceneIndex == 0x0 &&
-                   gSaveContext.chamberCutsceneNum == CHAMBER_CS_SPIRIT) {
-            gSaveContext.entranceIndex = ENTR_DESERT_COLOSSUS_SPIRIT_TEMPLE_BLUE_WARP;
-            isBlueWarpCutscene = true;
-            // Shadow Temple Blue warp
-        } else if (gSaveContext.entranceIndex == ENTR_CHAMBER_OF_THE_SAGES_0 && gSaveContext.cutsceneIndex == 0x0 &&
-                   gSaveContext.chamberCutsceneNum == CHAMBER_CS_SHADOW) {
-            gSaveContext.entranceIndex = ENTR_GRAVEYARD_SHADOW_TEMPLE_BLUE_WARP;
-            isBlueWarpCutscene = true;
-        }
-
-        if (isBlueWarpCutscene) {
-            if (gSaveContext.entranceIndex != ENTR_LAKE_HYLIA_WATER_TEMPLE_BLUE_WARP) {
-                // Normally set in the blue warp cutscene
-                gSaveContext.dayTime = gSaveContext.skyboxTime = 0x8000;
-            }
-
-            *should = false;
-            gSaveContext.cutsceneIndex = 0;
-        }
-
-        // This is outside the above condition because we want to handle both first and following visits to the blue
-        // warp
-        if (sEnteredBlueWarp && overrideBlueWarpDestinations) {
-            Entrance_OverrideBlueWarp();
-        }
-    }
-
-    sEnteredBlueWarp = false;
-}
-
-/**
- * Using this hook to simply observe that Link has entered a bluewarp
- * This way we know to allow entrance rando overrides to be processed on the next tranisition hook
- */
-void SkipBlueWarp_ShouldPlayBlueWarpCS(GIVanillaBehavior _, bool* should, va_list originalArgs) {
-    sEnteredBlueWarp = true;
-}
-
-/**
- * While we could rely on the Item_Give that's normally called, it's not very clear to the player that they
- * received the item when skipping the blue warp cutscene, so we'll prevent that and queue it up to be given
- * to the player instead.
- */
-void SkipBlueWarp_ShouldGiveItem(GIVanillaBehavior _, bool* should, va_list originalArgs) {
-    if (CVarGetInteger(CVAR_ENHANCEMENT("TimeSavers.SkipCutscene.Story"), IS_RANDO)) {
-        if (IS_VANILLA) {
-            if (gPlayState->sceneNum == SCENE_SHADOW_TEMPLE_BOSS) {
-                TimeSaverQueueItem(RG_SHADOW_MEDALLION);
-            } else if (gPlayState->sceneNum == SCENE_SPIRIT_TEMPLE_BOSS) {
-                TimeSaverQueueItem(RG_SPIRIT_MEDALLION);
-            }
-        }
-        *should = false;
-    }
-}
-
 // Todo: Move item queueing here
 
 /**
@@ -188,7 +67,16 @@ void RegisterSkipBlueWarp() {
      * to the player instead.
      */
     COND_VB_SHOULD(VB_GIVE_ITEM_FROM_BLUE_WARP,
-                   CVarGetInteger(CVAR_ENHANCEMENT("TimeSavers.SkipCutscene.Story"), IS_RANDO), { *should = false; });
+                   CVarGetInteger(CVAR_ENHANCEMENT("TimeSavers.SkipCutscene.Story"), IS_RANDO), {
+                       if (IS_VANILLA) {
+                           if (gPlayState->sceneNum == SCENE_SHADOW_TEMPLE_BOSS) {
+                               TimeSaverQueueItem(RG_SHADOW_MEDALLION);
+                           } else if (gPlayState->sceneNum == SCENE_SPIRIT_TEMPLE_BOSS) {
+                               TimeSaverQueueItem(RG_SPIRIT_MEDALLION);
+                           }
+                       }
+                       *should = false;
+                   });
 }
 
 void RegisterShouldPlayBlueWarp() {
