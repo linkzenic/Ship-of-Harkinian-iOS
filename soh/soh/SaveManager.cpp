@@ -1046,12 +1046,12 @@ void SaveManager::SaveFileThreaded(int fileNum, SaveContext* saveContext, int se
 
 #if defined(__SWITCH__) || defined(__WIIU__)
     FILE* w = fopen(tempFile.c_str(), "w");
-    std::string json_string = saveBlock.dump(4);
+    std::string json_string = saveBlock.dump(1);
     fwrite(json_string.c_str(), sizeof(char), json_string.length(), w);
     fclose(w);
 #else
     std::ofstream output(tempFile);
-    output << std::setw(4) << saveBlock << std::endl;
+    output << std::setw(1) << saveBlock << std::endl;
     output.close();
 #endif
 
@@ -1112,7 +1112,7 @@ void SaveManager::SaveGlobal() {
     const std::filesystem::path sGlobalPath = sSavePath / std::string("global.sav");
 
     std::ofstream output(sGlobalPath);
-    output << std::setw(4) << globalBlock << std::endl;
+    output << std::setw(1) << globalBlock << std::endl;
 }
 
 void SaveManager::LoadFile(int fileNum) {
