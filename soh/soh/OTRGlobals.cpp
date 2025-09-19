@@ -2620,6 +2620,10 @@ extern "C" int CustomMessage_RetrieveIfExists(PlayState* play) {
         } else if ((textId >= TEXT_SARIAS_SONG_FACE_TO_FACE && textId <= TEXT_SARIAS_SONG_CHANNELING_POWER) &&
                    ctx->GetOption(RSK_SARIA_HINT)) {
             messageEntry = ctx->GetHint(RH_SARIA_HINT)->GetHintMessage(MF_AUTO_FORMAT, 1);
+        } else if ((textId == TEXT_MIDO_SPEAK_TO_MIDO_FIRST_TIME || textId == TEXT_MIDO_SPEAK_TO_MIDO_AGAIN ||
+                    textId == TEXT_MIDO_HOME_AFTER_ZELDAS_LETTER || textId == TEXT_MIDO_HOME_BEFORE_ZELDAS_LETTER) &&
+                   ctx->GetOption(RSK_MIDO_HINT)) {
+            messageEntry = ctx->GetHint(RH_MIDO_HINT)->GetHintMessage(MF_AUTO_FORMAT);
         } else if (ctx->GetOption(RSK_BIGGORON_HINT) &&
                    (textId == TEXT_BIGGORON_BETTER_AT_SMITHING || textId == TEXT_BIGGORON_WAITING_FOR_YOU ||
                     textId == TEXT_BIGGORON_RETURN_AFTER_A_FEW_DAYS || textId == TEXT_BIGGORON_I_MAAAADE_THISSSS)) {
