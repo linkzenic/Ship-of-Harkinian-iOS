@@ -305,6 +305,7 @@ void Settings::CreateOptions() {
     OPT_BOOL(RSK_SUNLIGHT_ARROWS, "Sunlight Arrows", CVAR_RANDOMIZER_SETTING("SunlightArrows"), mOptionDescriptions[RSK_SUNLIGHT_ARROWS]);
     OPT_U8(RSK_INFINITE_UPGRADES, "Infinite Upgrades", {"Off", "Progressive", "Condensed Progressive"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("InfiniteUpgrades"), mOptionDescriptions[RSK_INFINITE_UPGRADES]);
     OPT_BOOL(RSK_SKELETON_KEY, "Skeleton Key", CVAR_RANDOMIZER_SETTING("SkeletonKey"), mOptionDescriptions[RSK_SKELETON_KEY]);
+    OPT_BOOL(RSK_SLINGBOW_BREAK_BEEHIVES, "Slingshot/Bow Can Break Beehives", CVAR_RANDOMIZER_SETTING("SlingBowBeehives"), mOptionDescriptions[RSK_SLINGBOW_BREAK_BEEHIVES]);
     OPT_U8(RSK_ITEM_POOL, "Item Pool", {"Plentiful", "Balanced", "Scarce", "Minimal"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("ItemPool"), mOptionDescriptions[RSK_ITEM_POOL], WidgetType::Combobox, RO_ITEM_POOL_BALANCED);
     OPT_U8(RSK_ICE_TRAPS, "Ice Traps", {"Off", "Normal", "Extra", "Mayhem", "Onslaught"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("IceTraps"), mOptionDescriptions[RSK_ICE_TRAPS], WidgetType::Combobox, RO_ICE_TRAPS_NORMAL);
     // TODO: Remove Double Defense, Progressive Goron Sword
@@ -1399,6 +1400,7 @@ void Settings::CreateOptions() {
                                                                              &mOptions[RSK_SUNLIGHT_ARROWS],
                                                                              &mOptions[RSK_INFINITE_UPGRADES],
                                                                              &mOptions[RSK_SKELETON_KEY],
+                                                                             &mOptions[RSK_SLINGBOW_BREAK_BEEHIVES],
                                                                          },
                                                                          WidgetContainerType::COLUMN);
     mOptionGroups[RSG_GAMEPLAY_IMGUI_TABLE] =
@@ -1665,6 +1667,7 @@ void Settings::CreateOptions() {
                                               &mOptions[RSK_SUNLIGHT_ARROWS],
                                               &mOptions[RSK_INFINITE_UPGRADES],
                                               &mOptions[RSK_SKELETON_KEY],
+                                              &mOptions[RSK_SLINGBOW_BREAK_BEEHIVES],
                                           });
     mOptionGroups[RSG_ITEM_POOL] = OptionGroup(
         "Item Pool Settings", std::initializer_list<Option*>({ &mOptions[RSK_ITEM_POOL], &mOptions[RSK_ICE_TRAPS] }));
@@ -2541,6 +2544,12 @@ void Settings::UpdateOptionProperties() {
         mOptions[RSK_BIG_POES_HINT].Disable("Poe Collector will just give you the item instead with 0 big poes.");
     } else {
         mOptions[RSK_BIG_POES_HINT].Enable();
+    }
+    if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleBeehives"), RO_GENERIC_OFF)) {
+        mOptions[RSK_SLINGBOW_BREAK_BEEHIVES].Enable();
+    } else {
+        mOptions[RSK_SLINGBOW_BREAK_BEEHIVES].Disable(
+            "This option is disabled because Shuffle Beehives is not enabled.");
     }
 }
 
