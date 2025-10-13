@@ -332,7 +332,7 @@ void Settings::CreateOptions() {
     OPT_U8(RSK_STARTING_SKULLTULA_TOKEN, "Gold Skulltula Tokens", {NumOpts(0, 100)}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("StartingSkulltulaToken"), "", WidgetType::Slider);
     OPT_U8(RSK_STARTING_HEARTS, "Starting Hearts", {NumOpts(1, 20)}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("StartingHearts"), "", WidgetType::Slider, 2);
     // TODO: Remainder of Starting Items
-    OPT_U8(RSK_LOGIC_RULES, "Logic", {"Glitchless", "No Logic", "Vanilla"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("LogicRules"), mOptionDescriptions[RSK_LOGIC_RULES], WidgetType::Combobox, RO_LOGIC_GLITCHLESS);
+    OPT_U8(RSK_LOGIC_RULES, "Logic", {"Glitchless", "No Logic"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("LogicRules"), mOptionDescriptions[RSK_LOGIC_RULES], WidgetType::Combobox, RO_LOGIC_GLITCHLESS);
     OPT_BOOL(RSK_ALL_LOCATIONS_REACHABLE, "All Locations Reachable", {"Off", "On"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("AllLocationsReachable"), mOptionDescriptions[RSK_ALL_LOCATIONS_REACHABLE], WidgetType::Checkbox, RO_GENERIC_ON);
     OPT_BOOL(RSK_SKULLS_SUNS_SONG, "Night Skulltula's Expect Sun's Song", CVAR_RANDOMIZER_SETTING("GsExpectSunsSong"), mOptionDescriptions[RSK_SKULLS_SUNS_SONG]);
     OPT_U8(RSK_DAMAGE_MULTIPLIER, "Damage Multiplier", {"x1/2", "x1", "x2", "x4", "x8", "x16", "OHKO"}, OptionCategory::Setting, "", "", WidgetType::Slider, RO_DAMAGE_MULTIPLIER_DEFAULT);
@@ -1845,158 +1845,134 @@ void Settings::UpdateOptionProperties() {
     mOptions[RSK_RAINBOW_BRIDGE_REWARD_COUNT].Hide();
     mOptions[RSK_RAINBOW_BRIDGE_DUNGEON_COUNT].Hide();
     mOptions[RSK_RAINBOW_BRIDGE_TOKEN_COUNT].Hide();
-    if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("LogicRules"), RO_LOGIC_GLITCHLESS) == RO_LOGIC_VANILLA) {
-        mOptionGroups[RSG_AREA_ACCESS_IMGUI].Disable();
-        mOptions[RSK_STARTING_AGE].Disable("");
-        mOptions[RSK_GERUDO_FORTRESS].Disable("");
-        mOptions[RSK_RAINBOW_BRIDGE].Disable("");
-        mOptions[RSK_BRIDGE_OPTIONS].Disable("");
-        mOptions[RSK_RAINBOW_BRIDGE_STONE_COUNT].Disable("");
-        mOptions[RSK_RAINBOW_BRIDGE_MEDALLION_COUNT].Disable("");
-        mOptions[RSK_RAINBOW_BRIDGE_REWARD_COUNT].Disable("");
-        mOptions[RSK_RAINBOW_BRIDGE_DUNGEON_COUNT].Disable("");
-        mOptions[RSK_RAINBOW_BRIDGE_TOKEN_COUNT].Disable("");
-        mOptions[RSK_GANONS_TRIALS].Disable("");
-        mOptions[RSK_TRIAL_COUNT].Disable("");
-        mOptions[RSK_TRIFORCE_HUNT].Disable("");
-        mOptions[RSK_TRIFORCE_HUNT_PIECES_TOTAL].Disable("");
-        mOptions[RSK_TRIFORCE_HUNT_PIECES_REQUIRED].Disable("");
-        mOptionGroups[RSG_ITEMS_IMGUI_TABLE].Disable();
-        mOptionGroups[RSG_GAMEPLAY_IMGUI_TABLE].Disable();
-        mOptions[RSK_LINKS_POCKET].Disable("");
-        mOptions[RSK_STARTING_OCARINA].Disable("");
+    mOptionGroups[RSG_AREA_ACCESS_IMGUI].Enable();
+    // Starting Age - Disabled when Forest is set to Closed or under very specific conditions
+    if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("DoorOfTime"), RO_DOOROFTIME_CLOSED) == RO_DOOROFTIME_CLOSED &&
+        CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleOcarinas"), RO_GENERIC_OFF) ==
+            RO_GENERIC_OFF) /* closed door of time with ocarina shuffle off */ {
+        mOptions[RSK_STARTING_AGE].Disable("This option is disabled due to other options making the game unbeatable.");
     } else {
-        mOptionGroups[RSG_AREA_ACCESS_IMGUI].Enable();
-        // Starting Age - Disabled when Forest is set to Closed or under very specific conditions
-        if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("DoorOfTime"), RO_DOOROFTIME_CLOSED) == RO_DOOROFTIME_CLOSED &&
-            CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleOcarinas"), RO_GENERIC_OFF) ==
-                RO_GENERIC_OFF) /* closed door of time with ocarina shuffle off */ {
-            mOptions[RSK_STARTING_AGE].Disable(
-                "This option is disabled due to other options making the game unbeatable.");
-        } else {
-            mOptions[RSK_STARTING_AGE].Enable();
-        }
-        mOptions[RSK_GERUDO_FORTRESS].Enable();
-        mOptions[RSK_RAINBOW_BRIDGE].Enable();
-        mOptions[RSK_BRIDGE_OPTIONS].Enable();
-        mOptions[RSK_RAINBOW_BRIDGE_STONE_COUNT].Enable();
-        mOptions[RSK_RAINBOW_BRIDGE_MEDALLION_COUNT].Enable();
-        mOptions[RSK_RAINBOW_BRIDGE_REWARD_COUNT].Enable();
-        mOptions[RSK_RAINBOW_BRIDGE_DUNGEON_COUNT].Enable();
-        mOptions[RSK_RAINBOW_BRIDGE_TOKEN_COUNT].Enable();
-        const uint8_t bridgeOpt =
-            CVarGetInteger(CVAR_RANDOMIZER_SETTING("BridgeRewardOptions"), RO_BRIDGE_STANDARD_REWARD);
-        switch (CVarGetInteger(CVAR_RANDOMIZER_SETTING("RainbowBridge"), RO_BRIDGE_VANILLA)) {
-            case RO_BRIDGE_STONES:
-                // Show Bridge Options and Stone Count slider
-                mOptions[RSK_RAINBOW_BRIDGE].RemoveFlag(IMFLAG_SEPARATOR_BOTTOM);
-                mOptions[RSK_BRIDGE_OPTIONS].Unhide();
-                mOptions[RSK_RAINBOW_BRIDGE_STONE_COUNT].Unhide();
-                if (bridgeOpt == RO_BRIDGE_GREG_REWARD) {
-                    if (mOptions[RSK_RAINBOW_BRIDGE_STONE_COUNT].GetOptionCount() == 4) {
-                        mOptions[RSK_RAINBOW_BRIDGE_STONE_COUNT].ChangeOptions(NumOpts(0, 4));
-                    }
-                } else {
-                    if (mOptions[RSK_RAINBOW_BRIDGE_STONE_COUNT].GetOptionCount() == 5) {
-                        mOptions[RSK_RAINBOW_BRIDGE_STONE_COUNT].ChangeOptions(NumOpts(0, 3));
-                    }
-                }
-                break;
-            case RO_BRIDGE_MEDALLIONS:
-                // Show Bridge Options and Medallion Count Slider
-                mOptions[RSK_RAINBOW_BRIDGE].RemoveFlag(IMFLAG_SEPARATOR_BOTTOM);
-                mOptions[RSK_BRIDGE_OPTIONS].Unhide();
-                mOptions[RSK_RAINBOW_BRIDGE_MEDALLION_COUNT].Unhide();
-                if (bridgeOpt == RO_BRIDGE_GREG_REWARD) {
-                    if (mOptions[RSK_RAINBOW_BRIDGE_MEDALLION_COUNT].GetOptionCount() == 7) {
-                        mOptions[RSK_RAINBOW_BRIDGE_MEDALLION_COUNT].ChangeOptions(NumOpts(0, 7));
-                    }
-                } else {
-                    if (mOptions[RSK_RAINBOW_BRIDGE_MEDALLION_COUNT].GetOptionCount() == 8) {
-                        mOptions[RSK_RAINBOW_BRIDGE_MEDALLION_COUNT].ChangeOptions(NumOpts(0, 6));
-                    }
-                }
-                break;
-            case RO_BRIDGE_DUNGEON_REWARDS:
-                // Show Bridge Options and Dungeon Reward Count Slider
-                mOptions[RSK_RAINBOW_BRIDGE].RemoveFlag(IMFLAG_SEPARATOR_BOTTOM);
-                mOptions[RSK_BRIDGE_OPTIONS].Unhide();
-                mOptions[RSK_RAINBOW_BRIDGE_REWARD_COUNT].Unhide();
-                if (bridgeOpt == RO_BRIDGE_GREG_REWARD) {
-                    if (mOptions[RSK_RAINBOW_BRIDGE_REWARD_COUNT].GetOptionCount() == 10) {
-                        mOptions[RSK_RAINBOW_BRIDGE_REWARD_COUNT].ChangeOptions(NumOpts(0, 10));
-                    }
-                } else {
-                    if (mOptions[RSK_RAINBOW_BRIDGE_REWARD_COUNT].GetOptionCount() == 11) {
-                        mOptions[RSK_RAINBOW_BRIDGE_REWARD_COUNT].ChangeOptions(NumOpts(0, 9));
-                    }
-                }
-                break;
-            case RO_BRIDGE_DUNGEONS:
-                // Show Bridge Options and Dungeon Count Slider
-                mOptions[RSK_RAINBOW_BRIDGE].RemoveFlag(IMFLAG_SEPARATOR_BOTTOM);
-                mOptions[RSK_BRIDGE_OPTIONS].Unhide();
-                mOptions[RSK_RAINBOW_BRIDGE_DUNGEON_COUNT].Unhide();
-                if (bridgeOpt == RO_BRIDGE_GREG_REWARD) {
-                    if (mOptions[RSK_RAINBOW_BRIDGE_DUNGEON_COUNT].GetOptionCount() == 9) {
-                        mOptions[RSK_RAINBOW_BRIDGE_DUNGEON_COUNT].ChangeOptions(NumOpts(0, 9));
-                    }
-                } else {
-                    if (mOptions[RSK_RAINBOW_BRIDGE_DUNGEON_COUNT].GetOptionCount() == 10) {
-                        mOptions[RSK_RAINBOW_BRIDGE_DUNGEON_COUNT].ChangeOptions(NumOpts(0, 8));
-                    }
-                }
-                break;
-            case RO_BRIDGE_TOKENS:
-                // Show token count slider (not bridge options)
-                mOptions[RSK_RAINBOW_BRIDGE].RemoveFlag(IMFLAG_SEPARATOR_BOTTOM);
-                mOptions[RSK_BRIDGE_OPTIONS].Hide();
-                mOptions[RSK_RAINBOW_BRIDGE_TOKEN_COUNT].Unhide();
-                break;
-            default:
-                break;
-        }
-        mOptions[RSK_GANONS_TRIALS].Enable();
-        mOptions[RSK_TRIAL_COUNT].Enable();
-        // Only show the trial count slider if Trials is set to Set Number
-        if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("GanonTrial"), RO_GANONS_TRIALS_SET_NUMBER) ==
-            RO_GANONS_TRIALS_SET_NUMBER) {
-            mOptions[RSK_GANONS_TRIALS].RemoveFlag(IMFLAG_SEPARATOR_BOTTOM);
-            mOptions[RSK_TRIAL_COUNT].Unhide();
-        } else {
-            mOptions[RSK_GANONS_TRIALS].AddFlag(IMFLAG_SEPARATOR_BOTTOM);
-            mOptions[RSK_TRIAL_COUNT].Hide();
-        }
-        mOptions[RSK_TRIFORCE_HUNT].Enable();
-        mOptions[RSK_TRIFORCE_HUNT_PIECES_TOTAL].Enable();
-        mOptions[RSK_TRIFORCE_HUNT_PIECES_REQUIRED].Enable();
-        // Remove the pieces required/total sliders and add a separator after Tirforce Hunt if Triforce Hunt is off
-        if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("TriforceHunt"), RO_GENERIC_OFF) == RO_GENERIC_OFF) {
-            mOptions[RSK_TRIFORCE_HUNT_PIECES_REQUIRED].Hide();
-            mOptions[RSK_TRIFORCE_HUNT_PIECES_TOTAL].Hide();
-            mOptions[RSK_TRIFORCE_HUNT].AddFlag(IMFLAG_SEPARATOR_BOTTOM);
-        } else {
-            mOptions[RSK_TRIFORCE_HUNT_PIECES_REQUIRED].Unhide();
-            mOptions[RSK_TRIFORCE_HUNT_PIECES_TOTAL].Unhide();
-            mOptions[RSK_TRIFORCE_HUNT].RemoveFlag(IMFLAG_SEPARATOR_BOTTOM);
-        }
-        // Update triforce pieces required to be capped at the current value for pieces total.
-        const uint8_t triforceTotal = CVarGetInteger(CVAR_RANDOMIZER_SETTING("TriforceHuntTotalPieces"), 30);
-        if (mOptions[RSK_TRIFORCE_HUNT_PIECES_REQUIRED].GetOptionCount() != triforceTotal + 1) {
-            mOptions[RSK_TRIFORCE_HUNT_PIECES_REQUIRED].ChangeOptions(NumOpts(1, triforceTotal + 1));
-        }
-        mOptionGroups[RSG_ITEMS_IMGUI_TABLE].Enable();
-        mOptionGroups[RSG_GAMEPLAY_IMGUI_TABLE].Enable();
-        // Link's Pocket - Disabled when Dungeon Rewards are shuffled to End of Dungeon
-        if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleDungeonReward"), RO_DUNGEON_REWARDS_END_OF_DUNGEON) ==
-            RO_DUNGEON_REWARDS_END_OF_DUNGEON) {
-            mOptions[RSK_LINKS_POCKET].Disable(
-                "This option is disabled because \"Dungeon Rewards\" are shuffled to \"End of Dungeons\".");
-        } else {
-            mOptions[RSK_LINKS_POCKET].Enable();
-        }
-        mOptions[RSK_STARTING_OCARINA].Enable();
+        mOptions[RSK_STARTING_AGE].Enable();
     }
+    mOptions[RSK_GERUDO_FORTRESS].Enable();
+    mOptions[RSK_RAINBOW_BRIDGE].Enable();
+    mOptions[RSK_BRIDGE_OPTIONS].Enable();
+    mOptions[RSK_RAINBOW_BRIDGE_STONE_COUNT].Enable();
+    mOptions[RSK_RAINBOW_BRIDGE_MEDALLION_COUNT].Enable();
+    mOptions[RSK_RAINBOW_BRIDGE_REWARD_COUNT].Enable();
+    mOptions[RSK_RAINBOW_BRIDGE_DUNGEON_COUNT].Enable();
+    mOptions[RSK_RAINBOW_BRIDGE_TOKEN_COUNT].Enable();
+    const uint8_t bridgeOpt = CVarGetInteger(CVAR_RANDOMIZER_SETTING("BridgeRewardOptions"), RO_BRIDGE_STANDARD_REWARD);
+    switch (CVarGetInteger(CVAR_RANDOMIZER_SETTING("RainbowBridge"), RO_BRIDGE_VANILLA)) {
+        case RO_BRIDGE_STONES:
+            // Show Bridge Options and Stone Count slider
+            mOptions[RSK_RAINBOW_BRIDGE].RemoveFlag(IMFLAG_SEPARATOR_BOTTOM);
+            mOptions[RSK_BRIDGE_OPTIONS].Unhide();
+            mOptions[RSK_RAINBOW_BRIDGE_STONE_COUNT].Unhide();
+            if (bridgeOpt == RO_BRIDGE_GREG_REWARD) {
+                if (mOptions[RSK_RAINBOW_BRIDGE_STONE_COUNT].GetOptionCount() == 4) {
+                    mOptions[RSK_RAINBOW_BRIDGE_STONE_COUNT].ChangeOptions(NumOpts(0, 4));
+                }
+            } else {
+                if (mOptions[RSK_RAINBOW_BRIDGE_STONE_COUNT].GetOptionCount() == 5) {
+                    mOptions[RSK_RAINBOW_BRIDGE_STONE_COUNT].ChangeOptions(NumOpts(0, 3));
+                }
+            }
+            break;
+        case RO_BRIDGE_MEDALLIONS:
+            // Show Bridge Options and Medallion Count Slider
+            mOptions[RSK_RAINBOW_BRIDGE].RemoveFlag(IMFLAG_SEPARATOR_BOTTOM);
+            mOptions[RSK_BRIDGE_OPTIONS].Unhide();
+            mOptions[RSK_RAINBOW_BRIDGE_MEDALLION_COUNT].Unhide();
+            if (bridgeOpt == RO_BRIDGE_GREG_REWARD) {
+                if (mOptions[RSK_RAINBOW_BRIDGE_MEDALLION_COUNT].GetOptionCount() == 7) {
+                    mOptions[RSK_RAINBOW_BRIDGE_MEDALLION_COUNT].ChangeOptions(NumOpts(0, 7));
+                }
+            } else {
+                if (mOptions[RSK_RAINBOW_BRIDGE_MEDALLION_COUNT].GetOptionCount() == 8) {
+                    mOptions[RSK_RAINBOW_BRIDGE_MEDALLION_COUNT].ChangeOptions(NumOpts(0, 6));
+                }
+            }
+            break;
+        case RO_BRIDGE_DUNGEON_REWARDS:
+            // Show Bridge Options and Dungeon Reward Count Slider
+            mOptions[RSK_RAINBOW_BRIDGE].RemoveFlag(IMFLAG_SEPARATOR_BOTTOM);
+            mOptions[RSK_BRIDGE_OPTIONS].Unhide();
+            mOptions[RSK_RAINBOW_BRIDGE_REWARD_COUNT].Unhide();
+            if (bridgeOpt == RO_BRIDGE_GREG_REWARD) {
+                if (mOptions[RSK_RAINBOW_BRIDGE_REWARD_COUNT].GetOptionCount() == 10) {
+                    mOptions[RSK_RAINBOW_BRIDGE_REWARD_COUNT].ChangeOptions(NumOpts(0, 10));
+                }
+            } else {
+                if (mOptions[RSK_RAINBOW_BRIDGE_REWARD_COUNT].GetOptionCount() == 11) {
+                    mOptions[RSK_RAINBOW_BRIDGE_REWARD_COUNT].ChangeOptions(NumOpts(0, 9));
+                }
+            }
+            break;
+        case RO_BRIDGE_DUNGEONS:
+            // Show Bridge Options and Dungeon Count Slider
+            mOptions[RSK_RAINBOW_BRIDGE].RemoveFlag(IMFLAG_SEPARATOR_BOTTOM);
+            mOptions[RSK_BRIDGE_OPTIONS].Unhide();
+            mOptions[RSK_RAINBOW_BRIDGE_DUNGEON_COUNT].Unhide();
+            if (bridgeOpt == RO_BRIDGE_GREG_REWARD) {
+                if (mOptions[RSK_RAINBOW_BRIDGE_DUNGEON_COUNT].GetOptionCount() == 9) {
+                    mOptions[RSK_RAINBOW_BRIDGE_DUNGEON_COUNT].ChangeOptions(NumOpts(0, 9));
+                }
+            } else {
+                if (mOptions[RSK_RAINBOW_BRIDGE_DUNGEON_COUNT].GetOptionCount() == 10) {
+                    mOptions[RSK_RAINBOW_BRIDGE_DUNGEON_COUNT].ChangeOptions(NumOpts(0, 8));
+                }
+            }
+            break;
+        case RO_BRIDGE_TOKENS:
+            // Show token count slider (not bridge options)
+            mOptions[RSK_RAINBOW_BRIDGE].RemoveFlag(IMFLAG_SEPARATOR_BOTTOM);
+            mOptions[RSK_BRIDGE_OPTIONS].Hide();
+            mOptions[RSK_RAINBOW_BRIDGE_TOKEN_COUNT].Unhide();
+            break;
+        default:
+            break;
+    }
+    mOptions[RSK_GANONS_TRIALS].Enable();
+    mOptions[RSK_TRIAL_COUNT].Enable();
+    // Only show the trial count slider if Trials is set to Set Number
+    if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("GanonTrial"), RO_GANONS_TRIALS_SET_NUMBER) ==
+        RO_GANONS_TRIALS_SET_NUMBER) {
+        mOptions[RSK_GANONS_TRIALS].RemoveFlag(IMFLAG_SEPARATOR_BOTTOM);
+        mOptions[RSK_TRIAL_COUNT].Unhide();
+    } else {
+        mOptions[RSK_GANONS_TRIALS].AddFlag(IMFLAG_SEPARATOR_BOTTOM);
+        mOptions[RSK_TRIAL_COUNT].Hide();
+    }
+    mOptions[RSK_TRIFORCE_HUNT].Enable();
+    mOptions[RSK_TRIFORCE_HUNT_PIECES_TOTAL].Enable();
+    mOptions[RSK_TRIFORCE_HUNT_PIECES_REQUIRED].Enable();
+    // Remove the pieces required/total sliders and add a separator after Tirforce Hunt if Triforce Hunt is off
+    if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("TriforceHunt"), RO_GENERIC_OFF) == RO_GENERIC_OFF) {
+        mOptions[RSK_TRIFORCE_HUNT_PIECES_REQUIRED].Hide();
+        mOptions[RSK_TRIFORCE_HUNT_PIECES_TOTAL].Hide();
+        mOptions[RSK_TRIFORCE_HUNT].AddFlag(IMFLAG_SEPARATOR_BOTTOM);
+    } else {
+        mOptions[RSK_TRIFORCE_HUNT_PIECES_REQUIRED].Unhide();
+        mOptions[RSK_TRIFORCE_HUNT_PIECES_TOTAL].Unhide();
+        mOptions[RSK_TRIFORCE_HUNT].RemoveFlag(IMFLAG_SEPARATOR_BOTTOM);
+    }
+    // Update triforce pieces required to be capped at the current value for pieces total.
+    const uint8_t triforceTotal = CVarGetInteger(CVAR_RANDOMIZER_SETTING("TriforceHuntTotalPieces"), 30);
+    if (mOptions[RSK_TRIFORCE_HUNT_PIECES_REQUIRED].GetOptionCount() != triforceTotal + 1) {
+        mOptions[RSK_TRIFORCE_HUNT_PIECES_REQUIRED].ChangeOptions(NumOpts(1, triforceTotal + 1));
+    }
+    mOptionGroups[RSG_ITEMS_IMGUI_TABLE].Enable();
+    mOptionGroups[RSG_GAMEPLAY_IMGUI_TABLE].Enable();
+    // Link's Pocket - Disabled when Dungeon Rewards are shuffled to End of Dungeon
+    if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("ShuffleDungeonReward"), RO_DUNGEON_REWARDS_END_OF_DUNGEON) ==
+        RO_DUNGEON_REWARDS_END_OF_DUNGEON) {
+        mOptions[RSK_LINKS_POCKET].Disable(
+            "This option is disabled because \"Dungeon Rewards\" are shuffled to \"End of Dungeons\".");
+    } else {
+        mOptions[RSK_LINKS_POCKET].Enable();
+    }
+    mOptions[RSK_STARTING_OCARINA].Enable();
 
     // Don't show any MQ options if both quests aren't available
     if (!(OTRGlobals::Instance->HasMasterQuest() && OTRGlobals::Instance->HasOriginal())) {
@@ -2911,15 +2887,6 @@ void Context::FinalizeSettings(const std::set<RandomizerCheck>& excludedLocation
         mLACSCondition = RO_LACS_TOKENS;
     } else {
         mLACSCondition = RO_LACS_VANILLA;
-    }
-
-    if (mOptions[RSK_LOGIC_RULES].Is(RO_LOGIC_VANILLA)) {
-        for (OptionValue* setting : VanillaLogicDefaults) {
-            // setting->SetDelayedOption();
-            setting->Set(0);
-        }
-        // mOptions[RSK_KEYSANITY].SetDelayedOption();
-        mOptions[RSK_KEYSANITY].Set(3);
     }
 
     if (!mOptions[RSK_SHUFFLE_WARP_SONGS]) {
