@@ -2326,6 +2326,9 @@ extern "C" int CustomMessage_RetrieveIfExists(PlayState* play) {
                 case TEXT_HF_ZR_SIGN:
                     entrance = ENTR_ZORAS_RIVER_WEST_EXIT;
                     break;
+                case TEXT_GF_GTG_SIGN:
+                    entrance = ENTR_GERUDO_TRAINING_GROUND_ENTRANCE;
+                    break;
                 case TEXT_KF_SHOP_SIGN:
                     entrance = ENTR_KOKIRI_SHOP_0;
                     break;
@@ -2401,7 +2404,7 @@ extern "C" int CustomMessage_RetrieveIfExists(PlayState* play) {
                         auto data = GetEntranceData(overrideIndex);
                         font->charTexBuf[0] = (TEXTBOX_TYPE_WOODEN << 4) | TEXTBOX_POS_BOTTOM;
                         return msgCtx->msgLength = font->msgLength = SohUtils::CopyStringToCharBuffer(
-                                   buffer, data->source + CustomMessage::MESSAGE_END(), maxBufferSize);
+                                   buffer, data->destination + CustomMessage::MESSAGE_END(), maxBufferSize);
                     }
                 }
             }
