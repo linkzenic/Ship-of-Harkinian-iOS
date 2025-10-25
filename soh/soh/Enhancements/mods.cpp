@@ -296,24 +296,6 @@ void UpdateHyperEnemiesState() {
     }
 }
 
-void UpdateDirtPathFixState(int32_t sceneNum) {
-    switch (sceneNum) {
-        case SCENE_HYRULE_FIELD:
-        case SCENE_KOKIRI_FOREST:
-        case SCENE_HYRULE_CASTLE:
-            CVarSetInteger(CVAR_Z_FIGHTING_MODE,
-                           CVarGetInteger(CVAR_ENHANCEMENT("SceneSpecificDirtPathFix"), ZFIGHT_FIX_DISABLED));
-            return;
-        default:
-            CVarClear(CVAR_Z_FIGHTING_MODE);
-    }
-}
-
-void RegisterMenuPathFix() {
-    GameInteractor::Instance->RegisterGameHook<GameInteractor::OnTransitionEnd>(
-        [](int32_t sceneNum) { UpdateDirtPathFixState(sceneNum); });
-}
-
 void UpdateMirrorModeState(int32_t sceneNum) {
     static bool prevMirroredWorld = false;
     bool nextMirroredWorld = false;
@@ -890,7 +872,6 @@ void InitMods() {
     RegisterDeleteFileOnDeath();
     RegisterHyperBosses();
     UpdateHyperEnemiesState();
-    RegisterMenuPathFix();
     RegisterMirrorModeHandler();
     RegisterResetNaviTimer();
     RegisterEnemyDefeatCounts();
