@@ -987,7 +987,7 @@ void Settings::CreateOptions() {
               "where the eye is.");
     OPT_TRICK(RT_SHADOW_UMBRELLA_HOVER, RCQUEST_BOTH, RA_SHADOW_TEMPLE, { Tricks::Tag::EXPERT },
               "Shadow Temple Stone Umbrella Skip",
-              "A very precise Hover Boots movement from off of the lower chest can get you on top of the crushing "
+              "A very precise Hover Boots movement from off of the lower chest can get you on top of the falling "
               "spikes without needing to pull the block. Applies to both Vanilla and Master Quest.");
     OPT_TRICK(RT_SHADOW_UMBRELLA_CLIP, RCQUEST_BOTH, RA_SHADOW_TEMPLE, { Tricks::Tag::NOVICE, Tricks::Tag::GLITCH },
               "Shadow Temple Stone Umbrella Clip",
@@ -996,7 +996,7 @@ void Settings::CreateOptions() {
     OPT_TRICK(RT_SHADOW_UMBRELLA_GS, RCQUEST_BOTH, RA_SHADOW_TEMPLE, { Tricks::Tag::EXPERT },
               "Shadow Temple Falling Spikes GS with Hover Boots",
               "After killing the Skulltula, a very precise Hover Boots movement from off of the lower chest can get "
-              "you on top of the crushing spikes without needing to pull the block. From there, another very precise "
+              "you on top of the falling spikes without needing to pull the block. From there, another very precise "
               "Hover Boots movement can be used to obtain the token without needing the Hookshot. Applies to both "
               "Vanilla and Master Quest.");
     OPT_TRICK(RT_SHADOW_FREESTANDING_KEY, RCQUEST_VANILLA, RA_SHADOW_TEMPLE, { Tricks::Tag::NOVICE },
