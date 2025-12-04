@@ -2336,6 +2336,28 @@ typedef enum {
 
     // #### `result`
     // ```c
+    // false
+    // ```
+    // #### `args`
+    // - *EnGirlACanBuyResult
+    VB_CAN_BUY_BOMBCHUS,
+
+    // #### `result`
+    // ```c
+    // true
+    // ```
+    // #### `args`
+    // - None
+    VB_CHECK_BOMBCHU_CAPACITY,
+
+    // #### `result`
+    // ```c
+    // false
+    // ```
+    // #### `args`
+    // - int16_t
+    VB_COLOR_AMMO_GREEN,
+
     // (this->collider.base.acFlags & AC_HIT) && !Player_InCsMode(play) &&
     //   (player->meleeWeaponAnimation == 22 || player->meleeWeaponAnimation == 23)
     // ```
