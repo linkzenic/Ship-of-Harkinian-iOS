@@ -745,6 +745,8 @@ void Settings::CreateOptions() {
               "You can hit the switch that opens the door to the boss room using a precisely-aimed Bombchu. Also, "
               "using the Hover Boots, adult can throw a Bomb at the switch. This trick is only relevant if \"Shuffle "
               "Boss Entrances\" is enabled.");
+    OPT_TRICK(RT_JABU_B1_CUBE_HOVER, RCQUEST_VANILLA, RA_JABU_JABUS_BELLY, { Tricks::Tag::NOVICE },
+              "Jabu B1 Pass Cube with Hover Boots", "It's possible reach pots past cube with only hover boots.");
     OPT_TRICK(RT_LENS_JABU_MQ, RCQUEST_MQ, RA_JABU_JABUS_BELLY, { Tricks::Tag::NOVICE },
               "Jabu MQ without Lens of Truth", "Removes the requirements for the Lens of Truth in Jabu MQ.");
     OPT_TRICK(RT_JABU_MQ_RANG_JUMP, RCQUEST_MQ, RA_JABU_JABUS_BELLY, { Tricks::Tag::ADVANCED },
