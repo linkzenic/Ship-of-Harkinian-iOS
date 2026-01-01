@@ -261,7 +261,7 @@ void RegionTable_Init_FireTemple() {
         Entrance(RR_FIRE_TEMPLE_FIRE_MAZE_UPPER,     []{return logic->CanUse(RG_HOVER_BOOTS) || logic->CanGroundJump();}),
         Entrance(RR_FIRE_TEMPLE_FIRE_MAZE_SIDE_ROOM, []{return true;}),
         Entrance(RR_FIRE_TEMPLE_WEST_CENTRAL_LOWER,  []{return logic->SmallKeys(SCENE_FIRE_TEMPLE, 8);}),
-        Entrance(RR_FIRE_TEMPLE_LATE_FIRE_MAZE,      []{return ctx->GetTrickOption(RT_FIRE_FLAME_MAZE) || false;}),
+        Entrance(RR_FIRE_TEMPLE_LATE_FIRE_MAZE,      []{return (bool)ctx->GetTrickOption(RT_FIRE_SKIP_FLAME_WALLS);}),
     });
 
     areaTable[RR_FIRE_TEMPLE_FIRE_MAZE_UPPER] = Region("Fire Temple Fire Maze Upper", SCENE_FIRE_TEMPLE, {
@@ -363,7 +363,7 @@ void RegionTable_Init_FireTemple() {
         //Exits
         Entrance(RR_FIRE_TEMPLE_ENTRYWAY,            []{return true;}),
         Entrance(RR_FIRE_TEMPLE_MQ_MAP_ROOM_SOUTH,   []{return true;}),
-        Entrance(RR_FIRE_TEMPLE_MQ_FIRST_ROOM_UPPER, []{return logic->IsAdult || logic->CanUse(RG_HOOKSHOT);}),
+        Entrance(RR_FIRE_TEMPLE_MQ_FIRST_ROOM_UPPER, []{return logic->IsAdult || logic->CanUse(RG_HOOKSHOT) || ctx->GetTrickOption(RT_FIRE_SKIP_FLAME_WALLS);}),
         Entrance(RR_FIRE_TEMPLE_MQ_STALFOS_ROOM,     []{return logic->SmallKeys(SCENE_FIRE_TEMPLE, 5);}),
     });
 
@@ -666,7 +666,7 @@ void RegionTable_Init_FireTemple() {
         Entrance(RR_FIRE_TEMPLE_MQ_HIGH_TORCH_ROOM,     []{return true;}),
         Entrance(RR_FIRE_TEMPLE_MQ_FIRE_MAZE_PLATFORMS, []{return logic->IsAdult || logic->CanUse(RG_SONG_OF_TIME) || logic->CanUse(RG_HOVER_BOOTS);}),
         //Hover boots get there via the platforms
-        Entrance(RR_FIRE_TEMPLE_MQ_NORTH_FIRE_MAZE,     []{return (bool)ctx->GetTrickOption(RT_FIRE_MQ_FLAME_MAZE);}),
+        Entrance(RR_FIRE_TEMPLE_MQ_NORTH_FIRE_MAZE,     []{return (bool)ctx->GetTrickOption(RT_FIRE_SKIP_FLAME_WALLS);}),
         Entrance(RR_FIRE_TEMPLE_MQ_WEST_FIRE_MAZE,      []{return logic->Get(LOGIC_FIRE_MQ_OPENED_FIRE_MAZE_DOOR);}),
     });
 
@@ -688,13 +688,13 @@ void RegionTable_Init_FireTemple() {
         LOCATION(RC_FIRE_TEMPLE_MQ_FIRE_MAZE_NORTHWEST_POT,     logic->CanBreakPots()),
     }, {
         //Exits
-        Entrance(RR_FIRE_TEMPLE_MQ_SOUTH_FIRE_MAZE, []{return logic->IsAdult || ctx->GetTrickOption(RT_FIRE_MQ_FLAME_MAZE);}),
-        Entrance(RR_FIRE_TEMPLE_MQ_WEST_FIRE_MAZE,  []{return (bool)ctx->GetTrickOption(RT_FIRE_MQ_FLAME_MAZE);}),
+        Entrance(RR_FIRE_TEMPLE_MQ_SOUTH_FIRE_MAZE, []{return logic->IsAdult || ctx->GetTrickOption(RT_FIRE_SKIP_FLAME_WALLS);}),
+        Entrance(RR_FIRE_TEMPLE_MQ_WEST_FIRE_MAZE,  []{return (bool)ctx->GetTrickOption(RT_FIRE_SKIP_FLAME_WALLS);}),
     });
 
     areaTable[RR_FIRE_TEMPLE_MQ_WEST_FIRE_MAZE] = Region("Fire Temple MQ West Fire Maze", SCENE_FIRE_TEMPLE, {}, {}, {
         Entrance(RR_FIRE_TEMPLE_MQ_FIRE_MAZE_PAST_WALL, []{return true;}),
-        Entrance(RR_FIRE_TEMPLE_MQ_NORTH_FIRE_MAZE,     []{return (bool)ctx->GetTrickOption(RT_FIRE_MQ_FLAME_MAZE);}),
+        Entrance(RR_FIRE_TEMPLE_MQ_NORTH_FIRE_MAZE,     []{return (bool)ctx->GetTrickOption(RT_FIRE_SKIP_FLAME_WALLS);}),
     });
 
     //this area exists for the pots in case we void warp to the top of fire somehow, because there's no way to get back the way we came

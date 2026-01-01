@@ -848,11 +848,13 @@ void Settings::CreateOptions() {
               "Fire Temple East Tower without Scarecrow\'s Song",
               "Also known as \"Pixelshot\". The Longshot can reach the target on the elevator itself, allowing you to "
               "skip needing to spawn the scarecrow.");
-    OPT_TRICK(RT_FIRE_FLAME_MAZE, RCQUEST_VANILLA, RA_FIRE_TEMPLE, { Tricks::Tag::INTERMEDIATE },
-              "Fire Temple Flame Wall Maze Skip",
-              "If you move quickly you can sneak past the edge of a flame wall before it can rise up to block you. To "
-              "do it without taking damage is more precise. Allows you to progress without needing either a Small Key "
-              "or Hover Boots.");
+    OPT_TRICK(RT_FIRE_SKIP_FLAME_WALLS, RCQUEST_BOTH, RA_FIRE_TEMPLE, { Tricks::Tag::INTERMEDIATE },
+              "Fire Temple Skip Flame Walls",
+              "If you move quickly you can sneak past the edge of a flame wall before rises up to block you. To "
+              "do it without taking damage is more precise. Allows progress without needing either a Small Key or "
+              "Hover Boots. In MQ if either \"Fire Temple MQ Lower to Upper Lizalfos Maze with Hover Boots\" or "
+              "\"with Precise Jump\" are enabled, this also allows progress deeper into the dungeon without Hookshot.\n"
+              "Child can sidehop past fire wall in MQ lobby.");
     OPT_TRICK(RT_FIRE_MQ_NEAR_BOSS, RCQUEST_MQ, RA_FIRE_TEMPLE, { Tricks::Tag::NOVICE },
               "Fire Temple MQ Chest Near Boss without Breaking Crate",
               "The hitbox for the torch extends a bit outside of the crate. Shoot a flaming arrow at the side of the "
@@ -889,13 +891,6 @@ void Settings::CreateOptions() {
               "Fire Temple MQ Above Flame Wall Maze GS from Below with Longshot",
               "The floor of the room that contains this Skulltula is only solid from above. From the maze below, the "
               "Longshot can be shot through the ceiling to obtain the token with two fewer small keys than normal.");
-    OPT_TRICK(
-        RT_FIRE_MQ_FLAME_MAZE, RCQUEST_MQ, RA_FIRE_TEMPLE, { Tricks::Tag::INTERMEDIATE },
-        "Fire Temple MQ Flame Wall Maze Skip",
-        "If you move quickly you can sneak past the edge of a flame wall before it can rise up to block you. To do it "
-        "without taking damage is more precise. Allows you to reach the side room GS without needing Song of Time or "
-        "Hover Boots. If either of \"Fire Temple MQ Lower to Upper Lizalfos Maze with Hover Boots\" or \"with Precise "
-        "Jump\" are enabled, this also allows you to progress deeper into the dungeon without Hookshot.");
     OPT_TRICK(RT_WATER_LONGSHOT_TORCH, RCQUEST_VANILLA, RA_WATER_TEMPLE, { Tricks::Tag::NOVICE },
               "Water Temple Torch Longshot",
               "Stand on the eastern side of the central pillar and longshot the torches on the bottom level. Swim "
