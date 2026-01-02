@@ -2196,6 +2196,7 @@ void Settings::CreateOptions() {
         WidgetContainerType::SECTION);
     mOptionGroups[RSG_MENU_COLUMN_LOGIC_WINCON] = OptionGroup::SubGroup("",
                                                                         std::initializer_list<OptionGroup*>{
+                                                                            &mOptionGroups[RSG_ITEM_POOL],
                                                                             &mOptionGroups[RSG_MENU_SECTION_LOGIC],
                                                                             &mOptionGroups[RSG_MENU_SECTION_WINCON],
                                                                         },
@@ -2998,7 +2999,7 @@ void Context::FinalizeSettings(const std::set<RandomizerCheck>& excludedLocation
                     mqSet += 1;
                     break;
                 case RO_MQ_SET_RANDOM:
-                    // 50% per dungeon, rolled seperatly so people can either have a linear distribtuion
+                    // 50% per dungeon, rolled separatly so people can either have a linear distribtuion
                     // or a bell curve for the number of MQ dungeons per seed.
                     if (Random(0, 2)) {
                         dungeon->SetMQ();

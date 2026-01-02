@@ -574,7 +574,7 @@ void Region::ResetVariables() {
  * In the second universe, the player went in as adult, possibly out of logic, and started wasting the keys to lock
  child out.
  * These Universes converge when the player has 7 keys (meaning adult can no longer lock child out) and adult is
- known to be able to reach Statue room. This creates "Certain Access", which is tracked seperatly for each age.
+ known to be able to reach Statue room. This creates "Certain Access", which is tracked separatly for each age.
  * Child Certain Access is simple, if we have 7 keys and child access, it's Certain Access.
  * Adult Certain Access is also simple, adult is not key locked, so if they make it to a location, it's Certain
  Access.
