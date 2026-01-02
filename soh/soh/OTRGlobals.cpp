@@ -37,6 +37,7 @@
 #include "Enhancements/randomizer/static_data.h"
 #include "Enhancements/randomizer/dungeon.h"
 #include "Enhancements/gameplaystats.h"
+#include "ObjectExtension/ObjectExtension.h"
 #include "frame_interpolation.h"
 #include "variables.h"
 #include "z64.h"
@@ -2532,12 +2533,14 @@ extern "C" int CustomMessage_RetrieveIfExists(PlayState* play) {
                 (RandomizerInf)((textId - TEXT_SHOP_ITEM_RANDOM_CONFIRM) + RAND_INF_SHOP_ITEMS_KF_SHOP_ITEM_1));
             messageEntry = OTRGlobals::Instance->gRandomizer->GetMerchantMessage(rc, TEXT_SHOP_ITEM_RANDOM_CONFIRM);
         } else if (textId == TEXT_SCRUB_RANDOM) {
-            EnDns* enDns = (EnDns*)player->talkActor;
-            RandomizerCheck rc = OTRGlobals::Instance->gRandomizer->GetCheckFromRandomizerInf(
-                (RandomizerInf)enDns->sohScrubIdentity.randomizerInf);
-            messageEntry = OTRGlobals::Instance->gRandomizer->GetMerchantMessage(
-                rc, TEXT_SCRUB_RANDOM, TEXT_SCRUB_RANDOM_FREE,
-                Randomizer_GetSettingValue(RSK_SCRUB_TEXT_HINT) == RO_GENERIC_OFF);
+            auto scrubIdentity = ObjectExtension::GetInstance().Get<ScrubIdentity>(player->talkActor);
+            if (scrubIdentity != nullptr) {
+                RandomizerCheck rc =
+                    OTRGlobals::Instance->gRandomizer->GetCheckFromRandomizerInf(scrubIdentity->randomizerInf);
+                messageEntry = OTRGlobals::Instance->gRandomizer->GetMerchantMessage(
+                    rc, TEXT_SCRUB_RANDOM, TEXT_SCRUB_RANDOM_FREE,
+                    Randomizer_GetSettingValue(RSK_SCRUB_TEXT_HINT) == RO_GENERIC_OFF);
+            }
         } else if (CVarGetInteger(CVAR_RANDOMIZER_ENHANCEMENT("RandomizeRupeeNames"), 1) &&
                    (textId == TEXT_BLUE_RUPEE || textId == TEXT_RED_RUPEE || textId == TEXT_PURPLE_RUPEE ||
                     textId == TEXT_HUGE_RUPEE)) {

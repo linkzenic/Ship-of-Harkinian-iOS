@@ -3653,7 +3653,6 @@ ScrubIdentity Randomizer::IdentifyScrub(s32 sceneNum, s32 actorParams, s32 respa
     scrubIdentity.randomizerCheck = RC_UNKNOWN_CHECK;
     scrubIdentity.getItemId = GI_NONE;
     scrubIdentity.itemPrice = -1;
-    scrubIdentity.isShuffled = false;
 
     // Scrubs that are 0x06 are loaded as 0x03 when child, switching from selling arrows to seeds
     if (actorParams == 0x06)
@@ -3666,17 +3665,19 @@ ScrubIdentity Randomizer::IdentifyScrub(s32 sceneNum, s32 actorParams, s32 respa
     Rando::Location* location = GetCheckObjectFromActor(ACTOR_EN_DNS, sceneNum, actorParams);
 
     if (location->GetRandomizerCheck() != RC_UNKNOWN_CHECK) {
-        scrubIdentity.randomizerInf = rcToRandomizerInf[location->GetRandomizerCheck()];
-        scrubIdentity.randomizerCheck = location->GetRandomizerCheck();
-        scrubIdentity.getItemId = (GetItemID)Rando::StaticData::RetrieveItem(location->GetVanillaItem()).GetItemID();
-        scrubIdentity.isShuffled = GetRandoSettingValue(RSK_SHUFFLE_SCRUBS) == RO_SCRUBS_ALL;
-
         if (location->GetRandomizerCheck() == RC_HF_DEKU_SCRUB_GROTTO ||
             location->GetRandomizerCheck() == RC_LW_DEKU_SCRUB_GROTTO_FRONT ||
             location->GetRandomizerCheck() == RC_LW_DEKU_SCRUB_NEAR_BRIDGE) {
-            scrubIdentity.isShuffled = GetRandoSettingValue(RSK_SHUFFLE_SCRUBS) != RO_SCRUBS_OFF;
+            if (GetRandoSettingValue(RSK_SHUFFLE_SCRUBS) == RO_SCRUBS_OFF) {
+                return scrubIdentity;
+            }
+        } else if (GetRandoSettingValue(RSK_SHUFFLE_SCRUBS) != RO_SCRUBS_ALL) {
+            return scrubIdentity;
         }
 
+        scrubIdentity.randomizerInf = rcToRandomizerInf[location->GetRandomizerCheck()];
+        scrubIdentity.randomizerCheck = location->GetRandomizerCheck();
+        scrubIdentity.getItemId = (GetItemID)Rando::StaticData::RetrieveItem(location->GetVanillaItem()).GetItemID();
         scrubIdentity.itemPrice =
             OTRGlobals::Instance->gRandoContext->GetItemLocation(scrubIdentity.randomizerCheck)->GetPrice();
     }

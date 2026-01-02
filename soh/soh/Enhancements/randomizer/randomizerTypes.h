@@ -6856,7 +6856,6 @@ typedef struct ScrubIdentity {
     RandomizerCheck randomizerCheck;
     GetItemID getItemId;
     int32_t itemPrice;
-    uint8_t isShuffled;
 } ScrubIdentity;
 
 typedef struct ShopItemIdentity {
