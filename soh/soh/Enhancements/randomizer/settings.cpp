@@ -1202,6 +1202,7 @@ void Settings::CreateOptions() {
     OPT_BOOL(RSK_TOT_ALTAR_HINT, "ToT Altar Hint", {"Off", "On"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("AltarHint"), mOptionDescriptions[RSK_TOT_ALTAR_HINT], WIDGET_CVAR_CHECKBOX, RO_GENERIC_ON, false, nullptr, IMFLAG_INDENT);
     OPT_BOOL(RSK_GANONDORF_HINT, "Ganondorf Hint", {"Off", "On"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("GanondorfHint"), mOptionDescriptions[RSK_GANONDORF_HINT], WIDGET_CVAR_CHECKBOX, RO_GENERIC_ON, false, nullptr, IMFLAG_NONE);
     OPT_BOOL(RSK_SHEIK_LA_HINT, "Sheik Light Arrow Hint", {"Off", "On"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("SheikLAHint"), mOptionDescriptions[RSK_SHEIK_LA_HINT], WIDGET_CVAR_CHECKBOX, RO_GENERIC_ON, false, nullptr, IMFLAG_NONE);
+    OPT_BOOL(RSK_BOSS_KEY_HINT, "Boss Door Hints", CVAR_RANDOMIZER_SETTING("BossKeyHint"), mOptionDescriptions[RSK_BOSS_KEY_HINT], IMFLAG_NONE);
     OPT_BOOL(RSK_DAMPES_DIARY_HINT, "Dampe's Diary Hint", CVAR_RANDOMIZER_SETTING("DampeHint"), mOptionDescriptions[RSK_DAMPES_DIARY_HINT], IMFLAG_NONE);
     OPT_BOOL(RSK_GREG_HINT, "Greg the Green Rupee Hint", CVAR_RANDOMIZER_SETTING("GregHint"), mOptionDescriptions[RSK_GREG_HINT], IMFLAG_NONE);
     OPT_BOOL(RSK_LOACH_HINT, "Hyrule Loach Hint", CVAR_RANDOMIZER_SETTING("LoachHint"), mOptionDescriptions[RSK_LOACH_HINT], IMFLAG_NONE);
@@ -2409,33 +2410,20 @@ void Settings::CreateOptions() {
                                                                    &mOptionGroups[RSG_MENU_SECTION_TRAPS] },
                               WidgetContainerType::COLUMN);
     mOptionGroups[RSG_MENU_SECTION_STATIC_HINTS] = OptionGroup::SubGroup(
-        "Static Hints",
-        { &mOptions[RSK_TOT_ALTAR_HINT],
-          &mOptions[RSK_GANONDORF_HINT],
-          &mOptions[RSK_SHEIK_LA_HINT],
-          &mOptions[RSK_DAMPES_DIARY_HINT],
-          &mOptions[RSK_GREG_HINT],
-          &mOptions[RSK_LOACH_HINT],
-          &mOptions[RSK_SARIA_HINT],
-          &mOptions[RSK_MIDO_HINT],
-          &mOptions[RSK_FROGS_HINT],
-          &mOptions[RSK_OOT_HINT],
-          &mOptions[RSK_BIGGORON_HINT],
-          &mOptions[RSK_BIG_POES_HINT],
-          &mOptions[RSK_CHICKENS_HINT],
-          &mOptions[RSK_MALON_HINT],
-          &mOptions[RSK_HBA_HINT],
-          &mOptions[RSK_FISHING_POLE_HINT],
-          &mOptions[RSK_WARP_SONG_HINTS],
-          &mOptions[RSK_SCRUB_TEXT_HINT],
-          &mOptions[RSK_MERCHANT_TEXT_HINT],
-          &mOptions[RSK_KAK_10_SKULLS_HINT],
-          &mOptions[RSK_KAK_20_SKULLS_HINT],
-          &mOptions[RSK_KAK_30_SKULLS_HINT],
-          &mOptions[RSK_KAK_40_SKULLS_HINT],
-          &mOptions[RSK_KAK_50_SKULLS_HINT],
-          &mOptions[RSK_KAK_100_SKULLS_HINT],
-          &mOptions[RSK_MASK_SHOP_HINT] },
+        "Static Hints", { &mOptions[RSK_TOT_ALTAR_HINT],     &mOptions[RSK_GANONDORF_HINT],
+                          &mOptions[RSK_SHEIK_LA_HINT],      &mOptions[RSK_BOSS_KEY_HINT],
+                          &mOptions[RSK_DAMPES_DIARY_HINT],  &mOptions[RSK_GREG_HINT],
+                          &mOptions[RSK_LOACH_HINT],         &mOptions[RSK_SARIA_HINT],
+                          &mOptions[RSK_MIDO_HINT],          &mOptions[RSK_FROGS_HINT],
+                          &mOptions[RSK_OOT_HINT],           &mOptions[RSK_BIGGORON_HINT],
+                          &mOptions[RSK_BIG_POES_HINT],      &mOptions[RSK_CHICKENS_HINT],
+                          &mOptions[RSK_MALON_HINT],         &mOptions[RSK_HBA_HINT],
+                          &mOptions[RSK_FISHING_POLE_HINT],  &mOptions[RSK_WARP_SONG_HINTS],
+                          &mOptions[RSK_SCRUB_TEXT_HINT],    &mOptions[RSK_MERCHANT_TEXT_HINT],
+                          &mOptions[RSK_KAK_10_SKULLS_HINT], &mOptions[RSK_KAK_20_SKULLS_HINT],
+                          &mOptions[RSK_KAK_30_SKULLS_HINT], &mOptions[RSK_KAK_40_SKULLS_HINT],
+                          &mOptions[RSK_KAK_50_SKULLS_HINT], &mOptions[RSK_KAK_100_SKULLS_HINT],
+                          &mOptions[RSK_MASK_SHOP_HINT] },
         WidgetContainerType::SECTION, "This setting adds some hints at locations other than Gossip Stones.");
     mOptionGroups[RSG_MENU_COLUMN_STATIC_HINTS] =
         OptionGroup::SubGroup("", { &mOptionGroups[RSG_MENU_SECTION_STATIC_HINTS] }, WidgetContainerType::COLUMN);
@@ -2702,6 +2690,7 @@ void Settings::CreateOptions() {
                                               &mOptions[RSK_TOT_ALTAR_HINT],
                                               &mOptions[RSK_GANONDORF_HINT],
                                               &mOptions[RSK_SHEIK_LA_HINT],
+                                              &mOptions[RSK_BOSS_KEY_HINT],
                                               &mOptions[RSK_DAMPES_DIARY_HINT],
                                               &mOptions[RSK_GREG_HINT],
                                               &mOptions[RSK_LOACH_HINT],
