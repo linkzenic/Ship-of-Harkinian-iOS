@@ -7,7 +7,7 @@
 #include <libultraship/libultra.h>
 #include "z64item.h"
 #include <memory>
-#include "context.h"
+#include "SeedContext.h"
 #include <soh/Enhancements/randomizer/randomizerTypes.h>
 #include "soh/Enhancements/randomizer/randomizer_check_objects.h"
 #include "soh/Enhancements/randomizer/randomizer_check_tracker.h"
@@ -82,6 +82,7 @@ extern "C" {
 #endif
 
 bool GenerateRandomizer(std::string seed = "");
+void JoinRandoGenerationThread();
 
 #ifdef __cplusplus
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "randomizerTypes.h"
-#include "context.h"
+#include "SeedContext.h"
 #include <cstdint>
 
 namespace Rando {

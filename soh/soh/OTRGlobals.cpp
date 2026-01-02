@@ -427,7 +427,6 @@ void OTRGlobals::Initialize() {
     Rando::Settings::GetInstance()->AssignContext(gRandoContext);
     Rando::StaticData::InitItemTable(); // RANDOTODO make this not rely on context's logic so it can be initialised in
                                         // InitStaticData
-    Rando::Settings::GetInstance()->CreateOptions();
     gRandomizer = std::make_shared<Randomizer>();
 
     hasMasterQuest = hasOriginal = false;
@@ -2853,8 +2852,6 @@ bool SoH_HandleConfigDrop(char* filePath) {
             }
         }
 
-        Rando::Settings::GetInstance()->UpdateOptionProperties();
-
         auto gui = Ship::Context::GetInstance()->GetWindow()->GetGui();
         gui->GetGuiWindow("Console")->Hide();
         gui->GetGuiWindow("Actor Viewer")->Hide();
@@ -2866,6 +2863,7 @@ bool SoH_HandleConfigDrop(char* filePath) {
             Ship::Context::GetInstance()->GetWindow()->GetGui()->GetGuiWindow("Console"))
             ->ClearBindings();
 
+        Rando::Settings::GetInstance()->UpdateAllOptions();
         gui->SaveConsoleVariablesNextFrame();
         ShipInit::Init("*");
 
