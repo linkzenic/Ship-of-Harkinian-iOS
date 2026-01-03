@@ -1564,6 +1564,11 @@ void Settings::CreateOptions() {
               "Gerudo Valley Crate PoH as Adult with Hover Boots",
               "From the far side of Gerudo Valley, a precise Hover Boots movement and jump-slash recoil can allow "
               "adult to reach the ledge with the crate PoH without needing Longshot. You will take fall damage.");
+    OPT_TRICK(RT_GV_CHILD_CUCCO_JUMP, RCQUEST_BOTH, RA_GERUDO_VALLEY, { Tricks::Tag::INTERMEDIATE },
+              "Gerudo Valley Jump Fence with Cucco", "Using cucco as child, it's possible to jumpslash over the gate.");
+    OPT_TRICK(RT_GV_CHILD_TENT, RCQUEST_BOTH, RA_GERUDO_VALLEY, { Tricks::Tag::NOVICE },
+              "Gerudo Valley Enter Carpenter's Tent as Child",
+              "The loading zone for Carpenter's Tent is accessible to child.");
     OPT_TRICK(RT_PASS_GUARDS_WITH_NOTHING, RCQUEST_BOTH, RA_GERUDO_FORTRESS, { Tricks::Tag::NOVICE },
               "Sneak Past Moving Gerudo Guards with No Items",
               "The logic normally guarantees Bow or Hookshot to stun them from a distance,"
@@ -1571,6 +1576,12 @@ void Settings::CreateOptions() {
     OPT_TRICK(RT_GF_JUMP, RCQUEST_BOTH, RA_GERUDO_FORTRESS, { Tricks::Tag::NOVICE }, "Gerudo\'s Fortress Ledge Jumps",
               "It is possible to navigate the rooves of Fortress with unintuative jumps to reach additional areas "
               "without going inside.");
+    OPT_TRICK(RT_GF_CHILD_SKIP_WASTELAND_GATE, RCQUEST_BOTH, RA_GERUDO_FORTRESS, { Tricks::Tag::NOVICE },
+              "Gerudo\'s Fortress Skip Wasteland Gate as Child",
+              "As child a sidehop out of bounds off the tower can be used to get past the gate.");
+    OPT_TRICK(RT_GF_ADULT_SKIP_WASTELAND_GATE, RCQUEST_BOTH, RA_GERUDO_FORTRESS, { Tricks::Tag::INTERMEDIATE },
+              "Gerudo\'s Fortress Skip Wasteland Gate as Adult",
+              "As adult a precise jumpslash out of bounds with hoverboots can be used to get past the gate.");
     OPT_TRICK(RT_GF_WARRIOR_WITH_DIFFICULT_WEAPON, RCQUEST_BOTH, RA_GERUDO_FORTRESS, { Tricks::Tag::NOVICE },
               "Gerudo\'s Fortress Warriors with Difficult Weapons",
               "Warriors can be defeated with Slingshot or Bombchus.");
