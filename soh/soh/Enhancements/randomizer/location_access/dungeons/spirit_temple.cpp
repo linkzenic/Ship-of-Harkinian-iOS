@@ -211,7 +211,7 @@ void RegionTable_Init_SpiritTemple() {
         //Exits
         Entrance(RR_SPIRIT_TEMPLE_SUN_ON_FLOOR_2F,  []{return true;}),
         Entrance(RR_SPIRIT_TEMPLE_INNER_WEST_HAND, []{return true;}),
-        Entrance(RR_SPIRIT_TEMPLE_GS_LEDGE,         []{return logic->CanUse(RG_HOVER_BOOTS) || logic->CanUse(RG_SCARECROW);}),
+        Entrance(RR_SPIRIT_TEMPLE_GS_LEDGE,         []{return logic->CanUse(RG_HOVER_BOOTS) || logic->ReachScarecrow();}),
         // RT_SPIRIT_PLATFORM_HOOKSHOT is currently disabled
         Entrance(RR_SPIRIT_TEMPLE_PLATFORM,         []{return logic->Get(LOGIC_SPIRIT_PLATFORM_LOWERED) && 
                                                               (logic->CanUse(RG_LONGSHOT) || (ctx->GetTrickOption(RT_SPIRIT_PLATFORM_HOOKSHOT) && logic->CanUse(RG_HOOKSHOT)));}),
@@ -775,7 +775,7 @@ void RegionTable_Init_SpiritTemple() {
         Entrance(RR_SPIRIT_TEMPLE_MQ_BIG_BLOCKS_DOOR,   []{return logic->Get(LOGIC_SPIRIT_STATUE_SOUTH_DOOR);}),
         //explicit adult check here is a precaution against possible Child logic leaking, Child with a hookshot can do this
         //It's possible to climb the legs of the statue to line up a longshot hit, but you can just go via West
-        Entrance(RR_SPIRIT_TEMPLE_MQ_STATUE_ROOM_ADULT, []{return logic->IsAdult && logic->CanUse(RG_SCARECROW);}),
+        Entrance(RR_SPIRIT_TEMPLE_MQ_STATUE_ROOM_ADULT, []{return logic->IsAdult && logic->ReachScarecrow();}),
     });
 
     areaTable[RR_SPIRIT_TEMPLE_MQ_FLAMETHROWER_STAIRS] = Region("Spirit Temple MQ Flamethrower Stairs", SCENE_SPIRIT_TEMPLE, {}, {}, {

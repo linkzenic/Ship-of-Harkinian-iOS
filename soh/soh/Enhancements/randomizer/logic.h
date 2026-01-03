@@ -113,6 +113,9 @@ class Logic {
     bool CanBuildRainbowBridge();
     bool CanTriggerLACS();
     bool IsFireLoopLocked();
+    bool ReachScarecrow();
+    bool ReachDistantScarecrow();
+    bool SummonEpona();
     void Reset(bool resetSaveContext = true);
     void SetContext(std::shared_ptr<Context> _ctx);
     bool Get(LogicVal logicVal);

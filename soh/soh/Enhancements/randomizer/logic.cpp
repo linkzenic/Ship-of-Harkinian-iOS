@@ -64,11 +64,6 @@ bool Logic::HasItem(RandomizerGet itemName) {
         case RG_PROGRESSIVE_NUT_UPGRADE:
         case RG_NUTS:
             return CurrentUpgrade(UPG_NUTS);
-        // RANDOTODO handle cases where the scarecrow is persistent between age better when OI is added
-        case RG_SCARECROW:
-            return ScarecrowsSong() && CanUse(RG_HOOKSHOT);
-        case RG_DISTANT_SCARECROW:
-            return ScarecrowsSong() && CanUse(RG_LONGSHOT);
         case RG_MAGIC_BEAN:
             return GetAmmo(ITEM_BEAN) > 0 || CheckInventory(ITEM_BEAN, true);
         case RG_KOKIRI_SWORD:
@@ -185,8 +180,6 @@ bool Logic::HasItem(RandomizerGet itemName) {
         case RG_RUTOS_LETTER:
             return CheckRandoInf(RandoGetToRandInf.at(itemName));
             // Boss Keys
-        case RG_EPONA:
-            return Get(LOGIC_FREED_EPONA);
         case RG_FOREST_TEMPLE_BOSS_KEY:
         case RG_FIRE_TEMPLE_BOSS_KEY:
         case RG_WATER_TEMPLE_BOSS_KEY:
@@ -299,8 +292,6 @@ bool Logic::CanUse(RandomizerGet itemName) {
             return IsAdult; // || HoverBootsAsChild;
         case RG_HOOKSHOT:
         case RG_LONGSHOT:
-        case RG_SCARECROW:
-        case RG_DISTANT_SCARECROW:
             return IsAdult; // || HookshotAsChild;
         case RG_GORON_TUNIC:
             return IsAdult; // || GoronTunicAsChild;
@@ -386,8 +377,6 @@ bool Logic::CanUse(RandomizerGet itemName) {
         // Misc. Items
         case RG_FISHING_POLE:
             return HasItem(RG_CHILD_WALLET); // as long as you have enough rubies
-        case RG_EPONA:
-            return IsAdult && CanUse(RG_EPONAS_SONG);
 
         // Bottle Items
         case RG_BOTTLE_WITH_BUGS:
@@ -504,7 +493,7 @@ bool Logic::CanDoGlitch(GlitchType glitch) {
 }
 
 // RANDOTODO quantity is a placeholder for proper ammo use calculation logic. in time will want updating to account for
-// ammo capacity Can we kill this enemy
+// ammo capacity
 bool Logic::CanKillEnemy(RandomizerEnemy enemy, EnemyDistance distance, bool wallOrFloor, uint8_t quantity, bool timer,
                          bool inWater) {
     bool killed = false;
@@ -2435,6 +2424,18 @@ bool Logic::IsFireLoopLocked() {
            ctx->GetOption(RSK_KEYSANITY).Is(RO_DUNGEON_ITEM_LOC_ANY_DUNGEON);
 }
 
+bool Logic::ReachScarecrow() {
+    return ScarecrowsSong() && CanUse(RG_HOOKSHOT);
+}
+
+bool Logic::ReachDistantScarecrow() {
+    return ScarecrowsSong() && CanUse(RG_LONGSHOT);
+}
+
+bool Logic::SummonEpona() {
+    return IsAdult && Get(LOGIC_FREED_EPONA) && CanUse(RG_EPONAS_SONG);
+}
+
 bool Logic::IsReverseAccessPossible() {
     // If we ever allow dungeon entrances to connect to boss rooms directly in dungeon chains, or for 1 boss door to
     // lead to another dungeons boss door, add RSK_MIX_DUNGEON_ENTRANCES to the final condition
@@ -2455,7 +2456,7 @@ bool Logic::SpiritExplosiveKeyLogic() {
 }
 
 bool Logic::SpiritWestToSkull() {
-    return (IsAdult && ctx->GetTrickOption(RT_SPIRIT_STATUE_JUMP)) || CanUse(RG_HOVER_BOOTS) || CanUse(RG_SCARECROW);
+    return (IsAdult && ctx->GetTrickOption(RT_SPIRIT_STATUE_JUMP)) || CanUse(RG_HOVER_BOOTS) || ReachScarecrow();
 }
 
 bool Logic::SpiritSunBlockSouthLedge() {

@@ -4635,7 +4635,6 @@ typedef enum {
     RG_DEKU_STICK_CAPACITY_30,
     RG_HOOKSHOT,
     RG_LONGSHOT,
-    RG_SCARECROW,
 
     // Overworld keys
     RG_GUARD_HOUSE_KEY,
@@ -4663,10 +4662,8 @@ typedef enum {
     RG_HYLIA_LAB_KEY,
     RG_FISHING_HOLE_KEY,
     // Logic Only
-    RG_DISTANT_SCARECROW,
     RG_STICKS,
     RG_NUTS,
-    RG_EPONA,
     RG_MAX
 } RandomizerGet;
 
