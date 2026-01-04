@@ -360,15 +360,15 @@ void RegionTable_Init_WaterTemple() {
 
     areaTable[RR_WATER_TEMPLE_BLOCK_U_BEND] = Region("Water Temple Block U-Bend", SCENE_WATER_TEMPLE, {}, {}, {
         //Exits
-        Entrance(RR_WATER_TEMPLE_MAIN,      []{return logic->Get(LOGIC_WATER_PUSHED_1F_BLOCK) && ((logic->CanUse(RG_IRON_BOOTS) && ((logic->CanUse(RG_HOOKSHOT) && logic->WaterLevel(WL_LOW)) || logic->HasItem(RG_BRONZE_SCALE))) ||
-                                                      (logic->WaterLevel(WL_HIGH_OR_MID) && logic->CanUse(RG_SILVER_SCALE))) && logic->WaterTimer() >= 8;}),
-        Entrance(RR_WATER_TEMPLE_1_JET_PIT, []{return logic->CanHitSwitch();}),
+        Entrance(RR_WATER_TEMPLE_MAIN,                []{return logic->Get(LOGIC_WATER_PUSHED_1F_BLOCK) && ((logic->CanUse(RG_IRON_BOOTS) && ((logic->CanUse(RG_HOOKSHOT) && logic->WaterLevel(WL_LOW)) || logic->HasItem(RG_BRONZE_SCALE))) ||
+                                                                (logic->WaterLevel(WL_HIGH_OR_MID) && logic->CanUse(RG_SILVER_SCALE))) && logic->WaterTimer() >= 8;}),
+        Entrance(RR_WATER_TEMPLE_OUTSIDE_DRAGON_ROOM, []{return logic->CanHitSwitch();}),
     });
 
-    areaTable[RR_WATER_TEMPLE_1_JET_PIT] = Region("Water Temple Outside Dragon Room", SCENE_WATER_TEMPLE, {}, {}, {
+    areaTable[RR_WATER_TEMPLE_OUTSIDE_DRAGON_ROOM] = Region("Water Temple Outside Dragon Room", SCENE_WATER_TEMPLE, {}, {}, {
         //Exits
-        Entrance(RR_WATER_TEMPLE_1_JET_PIT,   []{return logic->CanHitSwitch(ED_BOOMERANG);}),
-        Entrance(RR_WATER_TEMPLE_DRAGON_ROOM, []{return true;}),
+        Entrance(RR_WATER_TEMPLE_BLOCK_U_BEND, []{return logic->CanHitSwitch(ED_BOOMERANG) || logic->CanUse(RG_HOVER_BOOTS);}),
+        Entrance(RR_WATER_TEMPLE_DRAGON_ROOM,  []{return true;}),
     });
 
     areaTable[RR_WATER_TEMPLE_DRAGON_ROOM] = Region("Water Temple Dragon Room", SCENE_WATER_TEMPLE, {}, {
@@ -379,8 +379,8 @@ void RegionTable_Init_WaterTemple() {
                                                  logic->CanHitSwitch(ED_BOOMERANG, true) && (logic->HasItem(RG_SILVER_SCALE) || (logic->CanUse(RG_IRON_BOOTS) && logic->WaterTimer() >= 8))))),
     }, {
         //Exits
-        Entrance(RR_WATER_TEMPLE_1_JET_PIT,    []{return true;}),
-        Entrance(RR_WATER_TEMPLE_ABOVE_DRAGON, []{return false;}),
+        Entrance(RR_WATER_TEMPLE_OUTSIDE_DRAGON_ROOM, []{return true;}),
+        Entrance(RR_WATER_TEMPLE_ABOVE_DRAGON,        []{return false;}),
     });
 
     areaTable[RR_WATER_TEMPLE_PILLAR_1F] = Region("Water Temple Pillar 1F", SCENE_WATER_TEMPLE, {}, {}, {
