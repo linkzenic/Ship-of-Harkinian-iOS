@@ -556,7 +556,7 @@ void RegionTable_Init_JabuJabusBelly() {
     });
 
     areaTable[RR_JABU_JABUS_BELLY_BOSS_ROOM] = Region("Jabu Jabus Belly Boss Room", SCENE_JABU_JABU_BOSS, {
-        //Events //todo: add pot kill trick
+        //Events
         EventAccess(LOGIC_JABU_JABUS_BELLY_CLEAR, []{return logic->CanKillEnemy(RE_BARINADE);}),
     }, {
         //Locations

@@ -1729,6 +1729,8 @@ void Settings::CreateOptions() {
     OPT_TRICK(RT_JABU_MQ_SOT_GS, RCQUEST_MQ, RA_JABU_JABUS_BELLY, { Tricks::Tag::INTERMEDIATE },
               "Jabu MQ Song of Time Block GS with Boomerang",
               "Allow the Boomerang to return to you through the Song of Time block to grab the token.");
+    OPT_TRICK(RT_JABU_BARINADE_POTS, RCQUEST_BOTH, RA_JABU_JABUS_BELLY, { Tricks::Tag::ADVANCED },
+              "Jabu Barinade with Pots", "Barinade can be damaged with pots, requiring only boomerang to defeat.");
     OPT_TRICK(RT_LENS_BOTW, RCQUEST_VANILLA, RA_BOTTOM_OF_THE_WELL, { Tricks::Tag::NOVICE },
               "Bottom of the Well without Lens of Truth",
               "Removes the requirements for the Lens of Truth in Bottom of the Well.");
