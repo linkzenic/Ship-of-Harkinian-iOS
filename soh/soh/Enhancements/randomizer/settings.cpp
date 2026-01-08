@@ -7,8 +7,6 @@
 
 #include <spdlog/spdlog.h>
 
-#include <utility>
-
 #include <libultraship/bridge/consolevariablebridge.h>
 
 namespace Rando {
@@ -1384,6 +1382,9 @@ void Settings::CreateOptions() {
     OPT_TRICK(RT_OPEN_UNDERWATER_CHEST, RCQUEST_BOTH, RA_NONE, { Tricks::Tag::NOVICE, Tricks::Tag::GLITCH },
               "Open Underwater Chests",
               "Underwater chests can be opened by wearing iron boots and hookshotting the chest.");
+    OPT_TRICK(RT_DISTANT_BOULDER_COLLISION, RCQUEST_BOTH, RA_NONE, { Tricks::Tag::NOVICE, Tricks::Tag::GLITCH },
+              "Distant Boulder Collision",
+              "From afar boulder collision is disabled, allowing projectiles to pass through them.");
     OPT_TRICK(RT_HOOKSHOT_EXTENSION, RCQUEST_BOTH, RA_NONE, { Tricks::Tag::INTERMEDIATE },
               "Hookshot/Projectile Extension",
               "Slightly extends range. Also allows clipping projectile past collision. Used for:\n"
@@ -1481,7 +1482,7 @@ void Settings::CreateOptions() {
               "the top of Death Mountain.");
     OPT_TRICK(
         RT_DMT_UPPER_GS, RCQUEST_BOTH, RA_DEATH_MOUNTAIN_TRAIL, { Tricks::Tag::NOVICE },
-        "Death Mountain Trail Upper Red Rock GS without Hammer",
+        "Death Mountain Trail Upper Red Rock GS with Backflip",
         "After killing the Skulltula, the token can be collected by backflipping into the rock at the correct angle.");
     // disabled for now, only applies when trade quest is not shuffled so there's a timer (currently not considered in
     // logic) OPT_TRICK(RT_DMT_BOLERO_BIGGORON, RCQUEST_BOTH, RA_DEATH_MOUNTAIN_TRAIL, {Tricks::Tag::INTERMEDIATE},
@@ -1567,11 +1568,11 @@ void Settings::CreateOptions() {
               "Gerudo Valley Crate PoH as Adult with Hover Boots",
               "From the far side of Gerudo Valley, a precise Hover Boots movement and jump-slash recoil can allow "
               "adult to reach the ledge with the crate PoH without needing Longshot. You will take fall damage.");
-    OPT_TRICK(RT_GV_CHILD_CUCCO_JUMP, RCQUEST_BOTH, RA_GERUDO_VALLEY, { Tricks::Tag::INTERMEDIATE },
-              "Gerudo Valley Jump Fence with Cucco", "Using cucco as child, it's possible to jumpslash over the gate.");
     OPT_TRICK(RT_GV_CHILD_TENT, RCQUEST_BOTH, RA_GERUDO_VALLEY, { Tricks::Tag::NOVICE },
               "Gerudo Valley Enter Carpenter's Tent as Child",
               "The loading zone for Carpenter's Tent is accessible to child.");
+    OPT_TRICK(RT_GV_CHILD_CUCCO_JUMP, RCQUEST_BOTH, RA_GERUDO_VALLEY, { Tricks::Tag::INTERMEDIATE },
+              "Gerudo Valley Jump Fence with Cucco", "Using cucco as child, it's possible to jumpslash over the gate.");
     OPT_TRICK(RT_PASS_GUARDS_WITH_NOTHING, RCQUEST_BOTH, RA_GERUDO_FORTRESS, { Tricks::Tag::NOVICE },
               "Sneak Past Moving Gerudo Guards with No Items",
               "The logic normally guarantees Bow or Hookshot to stun them from a distance,"

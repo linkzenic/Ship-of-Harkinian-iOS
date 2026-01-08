@@ -310,7 +310,7 @@ void RegionTable_Init_JabuJabusBelly() {
 
     areaTable[RR_JABU_JABUS_BELLY_MQ_HOLES_ROOM] = Region("Jabu Jabus Belly MQ Holes Room", SCENE_JABU_JABU, {
         //Events
-        EventAccess(LOGIC_JABU_MQ_FORKED_ROOM_DOOR, []{return logic->HasExplosives() && logic->CanUse(RG_FAIRY_SLINGSHOT);}),
+        EventAccess(LOGIC_JABU_MQ_FORKED_ROOM_DOOR, []{return (logic->HasExplosives() || ctx->GetTrickOption(RT_DISTANT_BOULDER_COLLISION)) && logic->CanUse(RG_FAIRY_SLINGSHOT);}),
     }, {
         //Locations
         LOCATION(RC_JABU_JABUS_BELLY_MQ_PIT_GRASS_1, logic->CanCutShrubs() && logic->HasExplosives()),
