@@ -2482,6 +2482,14 @@ typedef enum {
     // true
     // ```
     // #### `args`
+    // - `*int16_t` // pauseCtx->namedItem
+    VB_DRAW_CUSTOM_ITEM_NAME,
+
+    // #### `result`
+    // ```c
+    // true
+    // ```
+    // #### `args`
     // - `*PlayState`
     // - `uint16_t` (cursorSlot - promoted from `u16`)
     // - `uint16_t` (cursorItem - promoted from `u16`)

@@ -1094,6 +1094,9 @@ void SaveManager::InitFileMaxed() {
 
     gSaveContext.entranceIndex = ENTR_HYRULE_FIELD_PAST_BRIDGE_SPAWN;
     gSaveContext.sceneFlags[5].swch = 0x40000000;
+
+    Flags_SetRandomizerInf(RAND_INF_OBTAINED_NAYRUS_LOVE);
+    Flags_SetRandomizerInf(RAND_INF_OBTAINED_ROCS_FEATHER);
 }
 
 #if defined(__WIIU__) || defined(__SWITCH__)

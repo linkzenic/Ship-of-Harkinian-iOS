@@ -13,6 +13,7 @@
 #include <string>
 #include <libultraship/bridge.h>
 #include <libultraship/libultraship.h>
+#include <soh_assets.h>
 
 extern "C" {
 #include <z64.h>
@@ -540,7 +541,16 @@ void DrawInventoryTab() {
 
             uint8_t item = gSaveContext.inventory.items[index];
             PushStyleButton(Colors::DarkGray);
-            if (item != ITEM_NONE) {
+            if (item == ITEM_ROCS_FEATHER) {
+                auto ret = ImGui::ImageButton(
+                    "ROCS_FEATHER",
+                    Ship::Context::GetInstance()->GetWindow()->GetGui()->GetTextureByName("ROCS_FEATHER"),
+                    ImVec2(48.0f, 48.0f), ImVec2(0, 0), ImVec2(1, 1));
+                if (ret) {
+                    selectedIndex = index;
+                    ImGui::OpenPopup(itemPopupPicker);
+                }
+            } else if (item != ITEM_NONE) {
                 const ItemMapEntry& slotEntry = itemMapping.find(item)->second;
                 auto ret = ImGui::ImageButton(
                     slotEntry.name.c_str(),
@@ -1843,4 +1853,6 @@ void SaveEditorWindow::DrawElement() {
 }
 
 void SaveEditorWindow::InitElement() {
+    Ship::Context::GetInstance()->GetWindow()->GetGui()->LoadGuiTexture("ROCS_FEATHER", gRocsFeatherTex,
+                                                                        ImVec4(1, 1, 1, 1));
 }
