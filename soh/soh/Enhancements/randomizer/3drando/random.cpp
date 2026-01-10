@@ -1,10 +1,5 @@
 #include "random.hpp"
 
-#include <bit>
-#include <random>
-#include <cassert>
-
-static bool init = false;
 uint64_t rando_state = 0;
 const uint64_t multiplier = 6364136223846793005ULL;
 const uint64_t increment = 11634580027462260723ULL;

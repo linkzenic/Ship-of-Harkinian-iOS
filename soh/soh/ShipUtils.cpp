@@ -98,14 +98,13 @@ extern "C" void* Ship_GetCharFontTexture(u8 character) {
     return (void*)fontTbl[adjustedChar];
 }
 
-static bool rand_init = false;
+static bool default_init = false;
 uint64_t default_state = 0;
 const uint64_t multiplier = 6364136223846793005ULL;
 const uint64_t increment = 11634580027462260723ULL;
 
 // Initialize with seed specified
 void ShipUtils::RandInit(uint64_t seed, uint64_t* state) {
-    rand_init = true;
     if (state == nullptr) {
         state = &default_state;
     }
@@ -115,16 +114,16 @@ void ShipUtils::RandInit(uint64_t seed, uint64_t* state) {
 uint32_t ShipUtils::next32(uint64_t* state) {
     if (state == nullptr) {
         state = &default_state;
-    }
-
-    if (!rand_init) {
-        // No seed given, get a random number from device to seed
+        if (!default_init) {
+            // No seed given, get a random number from device to seed
 #if !defined(__SWITCH__) && !defined(__WIIU__)
-        uint64_t seed = static_cast<uint64_t>(std::random_device{}());
+            uint64_t seed = static_cast<uint64_t>(std::random_device{}());
 #else
-        uint64_t seed = static_cast<uint64_t>(rand());
+            uint64_t seed = static_cast<uint64_t>(rand());
 #endif
-        ShipUtils::RandInit(seed, state);
+            default_init = true;
+            ShipUtils::RandInit(seed, state);
+        }
     }
 
     *state = *state * multiplier + increment;
