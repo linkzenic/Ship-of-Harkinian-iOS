@@ -2,8 +2,10 @@
 #include "OTRAudio.h"
 #include <iostream>
 #include <algorithm>
+#include <atomic>
 #include <filesystem>
 #include <fstream>
+#include <vector>
 #include <chrono>
 
 #include "ResourceManagerHelpers.h"
@@ -37,6 +39,8 @@
 #include "Enhancements/gameplaystats.h"
 #include "ObjectExtension/ObjectExtension.h"
 #include "frame_interpolation.h"
+#include "SohGui/SohMenu.h"
+#include "SohGui/SohGui.hpp"
 #include "variables.h"
 #include "z64.h"
 #include "macros.h"
@@ -145,6 +149,8 @@ Sail* Sail::Instance;
 Anchor* Anchor::Instance;
 
 extern "C" char** cameraStrings;
+
+extern "C" void PadMgr_ThreadEntry(PadMgr* padMgr);
 std::vector<std::shared_ptr<std::string>> cameraStdStrings;
 
 Color_RGB8 kokiriColor = { 0x1E, 0x69, 0x1B };
@@ -263,25 +269,520 @@ const char* constCameraStrings[] = {
     GFXP_KATAKANA "ｷ-     /   ",
 };
 
+typedef struct {
+    uint16_t major;
+    uint16_t minor;
+    uint16_t patch;
+} OTRVersion;
+
+std::shared_ptr<Fast::Fast3dWindow> sohFast3dWindow;
+static OTRVersion DetectOTRVersion(std::string path, bool isMq);
+static bool VerifyArchiveVersion(OTRVersion version);
+std::string portArchivePath = "";
+static bool sohArchiveVersionMatch = false;
+
 OTRGlobals::OTRGlobals() {
     context = Ship::Context::CreateUninitializedInstance("Ship of Harkinian", appShortName, "shipofharkinian.json");
+
+    portArchivePath = Ship::Context::LocateFileAcrossAppDirs("soh.o2r");
+    OTRVersion portArchiveVersion = DetectOTRVersion(portArchivePath, false);
+    sohArchiveVersionMatch = portArchiveVersion.major == gBuildVersionMajor &&
+                             portArchiveVersion.minor == gBuildVersionMinor &&
+                             portArchiveVersion.patch == gBuildVersionPatch;
+
+    context->InitConfiguration();
+    context->InitConsoleVariables();
+
+    auto controlDeck = std::make_shared<LUS::ControlDeck>(std::vector<CONTROLLERBUTTONS_T>({
+        BTN_CUSTOM_MODIFIER1,
+        BTN_CUSTOM_MODIFIER2,
+        BTN_CUSTOM_OCARINA_NOTE_D4,
+        BTN_CUSTOM_OCARINA_NOTE_F4,
+        BTN_CUSTOM_OCARINA_NOTE_A4,
+        BTN_CUSTOM_OCARINA_NOTE_B4,
+        BTN_CUSTOM_OCARINA_NOTE_D5,
+        BTN_CUSTOM_OCARINA_DISABLE_SONGS,
+        BTN_CUSTOM_OCARINA_PITCH_UP,
+        BTN_CUSTOM_OCARINA_PITCH_DOWN,
+    }));
+    context->InitControlDeck(controlDeck);
+    context->InitResourceManager({ portArchivePath }, {}, 3, true);
+    context->InitConsole();
+
+    auto sohInputEditorWindow =
+        std::make_shared<SohInputEditorWindow>(CVAR_WINDOW("ControllerConfiguration"), "Configure Controller");
+    sohFast3dWindow =
+        std::make_shared<Fast::Fast3dWindow>(std::vector<std::shared_ptr<Ship::GuiWindow>>({ sohInputEditorWindow }));
+    context->InitWindow(sohFast3dWindow);
+
+    SohGui::SetupMenu();
+
+    if (sohArchiveVersionMatch) {
+
+        auto overlay = context->GetInstance()->GetWindow()->GetGui()->GetGameOverlay();
+        overlay->LoadFont("Press Start 2P", 12.0f, "fonts/PressStart2P-Regular.ttf");
+        overlay->LoadFont("Fipps", 32.0f, "fonts/Fipps-Regular.otf");
+        overlay->SetCurrentFont(CVarGetString(CVAR_GAME_OVERLAY_FONT, "Press Start 2P"));
+
+        fontMonoSmall = CreateFontWithSize(14.0f, "fonts/Inconsolata-Regular.ttf");
+        fontMono = CreateFontWithSize(16.0f, "fonts/Inconsolata-Regular.ttf");
+        fontMonoLarger = CreateFontWithSize(20.0f, "fonts/Inconsolata-Regular.ttf");
+        fontMonoLargest = CreateFontWithSize(24.0f, "fonts/Inconsolata-Regular.ttf");
+        fontStandard = CreateFontWithSize(16.0f, "fonts/Montserrat-Regular.ttf");
+        fontStandardLarger = CreateFontWithSize(20.0f, "fonts/Montserrat-Regular.ttf");
+        fontStandardLargest = CreateFontWithSize(24.0f, "fonts/Montserrat-Regular.ttf");
+        fontJapanese = CreateFontWithSize(24.0f, "fonts/NotoSansJP-Regular.ttf", true);
+        ImGui::GetIO().FontDefault = fontStandardLarger;
+    }
+
+    previousImGuiScaleIndex = -1;
+    previousImGuiScale = defaultImGuiScale;
+    ScaleImGui();
+}
+
+typedef enum ExtractSteps {
+    ES_PORT_ARCHIVE,
+    ES_WINDOWS,
+    ES_EXTRACT_ARGS,
+    ES_EXTRACT,
+    ES_VERIFY,
+} ExtractSteps;
+
+typedef enum PromptSteps {
+    PS_FILE_CHECK,
+    PS_LOCAL,
+    PS_FIRST,
+    PS_SECOND,
+    PS_DUPE,
+    PS_WAIT,
+    PS_NONE,
+} PromptSteps;
+
+typedef enum WindowsSteps {
+    WS_TEMP,
+    WS_PERMS,
+    WS_ONEDRIVE,
+    WS_DONE,
+} WindowsSteps;
+
+bool IsSubpath(const std::filesystem::path& path, const std::filesystem::path& base) {
+    auto rel = std::filesystem::relative(path, base);
+    return !rel.empty() && rel.native()[0] != '.';
+}
+
+bool PathTestCleanup(FILE* tfile) {
+    try {
+        if (std::filesystem::exists("./text.txt"))
+            std::filesystem::remove("./text.txt");
+        if (std::filesystem::exists("./test/"))
+            std::filesystem::remove("./test/");
+    } catch (std::filesystem::filesystem_error const& ex) { return false; }
+    return true;
+}
+
+void CheckAndCreateModFolder() {
+    try {
+        std::string modsPath = Ship::Context::LocateFileAcrossAppDirs("mods", appShortName);
+        if (!std::filesystem::exists(modsPath)) {
+            // Create mods folder relative to app dir
+            modsPath = Ship::Context::GetPathRelativeToAppDirectory("mods", appShortName);
+            std::string filePath = modsPath + "/custom_mod_files_go_here.txt";
+            if (std::filesystem::create_directories(modsPath)) {
+                std::ofstream(filePath).close();
+            }
+        }
+    } catch (std::filesystem::filesystem_error const& ex) {
+        // Couldn't make the folder, continue silently
+        return;
+    }
+}
+
+namespace SohGui {
+extern std::shared_ptr<SohGui::SohMenu> mSohMenu;
+}
+
+void OTRGlobals::RunExtract(int argc, char* argv[]) {
+    bool extractDone = false;
+    ExtractSteps extractStep = ES_PORT_ARCHIVE;
+    WindowsSteps windowsStep = WS_TEMP;
+    auto wnd = std::dynamic_pointer_cast<Fast::Fast3dWindow>(OTRGlobals::Instance->context->GetWindow());
+    auto gui = wnd->GetGui();
+
+    OTRVersion vanillaVersion = DetectOTRVersion("oot.o2r", false);
+    OTRVersion mqVersion = DetectOTRVersion("oot-mq.o2r", true);
+
+    bool shouldRegen = VerifyArchiveVersion(vanillaVersion) || VerifyArchiveVersion(mqVersion);
+
+    std::filesystem::path ownPath;
+    std::vector<std::string> args;
+    if (argc > 1) {
+        for (int i = 1; i < argc; i++) {
+            args.push_back(argv[argc]);
+        }
+    }
+    Extractor extract;
+    PromptSteps promptStep = PS_FILE_CHECK;
+    bool generatedIsMQ = false;
+    std::atomic<bool> extracting = false;
+    std::atomic<size_t> extractCount = 0, totalExtract = 0;
+
+    std::string installPath = Ship::Context::GetAppBundlePath();
+    std::string file;
+
+#if defined(__SWITCH__)
+    SohGui::RegisterPopup("Outdated ROM Archives",
+                          "\x1b[2;2HYou've launched the Ship with an old ROM O2R file."
+                          "\x1b[4;2HPlease regenerate a new ROM O2R and relaunch."
+                          "\x1b[6;2HPress the Home button to exit...",
+                          "OK", "", [&]() { exit(1); });
+#elif defined(__WIIU__)
+    SohGui::RegisterPopup("Outdated ROM Archives",
+                          "You've launched the Ship with an old a ROM O2R file.\n\n"
+                          "Please generate a ROM O2R and relaunch.\n\n"
+                          "Press and hold the Power button to shutdown...",
+                          "OK", "", [&]() { exit(1); });
+    OSFatal();
+#endif
+
+    if (!std::filesystem::exists(installPath + "/assets")) {
+        SohGui::RegisterPopup("Extractor assets not found",
+                              "No O2R files found. Missing 'assets/' folder needed to generate OTR file.\nPlease "
+                              "re-extract them from the download or.\n\nExiting...",
+                              "OK", "", [&]() { exit(1); });
+    } else if (shouldRegen) {
+        SohGui::RegisterPopup("Outdated ROM Archives",
+                              "Your oot.o2r or oot-mq.o2r were created with incompatible versions of SoH.\nYou will "
+                              "now be redirected to re-extract them.");
+        std::filesystem::remove("oot.o2r");
+        std::filesystem::remove("oot-mq.o2r");
+    }
+
+    std::shared_ptr<BS::thread_pool> threadPool = std::make_shared<BS::thread_pool>(1);
+    while (!extractDone) {
+        if (SohGui::PopupsQueued() > 0 || extracting) {
+            goto render;
+        }
+        switch (extractStep) {
+            case ES_PORT_ARCHIVE: {
+                if (sohArchiveVersionMatch) {
+#ifdef _WIN32
+                    extractStep = ES_WINDOWS;
+#elif (defined(__WIIU__) || defined(__SWITCH__))
+                    extractStep = ES_VERIFY;
+#else
+                    extractStep = ES_EXTRACT;
+#endif
+                } else {
+                    std::string msg;
+
+#if defined(__SWITCH__)
+                    msg = "\x1b[4;2HPlease re-extract it from the download.\n"
+                          "\x1b[6;2HPress the Home button to exit...";
+#elif defined(__WIIU__)
+                    msg = "Please extract the soh.o2r from the Ship of Harkinian download\nto your folder.\n\nPress "
+                          "and hold the power\n"
+                          "button to shutdown...";
+#else
+                    msg =
+                        "Please extract the soh.o2r from the Ship of Harkinian download to your folder.\n\nExiting...";
+#endif
+                    std::string title =
+                        !std::filesystem::exists(portArchivePath) ? "Missing soh.o2r" : "soh.o2r is outdated";
+                    SohGui::RegisterPopup(title, msg, "OK", "", [&]() { exit(1); });
+                }
+                continue;
+            }
+            case ES_WINDOWS: {
+                switch (windowsStep) {
+                    case WS_TEMP: {
+#ifdef _WIN32
+                        char* tempVar = getenv("TEMP");
+                        std::filesystem::path tempPath;
+                        try {
+                            tempPath = std::filesystem::canonical(tempVar);
+                        } catch (std::filesystem::filesystem_error const& ex) {
+                            std::string userPath = getenv("USERPROFILE");
+                            userPath.append("\\AppData\\Local\\Temp");
+                            tempPath = std::filesystem::canonical(userPath);
+                        }
+                        wchar_t buffer[MAX_PATH];
+                        GetModuleFileName(NULL, buffer, _countof(buffer));
+                        ownPath = std::filesystem::canonical(buffer).parent_path();
+                        if (IsSubpath(ownPath, tempPath)) {
+                            SohGui::RegisterPopup("SoH Path Error",
+                                                  "SoH is running in a temp folder.\nExtract the .zip and run again.",
+                                                  "OK", "", [&]() { exit(0); });
+                        } else {
+                            windowsStep = WS_PERMS;
+                        }
+#endif
+                        continue;
+                    }
+                    case WS_PERMS: {
+                        FILE* tfile = fopen("./text.txt", "w");
+                        std::filesystem::path tfolder = std::filesystem::path("./test/");
+                        bool error = false;
+                        try {
+                            create_directories(tfolder);
+                        } catch (std::filesystem::filesystem_error const& ex) { error = true; }
+                        if (tfile == NULL || error) {
+                            SohGui::RegisterPopup("SoH Permissions Error",
+                                                  "SoH does not have proper file permissions.\nPlease move it to a "
+                                                  "folder that does and run again.",
+                                                  "OK", "", [&]() {
+                                                      fclose(tfile);
+                                                      PathTestCleanup(tfile);
+                                                      exit(0);
+                                                  });
+                        } else {
+                            fclose(tfile);
+                            if (!PathTestCleanup(tfile)) {
+                                SohGui::RegisterPopup("SoH Permissions Error",
+                                                      "SoH does not have proper file permissions.\nPlease move it to a "
+                                                      "folder that does and run again.",
+                                                      "OK", "", [&]() { exit(0); });
+                            }
+                            windowsStep = WS_ONEDRIVE;
+                        }
+                        continue;
+                    }
+                    case WS_ONEDRIVE: {
+                        if (ownPath.string().find("OneDrive") != std::string::npos) {
+                            SohGui::RegisterPopup("SoH Path Error",
+                                                  "SoH appears to be in a OneDrive folder, which will cause issues.\n"
+                                                  "Please move it to a folder outside of OneDrive, like the root of a\n"
+                                                  "drive (e.g. \"C:\\Games\\SoH\").",
+                                                  "OK", "", [&]() { exit(0); });
+                        } else {
+                            windowsStep = WS_DONE;
+                            if (args.size() > 0) {
+                                extractStep = ES_EXTRACT_ARGS;
+                            } else {
+                                extractStep = ES_EXTRACT;
+                            }
+                        }
+                        continue;
+                    }
+                    default:
+                        continue;
+                }
+                break;
+            }
+            case ES_EXTRACT_ARGS: {
+#if !defined(__SWITCH__) && !defined(__WIIU__)
+                if (args.size() == 0) {
+                    SohGui::RegisterPopup(
+                        "Run Ship of Harkinian", "All files have been processed. Run SoH?", "Yes", "No",
+                        [&]() {
+                            if (!std::filesystem::exists(Ship::Context::GetAppDirectoryPath(appShortName) +
+                                                         "/oot.o2r") &&
+                                !std::filesystem::exists(Ship::Context::GetAppDirectoryPath(appShortName) +
+                                                         "/oot-mq.o2r")) {
+                                extractStep = ES_EXTRACT;
+                                promptStep = PS_FILE_CHECK;
+                            } else {
+                                extractStep = ES_VERIFY;
+                            }
+                        },
+                        [&]() { exit(0); });
+                    break;
+                }
+                file = args.at(0);
+                args.erase(args.begin());
+                extract = Extractor();
+                if (extract.RunFileStandalone(file)) {
+                    bool doExtract = true;
+                    std::string archive = (extract.IsMasterQuest() ? "oot-mq.o2r" : "oot.o2r");
+                    if (std::filesystem::exists(Ship::Context::GetAppDirectoryPath(appShortName) + "/" + archive)) {
+                        std::string msg = "Archive for current ROM, " + archive + ", already exists.\nExtract again?";
+                        SohGui::RegisterPopup("Confirm Re-extract", msg.c_str(), "Yes", "No", [&]() {
+                            extracting = true;
+                            threadPool->submit_task([&]() -> void {
+                                extract.CallZapd(installPath, Ship::Context::GetAppDirectoryPath(appShortName),
+                                                 &extractCount, &totalExtract);
+                                extracting = false;
+                                extractCount = totalExtract = 0;
+                            });
+                        });
+                    } else {
+                        extracting = true;
+                        threadPool->submit_task([&]() -> void {
+                            extract.CallZapd(installPath, Ship::Context::GetAppDirectoryPath(appShortName),
+                                             &extractCount, &totalExtract);
+                            extracting = false;
+                            extractCount = totalExtract = 0;
+                        });
+                    }
+                } else {
+                    bool open = true;
+                    std::string msg = "File\n" + std::string(file) + "\nis not a ROM or does not match supported ROMs.";
+                    SohGui::RegisterPopup("SoH ROM Error", msg.c_str());
+                }
+#else
+                extractStep = ES_VERIFY;
+#endif
+                break;
+            }
+            case ES_EXTRACT: {
+                switch (promptStep) {
+                    case PS_FILE_CHECK: {
+                        const bool ootO2RExists =
+                            std::filesystem::exists(
+                                Ship::Context::LocateFileAcrossAppDirs("oot-mq.o2r", appShortName)) ||
+                            std::filesystem::exists(Ship::Context::LocateFileAcrossAppDirs("oot.o2r", appShortName));
+
+                        if (!ootO2RExists) {
+                            SohGui::RegisterPopup(
+                                "No O2R Files", "No O2R files found. Generate one now?", "Yes", "No",
+                                [&]() { promptStep = PS_LOCAL; }, [&]() { exit(0); });
+                        } else {
+                            extractStep = ES_VERIFY;
+                        }
+                        continue;
+                    }
+                    case PS_LOCAL: {
+                        extract = Extractor();
+                        extract.SetSearchPath(installPath);
+                        extract.GetRoms(args);
+                        if (!args.empty()) {
+                            promptStep = PS_WAIT;
+                            SohGui::RegisterPopup(
+                                "ROMs found", "ROMs found in application directory. Would you like to process them?",
+                                "Yes", "No", [&]() { extractStep = ES_EXTRACT_ARGS; },
+                                [&]() { promptStep = PS_FIRST; });
+                        } else {
+                            promptStep = PS_FIRST;
+                        }
+                        continue;
+                    }
+                    case PS_FIRST: {
+                        if (!extract.ManuallySearchForRomMatchingType(RomSearchMode::Both)) {
+                            promptStep = PS_FILE_CHECK;
+                            continue;
+                        }
+                        extracting = true;
+                        threadPool->submit_task([&]() -> void {
+                            extract.CallZapd(installPath, Ship::Context::GetAppDirectoryPath(appShortName),
+                                             &extractCount, &totalExtract);
+                            generatedIsMQ = extract.IsMasterQuest();
+                            extracting = false;
+                            promptStep = PS_SECOND;
+                            extractCount = 0;
+                            totalExtract = 0;
+                        });
+                        continue;
+                    }
+                    case PS_SECOND: {
+                        SohGui::RegisterPopup(
+                            "Extraction Complete", "ROM Extracted. Extract another?", "Yes", "No",
+                            [&]() {
+                                if (!extract.ManuallySearchForRomMatchingType(generatedIsMQ ? RomSearchMode::Vanilla
+                                                                                            : RomSearchMode::MQ)) {
+                                    extractStep = ES_VERIFY;
+                                } else {
+                                    extracting = true;
+                                    threadPool->submit_task([&]() -> void {
+                                        extract.CallZapd(installPath, Ship::Context::GetAppDirectoryPath(appShortName),
+                                                         &extractCount, &totalExtract);
+                                        extracting = false;
+                                        extractStep = ES_VERIFY;
+                                        extractCount = 0;
+                                        totalExtract = 0;
+                                    });
+                                }
+                            },
+                            [&]() { extractStep = ES_VERIFY; });
+                        continue;
+                    }
+                    default:
+                        break;
+                }
+                break;
+            }
+            case ES_VERIFY: {
+                const bool ootO2RExists =
+                    std::filesystem::exists(Ship::Context::LocateFileAcrossAppDirs("oot-mq.o2r", appShortName)) ||
+                    std::filesystem::exists(Ship::Context::LocateFileAcrossAppDirs("oot.o2r", appShortName));
+
+                if (!ootO2RExists) {
+                    SohGui::RegisterPopup("No ROM Archives",
+                                          "No ROM O2R files detected. Please generate a ROM O2R and relaunch.", "OK",
+                                          "", [&]() { exit(0); });
+                }
+                extractDone = true;
+                continue;
+            }
+            default:
+                break;
+        }
+
+    render:
+        if (!WindowIsRunning()) {
+            exit(0);
+        }
+        // Process window events for resize, mouse, keyboard events
+        wnd->HandleEvents();
+        UIWidgets::Colors themeColor =
+            static_cast<UIWidgets::Colors>(CVarGetInteger(CVAR_SETTING("Menu.Theme"), UIWidgets::Colors::LightBlue));
+        ImGui::PushStyleColor(ImGuiCol_TitleBgActive, UIWidgets::ColorValues.at(themeColor));
+        ImGui::PushStyleColor(ImGuiCol_ModalWindowDimBg, UIWidgets::ColorValues.at(UIWidgets::Colors::DarkGray));
+
+        // Skip dropped frames
+        if (!wnd->IsFrameReady()) {
+            continue;
+        }
+        gui->StartDraw();
+        sohFast3dWindow->StartFrame();
+        sohFast3dWindow->RunGuiOnly();
+        if (extracting && !ImGui::IsPopupOpen("ROM Extraction")) {
+            ImGui::OpenPopup("ROM Extraction");
+        }
+        if (extracting) {
+            ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
+            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10.0f, 8.0f));
+            auto color = UIWidgets::ColorValues.at(THEME_COLOR);
+            ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(color.x, color.y, color.z, 0.6f));
+            ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(color.x, color.y, color.z, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.0f, 0.0f, 0.0f, 0.3f));
+            if (ImGui::BeginPopupModal("ROM Extraction", NULL,
+                                       ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize |
+                                           ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
+                                           ImGuiWindowFlags_NoSavedSettings)) {
+                float progress = (totalExtract > 0.0f ? (float)extractCount / (float)totalExtract : 0) * 100.0f;
+                auto filename = std::filesystem::path(file).filename().string();
+                ImGui::Text("Extracting %s...%s", filename.c_str(),
+                            roundf(progress) == 100.0f ? " Done. Finishing up." : "");
+                std::string overlay = extractCount > 0 ? fmt::format("{:.0f}%", progress) : "Starting Up";
+                ImGui::ProgressBar(progress / 100.0f, ImVec2(600.0f, 50.0f), overlay.c_str());
+                ImGui::EndPopup();
+            }
+            ImGui::PopStyleColor(3);
+            ImGui::PopStyleVar(2);
+        }
+        gui->EndDraw();
+        sohFast3dWindow->EndFrame();
+        ImGui::PopStyleColor(2);
+    }
+
+#ifdef __SWITCH__
+    Ship::Switch::Init(Ship::PreInitPhase);
+#elif defined(__WIIU__)
+    Ship::WiiU::Init(appShortName);
+#endif
+
+#if not defined(__SWITCH__) && not defined(__WIIU__)
+    CheckAndCreateModFolder();
+#endif
 }
 
 void OTRGlobals::Initialize() {
-    std::vector<std::string> OTRFiles;
     std::string mqPath = Ship::Context::LocateFileAcrossAppDirs("oot-mq.o2r", appShortName);
     if (std::filesystem::exists(mqPath)) {
-        OTRFiles.push_back(mqPath);
+        context->GetResourceManager()->GetArchiveManager()->AddArchive(mqPath);
     }
     std::string ootPath = Ship::Context::LocateFileAcrossAppDirs("oot.o2r", appShortName);
     if (std::filesystem::exists(ootPath)) {
-        OTRFiles.push_back(ootPath);
-    }
-
-    std::string sohOtrPath = Ship::Context::LocateFileAcrossAppDirs("soh.o2r");
-
-    if (std::filesystem::exists(sohOtrPath)) {
-        OTRFiles.push_back(sohOtrPath);
+        context->GetResourceManager()->GetArchiveManager()->AddArchive(ootPath);
     }
 
     std::unordered_set<uint32_t> ValidHashes = {
@@ -306,41 +807,14 @@ void OTRGlobals::Initialize() {
     context->InitFileDropMgr();
 
     // tell LUS to reserve 3 SoH specific threads (Game, Audio, Save)
-    context->InitResourceManager(OTRFiles, {}, 3);
     prevAltAssets = CVarGetInteger(CVAR_SETTING("AltAssets"), 1);
     context->GetResourceManager()->SetAltAssetsEnabled(prevAltAssets);
 
-    auto controlDeck = std::make_shared<LUS::ControlDeck>(std::vector<CONTROLLERBUTTONS_T>({
-        BTN_CUSTOM_MODIFIER1,
-        BTN_CUSTOM_MODIFIER2,
-        BTN_CUSTOM_OCARINA_NOTE_D4,
-        BTN_CUSTOM_OCARINA_NOTE_F4,
-        BTN_CUSTOM_OCARINA_NOTE_A4,
-        BTN_CUSTOM_OCARINA_NOTE_B4,
-        BTN_CUSTOM_OCARINA_NOTE_D5,
-        BTN_CUSTOM_OCARINA_DISABLE_SONGS,
-        BTN_CUSTOM_OCARINA_PITCH_UP,
-        BTN_CUSTOM_OCARINA_PITCH_DOWN,
-    }));
-    context->InitControlDeck(controlDeck);
-
     context->InitCrashHandler();
-    context->InitConsole();
-
-    auto sohInputEditorWindow =
-        std::make_shared<SohInputEditorWindow>(CVAR_WINDOW("ControllerConfiguration"), "Configure Controller");
-    auto sohFast3dWindow =
-        std::make_shared<Fast::Fast3dWindow>(std::vector<std::shared_ptr<Ship::GuiWindow>>({ sohInputEditorWindow }));
-    context->InitWindow(sohFast3dWindow);
 
     context->GetWindow()->SetAutoCaptureMouse(CVarGetInteger(CVAR_SETTING("EnableMouse"), 0) &&
                                               CVarGetInteger(CVAR_SETTING("AutoCaptureMouse"), 1));
     context->GetWindow()->SetForceCursorVisibility(CVarGetInteger(CVAR_SETTING("CursorVisibility"), 0));
-
-    auto overlay = context->GetInstance()->GetWindow()->GetGui()->GetGameOverlay();
-    overlay->LoadFont("Press Start 2P", 12.0f, "fonts/PressStart2P-Regular.ttf");
-    overlay->LoadFont("Fipps", 32.0f, "fonts/Fipps-Regular.otf");
-    overlay->SetCurrentFont(CVarGetString(CVAR_GAME_OVERLAY_FONT, "Press Start 2P"));
 
     context->InitAudio({ .SampleRate = 32000, .SampleLength = 1024, .DesiredBuffered = 1680 });
 
@@ -429,20 +903,6 @@ void OTRGlobals::Initialize() {
     gRandomizer = std::make_shared<Randomizer>();
 
     hasMasterQuest = hasOriginal = false;
-
-    previousImGuiScaleIndex = -1;
-    previousImGuiScale = defaultImGuiScale;
-
-    fontMonoSmall = CreateFontWithSize(14.0f, "fonts/Inconsolata-Regular.ttf", false);
-    fontMono = CreateFontWithSize(16.0f, "fonts/Inconsolata-Regular.ttf", false);
-    fontMonoLarger = CreateFontWithSize(20.0f, "fonts/Inconsolata-Regular.ttf", false);
-    fontMonoLargest = CreateFontWithSize(24.0f, "fonts/Inconsolata-Regular.ttf", false);
-    fontStandard = CreateFontWithSize(16.0f, "fonts/Montserrat-Regular.ttf", false);
-    fontStandardLarger = CreateFontWithSize(20.0f, "fonts/Montserrat-Regular.ttf", false);
-    fontStandardLargest = CreateFontWithSize(24.0f, "fonts/Montserrat-Regular.ttf", false);
-    fontJapanese = CreateFontWithSize(24.0f, "fonts/NotoSansJP-Regular.ttf", true);
-    ImGui::GetIO().FontDefault = fontStandardLarger;
-    ScaleImGui();
 
     // Move the camera strings from read only memory onto the heap (writable memory)
     // This is in OTRGlobals right now because this is a place that will only ever be run once at the beginning of
@@ -961,12 +1421,6 @@ extern "C" void OTRExtScanner() {
     }
 }
 
-typedef struct {
-    uint16_t major;
-    uint16_t minor;
-    uint16_t patch;
-} OTRVersion;
-
 // Read the port version from an OTR file
 OTRVersion ReadPortVersionFromOTR(std::string otrPath) {
     OTRVersion version = {};
@@ -989,284 +1443,38 @@ OTRVersion ReadPortVersionFromOTR(std::string otrPath) {
     return version;
 }
 
-// Check that a soh.o2r exists and matches the version of soh running
-// Otherwise show a message and exit
-void CheckSoHOTRVersion(std::string otrPath) {
-    std::string msg;
-
-#if defined(__SWITCH__)
-    msg = "\x1b[4;2HPlease re-extract it from the download."
-          "\x1b[6;2HPress the Home button to exit...";
-#elif defined(__WIIU__)
-    msg = "Please extract the soh.o2r from the Ship of Harkinian download\nto your folder.\n\nPress and hold the power "
-          "button to shutdown...";
-#else
-    msg = "Please extract the soh.o2r from the Ship of Harkinian download to your folder.\n\nExiting...";
-#endif
-
-    if (!std::filesystem::exists(otrPath)) {
-#if not defined(__SWITCH__) && not defined(__WIIU__)
-        Extractor::ShowErrorBox("soh.o2r file is missing", msg.c_str());
-        exit(1);
-#elif defined(__SWITCH__)
-        Ship::Switch::PrintErrorMessageToScreen(("\x1b[2;2HYou are missing the soh.o2r file." + msg).c_str());
-#elif defined(__WIIU__)
-        OSFatal(("You are missing the soh.o2r file\n\n" + msg).c_str());
-#endif
-    }
-
-    OTRVersion otrVersion = ReadPortVersionFromOTR(otrPath);
-
-    if (otrVersion.major != gBuildVersionMajor || otrVersion.minor != gBuildVersionMinor ||
-        otrVersion.patch != gBuildVersionPatch) {
-#if not defined(__SWITCH__) && not defined(__WIIU__)
-        Extractor::ShowErrorBox("soh.o2r file version does not match", msg.c_str());
-        exit(1);
-#elif defined(__SWITCH__)
-        Ship::Switch::PrintErrorMessageToScreen(("\x1b[2;2HYou have an old soh.o2r file." + msg).c_str());
-#elif defined(__WIIU__)
-        OSFatal(("You have an old soh.o2r file\n\n" + msg).c_str());
-#endif
-    }
-}
-
 // Checks the program version stored in the otr and compares the major value to soh
 // For Windows/Mac/Linux if the version doesn't match, offer to
-void DetectOTRVersion(std::string fileName, bool isMQ) {
+OTRVersion DetectOTRVersion(std::string fileName, bool isMQ) {
     bool isOtrOld = false;
     std::string otrPath = Ship::Context::LocateFileAcrossAppDirs(fileName, appShortName);
 
     // Doesn't exist so nothing to do here
     if (!std::filesystem::exists(otrPath)) {
-        return;
+        return { INT16_MAX, INT16_MAX, INT16_MAX };
     }
 
-    OTRVersion otrVersion = ReadPortVersionFromOTR(otrPath);
-
-    if (otrVersion.major != gBuildVersionMajor) {
-        isOtrOld = true;
-    }
-
-    if (isOtrOld) {
-#if not defined(__SWITCH__) && not defined(__WIIU__)
-        char msgBuf[250];
-        char version[18]; // 5 digits for int16_max (x3) + separators + terminator
-
-        if (otrVersion.major != 0 || otrVersion.minor != 0 || otrVersion.patch != 0) {
-            snprintf(version, 18, "%d.%d.%d", otrVersion.major, otrVersion.minor, otrVersion.patch);
-        } else {
-            snprintf(version, 18, "no version found");
-        }
-
-        snprintf(msgBuf, 250,
-                 "The %s file was generated with a different version of Ship of Harkinian.\nOTR version: %s\n\n"
-                 "You must regenerate to be able to play, otherwise the program will exit.\nWould you like to "
-                 "regenerate it now?",
-                 fileName.c_str(), version);
-
-        if (Extractor::ShowYesNoBox("Old OTR File Found", msgBuf) == IDYES) {
-            std::string installPath = Ship::Context::GetAppBundlePath();
-            if (!std::filesystem::exists(installPath + "/assets")) {
-                Extractor::ShowErrorBox(
-                    "Extractor assets not found",
-                    "Unable to regenerate. Missing assets/ folder needed to generate OTR file.\n\nExiting...");
-                exit(1);
-            }
-
-            Extractor extract;
-            if (!extract.Run(Ship::Context::GetAppDirectoryPath(appShortName),
-                             isMQ ? RomSearchMode::MQ : RomSearchMode::Vanilla)) {
-                Extractor::ShowErrorBox("Error", "An error occured, no OTR file was generated.\n\nExiting...");
-                exit(1);
-            }
-            extract.CallZapd(installPath, Ship::Context::GetAppDirectoryPath(appShortName));
-        } else {
-            exit(1);
-        }
-
-#elif defined(__SWITCH__)
-        Ship::Switch::PrintErrorMessageToScreen("\x1b[2;2HYou've launched the Ship with an old game OTR file."
-                                                "\x1b[4;2HPlease regenerate a new game OTR and relaunch."
-                                                "\x1b[6;2HPress the Home button to exit...");
-#elif defined(__WIIU__)
-        OSFatal("You've launched the Ship with an old a game OTR file.\n\n"
-                "Please generate a game OTR and relaunch.\n\n"
-                "Press and hold the Power button to shutdown...");
-#endif
-    }
+    return ReadPortVersionFromOTR(otrPath);
 }
 
 extern "C" void Messagebox_ShowErrorBox(char* title, char* body) {
     Extractor::ShowErrorBox(title, body);
 }
 
-bool IsSubpath(const std::filesystem::path& path, const std::filesystem::path& base) {
-    auto rel = std::filesystem::relative(path, base);
-    return !rel.empty() && rel.native()[0] != '.';
-}
-
-bool PathTestCleanup(FILE* tfile) {
-    try {
-        if (std::filesystem::exists("./text.txt"))
-            std::filesystem::remove("./text.txt");
-        if (std::filesystem::exists("./test/"))
-            std::filesystem::remove("./test/");
-    } catch (std::filesystem::filesystem_error const& ex) { return false; }
-    return true;
-}
-
-void CheckAndCreateModFolder() {
-    try {
-        std::string modsPath = Ship::Context::LocateFileAcrossAppDirs("mods", appShortName);
-        if (!std::filesystem::exists(modsPath)) {
-            // Create mods folder relative to app dir
-            modsPath = Ship::Context::GetPathRelativeToAppDirectory("mods", appShortName);
-            std::string filePath = modsPath + "/custom_mod_files_go_here.txt";
-            if (std::filesystem::create_directories(modsPath)) {
-                std::ofstream(filePath).close();
-            }
-        }
-    } catch (std::filesystem::filesystem_error const& ex) {
-        // Couldn't make the folder, continue silently
-        return;
+bool VerifyArchiveVersion(OTRVersion version) {
+    if (version.major != INT16_MAX && version.major != gBuildVersionMajor) {
+        return true;
     }
+    return false;
 }
 
 extern "C" void InitOTR(int argc, char* argv[]) {
-#if !defined(__SWITCH__) && !defined(__WIIU__)
-    if (argc > 1) {
-        for (int i = 1; i < argc; i++) {
-            std::string installPath = Ship::Context::GetAppBundlePath();
-            Extractor extract;
-            if (extract.RunFileStandalone(argv[i])) {
-                bool doExtract = true;
-                std::string archive = (extract.IsMasterQuest() ? "oot-mq.o2r" : "oot.o2r");
-                if (std::filesystem::exists(Ship::Context::GetAppBundlePath() + "/" + archive)) {
-                    std::string msg = "Archive for current ROM, " + archive + ", already exists. Extract again?";
-                    doExtract = extract.ShowYesNoBox("Confirm Re-extract", msg.c_str()) == IDYES;
-                }
-                if (doExtract) {
-                    extract.CallZapd(installPath, Ship::Context::GetAppDirectoryPath(appShortName));
-                }
-            } else {
-                std::string msg = "File " + std::string(argv[i]) + " is not a ROM or does not match supported ROMs.";
-                extract.ShowErrorBox("Incompatible File", msg.c_str());
-            }
-        }
-        if (Extractor::ShowYesNoBox("Run Ship of Harkinian", "All files have been processed. Run SoH?") != IDYES) {
-            exit(0);
-        }
-    }
-#endif
     OTRGlobals::Instance = new OTRGlobals();
-#ifdef __SWITCH__
-    Ship::Switch::Init(Ship::PreInitPhase);
-#elif defined(__WIIU__)
-    Ship::WiiU::Init(appShortName);
-#endif
-
-#ifdef _WIN32
-    char* tempVar = getenv("TEMP");
-    std::filesystem::path tempPath;
-    try {
-        tempPath = std::filesystem::canonical(tempVar);
-    } catch (std::filesystem::filesystem_error const& ex) {
-        std::string userPath = getenv("USERPROFILE");
-        userPath.append("\\AppData\\Local\\Temp");
-        tempPath = std::filesystem::canonical(userPath);
-    }
-    wchar_t buffer[MAX_PATH];
-    GetModuleFileName(NULL, buffer, _countof(buffer));
-    auto ownPath = std::filesystem::canonical(buffer).parent_path();
-    if (IsSubpath(ownPath, tempPath)) {
-        Extractor::ShowErrorBox("Error", "SoH is running in a temp folder. Extract the .zip and run again.");
-        exit(1);
-    }
-    FILE* tfile = fopen("./text.txt", "w");
-    std::filesystem::path tfolder = std::filesystem::path("./test/");
-    bool error = false;
-    try {
-        create_directories(tfolder);
-    } catch (std::filesystem::filesystem_error const& ex) { error = true; }
-    if (tfile == NULL || error) {
-        Extractor::ShowErrorBox(
-            "Error", "SoH does not have proper file permissions. Please move it to a folder that does and run again.");
-        PathTestCleanup(tfile);
-        exit(1);
-    }
-    fclose(tfile);
-    if (!PathTestCleanup(tfile)) {
-        Extractor::ShowErrorBox(
-            "Error", "SoH does not have proper file permissions. Please move it to a folder that does and run again.");
-        exit(1);
-    }
-    if (ownPath.string().find("OneDrive") != std::string::npos) {
-        Extractor::ShowErrorBox(
-            "Error",
-            "SoH appears to be in a OneDrive folder, which will cause issues. "
-            "Please move it to a folder outside of OneDrive, like the root of a drive (e.g. \"C:\\Games\\SoH\").");
-        exit(1);
-    }
-#endif
-
-#if not defined(__SWITCH__) && not defined(__WIIU__)
-    CheckAndCreateModFolder();
-#endif
-    const bool ootO2RExists =
-        std::filesystem::exists(Ship::Context::LocateFileAcrossAppDirs("oot-mq.o2r", appShortName)) ||
-        std::filesystem::exists(Ship::Context::LocateFileAcrossAppDirs("oot.o2r", appShortName));
-
-    if (!ootO2RExists) {
-
-#if not defined(__SWITCH__) && not defined(__WIIU__)
-        std::string installPath = Ship::Context::GetAppBundlePath();
-        if (!std::filesystem::exists(installPath + "/assets")) {
-            Extractor::ShowErrorBox(
-                "Extractor assets not found",
-                "No OTR files found. Missing assets/ folder needed to generate OTR file.\n\nExiting...");
-            exit(1);
-        }
-
-        bool generatedOtrIsMQ = false;
-        if (Extractor::ShowYesNoBox("No OTR Files", "No OTR files found. Generate one now?") == IDYES) {
-            Extractor extract;
-            if (!extract.Run(Ship::Context::GetAppDirectoryPath(appShortName))) {
-                Extractor::ShowErrorBox("Error", "An error occured, no OTR file was generated.\n\nExiting...");
-                exit(1);
-            }
-            extract.CallZapd(installPath, Ship::Context::GetAppDirectoryPath(appShortName));
-            generatedOtrIsMQ = extract.IsMasterQuest();
-        } else {
-            exit(1);
-        }
-        if (Extractor::ShowYesNoBox("Extraction Complete", "ROM Extracted. Extract another?") == IDYES) {
-            Extractor extract;
-            if (!extract.Run(Ship::Context::GetAppDirectoryPath(appShortName),
-                             generatedOtrIsMQ ? RomSearchMode::Vanilla : RomSearchMode::MQ)) {
-                Extractor::ShowErrorBox(
-                    "Error",
-                    "An error occured, an OTR file may have been generated by a different step.\n\nContinuing...");
-            } else {
-                extract.CallZapd(installPath, Ship::Context::GetAppDirectoryPath(appShortName));
-            }
-        }
-
-#elif defined(__SWITCH__)
-        Ship::Switch::PrintErrorMessageToScreen("\x1b[2;2HYou've launched the Ship without a game OTR file."
-                                                "\x1b[4;2HPlease generate a game OTR and relaunch."
-                                                "\x1b[6;2HPress the Home button to exit...");
-#elif defined(__WIIU__)
-        OSFatal("You've launched the Ship without a game OTR file.\n\n"
-                "Please generate a game OTR and relaunch.\n\n"
-                "Press and hold the Power button to shutdown...");
-#endif
-    }
-
-    DetectOTRVersion("oot.o2r", false);
-    DetectOTRVersion("oot-mq.o2r", true);
+    OTRGlobals::Instance->RunExtract(argc, argv);
 
     OTRGlobals::Instance->Initialize();
     CustomMessageManager::Instance = new CustomMessageManager();
+    Randomizer::CreateCustomMessages();
     ItemTableManager::Instance = new ItemTableManager();
     GameInteractor::Instance = new GameInteractor();
     SaveManager::Instance = new SaveManager();
@@ -1279,7 +1487,7 @@ extern "C" void InitOTR(int argc, char* argv[]) {
     conf->RunVersionUpdates();
 
     SohGui::SetupGuiElements();
-    ShipInit::InitAll();
+    SohGui::SetupMenuElements();
 
     Rando::StaticData::InitHashMaps();
     OTRGlobals::Instance->gRandoContext->AddExcludedOptions();
@@ -1338,6 +1546,7 @@ extern "C" void InitOTR(int argc, char* argv[]) {
     if (CVarGetInteger(CVAR_REMOTE_ANCHOR("Enabled"), 0)) {
         Anchor::Instance->Enable();
     }
+    ShipInit::InitAll();
 }
 
 extern "C" void SaveManager_ThreadPoolWait() {
