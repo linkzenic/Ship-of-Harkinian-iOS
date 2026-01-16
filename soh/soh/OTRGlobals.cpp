@@ -1474,7 +1474,6 @@ extern "C" void InitOTR(int argc, char* argv[]) {
 
     OTRGlobals::Instance->Initialize();
     CustomMessageManager::Instance = new CustomMessageManager();
-    Randomizer::CreateCustomMessages();
     ItemTableManager::Instance = new ItemTableManager();
     GameInteractor::Instance = new GameInteractor();
     SaveManager::Instance = new SaveManager();
