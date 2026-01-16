@@ -45,7 +45,7 @@ void RegionTable_Init_Graveyard() {
 
     areaTable[RR_GRAVEYARD_SHIELD_GRAVE] = Region("Graveyard Shield Grave", SCENE_GRAVE_WITH_FAIRYS_FOUNTAIN, {}, {
         //Locations
-        LOCATION(RC_GRAVEYARD_SHIELD_GRAVE_CHEST, true),
+        LOCATION(RC_GRAVEYARD_SHIELD_GRAVE_CHEST, logic->HasItem(RG_OPEN_CHEST)),
     }, {
         //Exits
         Entrance(RR_THE_GRAVEYARD,               []{return true;}),
@@ -69,7 +69,7 @@ void RegionTable_Init_Graveyard() {
 
     areaTable[RR_GRAVEYARD_HEART_PIECE_GRAVE] = Region("Graveyard Heart Piece Grave", SCENE_REDEAD_GRAVE, {}, {
         //Locations
-        LOCATION(RC_GRAVEYARD_HEART_PIECE_GRAVE_CHEST, logic->CanUse(RG_SUNS_SONG)),
+        LOCATION(RC_GRAVEYARD_HEART_PIECE_GRAVE_CHEST, logic->CanUse(RG_SUNS_SONG) && logic->HasItem(RG_OPEN_CHEST)),
     }, {
         //Exits
         Entrance(RR_THE_GRAVEYARD, []{return true;}),
@@ -77,7 +77,7 @@ void RegionTable_Init_Graveyard() {
 
     areaTable[RR_GRAVEYARD_COMPOSERS_GRAVE] = Region("Graveyard Composers Grave", SCENE_ROYAL_FAMILYS_TOMB, {}, {
         //Locations
-        LOCATION(RC_GRAVEYARD_ROYAL_FAMILYS_TOMB_CHEST,     logic->HasFireSource()),
+        LOCATION(RC_GRAVEYARD_ROYAL_FAMILYS_TOMB_CHEST,     logic->HasFireSource() && logic->HasItem(RG_OPEN_CHEST)),
         LOCATION(RC_SONG_FROM_ROYAL_FAMILYS_TOMB,           logic->CanUseProjectile() || logic->CanJumpslash()),
         LOCATION(RC_GRAVEYARD_ROYAL_FAMILYS_TOMB_SUN_FAIRY, logic->CanUse(RG_SUNS_SONG)),
     }, {
@@ -90,7 +90,7 @@ void RegionTable_Init_Graveyard() {
         EventAccess(LOGIC_NUT_ACCESS,             []{return logic->CanBreakPots();}),
     }, {
         //Locations
-        LOCATION(RC_GRAVEYARD_HOOKSHOT_CHEST,              true),
+        LOCATION(RC_GRAVEYARD_HOOKSHOT_CHEST,              logic->HasItem(RG_OPEN_CHEST)),
         LOCATION(RC_GRAVEYARD_DAMPE_RACE_FREESTANDING_POH, logic->IsAdult || ctx->GetTrickOption(RT_GY_CHILD_DAMPE_RACE_POH)),
         LOCATION(RC_GY_DAMPES_GRAVE_POT_1,                 logic->CanBreakPots()),
         LOCATION(RC_GY_DAMPES_GRAVE_POT_2,                 logic->CanBreakPots()),

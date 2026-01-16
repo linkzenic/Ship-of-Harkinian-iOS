@@ -1471,6 +1471,14 @@ typedef enum {
 
     // #### `result`
     // ```c
+    // this->getItemId != GI_NONE
+    // ```
+    // #### `args`
+    // - `None`
+    VB_OPEN_CHEST,
+
+    // #### `result`
+    // ```c
     // CHECK_QUEST_ITEM(QUEST_KOKIRI_EMERALD)
     // ```
     // #### `args`

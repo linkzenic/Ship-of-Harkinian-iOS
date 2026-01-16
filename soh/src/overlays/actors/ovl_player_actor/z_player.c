@@ -7387,46 +7387,48 @@ s32 Player_ActionHandler_2(Player* this, PlayState* play) {
                    !(this->stateFlags1 & PLAYER_STATE1_CARRYING_ACTOR) &&
                    !(this->stateFlags2 & PLAYER_STATE2_UNDERWATER)) {
             if (this->getItemId != GI_NONE) {
-                GetItemEntry giEntry;
-                if (this->getItemEntry.objectId == OBJECT_INVALID) {
-                    giEntry = ItemTable_Retrieve(-this->getItemId);
-                } else {
-                    giEntry = this->getItemEntry;
-                }
-                EnBox* chest = (EnBox*)interactedActor;
-                if (giEntry.itemId != ITEM_NONE) {
-                    if (((Item_CheckObtainability(giEntry.itemId) == ITEM_NONE) && (giEntry.field & 0x40)) ||
-                        ((Item_CheckObtainability(giEntry.itemId) != ITEM_NONE) && (giEntry.field & 0x20))) {
-                        this->getItemId = -GI_RUPEE_BLUE;
-                        giEntry = ItemTable_Retrieve(GI_RUPEE_BLUE);
+                if (GameInteractor_Should(VB_OPEN_CHEST, true)) {
+                    GetItemEntry giEntry;
+                    if (this->getItemEntry.objectId == OBJECT_INVALID) {
+                        giEntry = ItemTable_Retrieve(-this->getItemId);
+                    } else {
+                        giEntry = this->getItemEntry;
                     }
-                }
+                    EnBox* chest = (EnBox*)interactedActor;
+                    if (giEntry.itemId != ITEM_NONE) {
+                        if (((Item_CheckObtainability(giEntry.itemId) == ITEM_NONE) && (giEntry.field & 0x40)) ||
+                            ((Item_CheckObtainability(giEntry.itemId) != ITEM_NONE) && (giEntry.field & 0x20))) {
+                            this->getItemId = -GI_RUPEE_BLUE;
+                            giEntry = ItemTable_Retrieve(GI_RUPEE_BLUE);
+                        }
+                    }
 
-                if (GameInteractor_Should(VB_GIVE_ITEM_FROM_CHEST, true, chest)) {
-                    Player_SetupWaitForPutAway(play, this, func_8083A434);
-                }
-                this->stateFlags1 |=
-                    PLAYER_STATE1_GETTING_ITEM | PLAYER_STATE1_CARRYING_ACTOR | PLAYER_STATE1_IN_CUTSCENE;
-                func_8083AE40(this, giEntry.objectId);
+                    if (GameInteractor_Should(VB_GIVE_ITEM_FROM_CHEST, true, chest)) {
+                        Player_SetupWaitForPutAway(play, this, func_8083A434);
+                    }
+                    this->stateFlags1 |=
+                        PLAYER_STATE1_GETTING_ITEM | PLAYER_STATE1_CARRYING_ACTOR | PLAYER_STATE1_IN_CUTSCENE;
+                    func_8083AE40(this, giEntry.objectId);
 
-                this->actor.world.pos.x =
-                    chest->dyna.actor.world.pos.x - (Math_SinS(chest->dyna.actor.shape.rot.y) * 29.4343f);
-                this->actor.world.pos.z =
-                    chest->dyna.actor.world.pos.z - (Math_CosS(chest->dyna.actor.shape.rot.y) * 29.4343f);
-                this->yaw = this->actor.shape.rot.y = chest->dyna.actor.shape.rot.y;
-                func_80832224(this);
+                    this->actor.world.pos.x =
+                        chest->dyna.actor.world.pos.x - (Math_SinS(chest->dyna.actor.shape.rot.y) * 29.4343f);
+                    this->actor.world.pos.z =
+                        chest->dyna.actor.world.pos.z - (Math_CosS(chest->dyna.actor.shape.rot.y) * 29.4343f);
+                    this->yaw = this->actor.shape.rot.y = chest->dyna.actor.shape.rot.y;
+                    func_80832224(this);
 
-                bool vanillaPlaySlowChestCS = (giEntry.itemId != ITEM_NONE) && (giEntry.gi >= 0) &&
-                                              (Item_CheckObtainability(giEntry.itemId) == ITEM_NONE);
+                    bool vanillaPlaySlowChestCS = (giEntry.itemId != ITEM_NONE) && (giEntry.gi >= 0) &&
+                                                  (Item_CheckObtainability(giEntry.itemId) == ITEM_NONE);
 
-                if (GameInteractor_Should(VB_PLAY_SLOW_CHEST_CS, vanillaPlaySlowChestCS, chest)) {
-                    Player_AnimPlayOnceAdjusted(play, this, this->ageProperties->unk_98);
-                    Player_StartAnimMovement(play, this, 0x28F);
-                    chest->unk_1F4 = 1;
-                    Camera_ChangeSetting(Play_GetCamera(play, 0), CAM_SET_SLOW_CHEST_CS);
-                } else {
-                    Player_AnimPlayOnce(play, this, &gPlayerAnim_link_normal_box_kick);
-                    chest->unk_1F4 = -1;
+                    if (GameInteractor_Should(VB_PLAY_SLOW_CHEST_CS, vanillaPlaySlowChestCS, chest)) {
+                        Player_AnimPlayOnceAdjusted(play, this, this->ageProperties->unk_98);
+                        Player_StartAnimMovement(play, this, 0x28F);
+                        chest->unk_1F4 = 1;
+                        Camera_ChangeSetting(Play_GetCamera(play, 0), CAM_SET_SLOW_CHEST_CS);
+                    } else {
+                        Player_AnimPlayOnce(play, this, &gPlayerAnim_link_normal_box_kick);
+                        chest->unk_1F4 = -1;
+                    }
                 }
 
                 return 1;

@@ -48,7 +48,7 @@ void RegionTable_Init_IceCavern() {
         EventAccess(LOGIC_BLUE_FIRE_ACCESS, []{return true;}),
     }, {
         //Locations
-        LOCATION(RC_ICE_CAVERN_MAP_CHEST,             logic->BlueFire()),
+        LOCATION(RC_ICE_CAVERN_MAP_CHEST,             logic->BlueFire() && logic->HasItem(RG_OPEN_CHEST)),
         // very easy to break pot through ice
         LOCATION(RC_ICE_CAVERN_FROZEN_POT_1,          (logic->CanBreakPots() && logic->BlueFire()) || logic->HasExplosives() ||
                                                       (ctx->GetTrickOption(RT_RUSTED_SWITCHES) && ((logic->CanStandingShield() && logic->CanUse(RG_KOKIRI_SWORD)) || logic->CanUse(RG_MASTER_SWORD) || logic->CanUse(RG_BIGGORON_SWORD) || logic->CanUse(RG_MEGATON_HAMMER))) ||
@@ -66,7 +66,7 @@ void RegionTable_Init_IceCavern() {
         EventAccess(LOGIC_BLUE_FIRE_ACCESS, []{return true;}),
     }, {
         //Locations
-        LOCATION(RC_ICE_CAVERN_COMPASS_CHEST,       (logic->IsChild || logic->CanClearStalagmite() || ctx->GetTrickOption(RT_ICE_STALAGMITE_CLIP)) && logic->BlueFire()),
+        LOCATION(RC_ICE_CAVERN_COMPASS_CHEST,       (logic->IsChild || logic->CanClearStalagmite() || ctx->GetTrickOption(RT_ICE_STALAGMITE_CLIP)) && logic->BlueFire() && logic->HasItem(RG_OPEN_CHEST)),
         LOCATION(RC_ICE_CAVERN_FREESTANDING_POH,    (logic->CanClearStalagmite() || ctx->GetTrickOption(RT_ICE_STALAGMITE_CLIP)) && logic->BlueFire()), // can skip blue fire with rang trick
         LOCATION(RC_ICE_CAVERN_GS_HEART_PIECE_ROOM, logic->HookshotOrBoomerang()),
     }, {
@@ -104,8 +104,8 @@ void RegionTable_Init_IceCavern() {
 
     areaTable[RR_ICE_CAVERN_FINAL_ROOM] = Region("Ice Cavern Final Room", SCENE_ICE_CAVERN, {}, {
         //Locations
-        LOCATION(RC_ICE_CAVERN_IRON_BOOTS_CHEST, AnyAgeTime([]{return logic->CanKillEnemy(RE_WOLFOS);})),
-        LOCATION(RC_SHEIK_IN_ICE_CAVERN,         AnyAgeTime([]{return logic->CanKillEnemy(RE_WOLFOS);})), // rando enables this for child
+        LOCATION(RC_ICE_CAVERN_IRON_BOOTS_CHEST, AnyAgeTime([]{return logic->CanKillEnemy(RE_WOLFOS);}) && logic->HasItem(RG_OPEN_CHEST)),
+        LOCATION(RC_SHEIK_IN_ICE_CAVERN,         AnyAgeTime([]{return logic->CanKillEnemy(RE_WOLFOS);}) && logic->HasItem(RG_OPEN_CHEST)), // rando enables this for child
     }, {
         //Exits
         Entrance(RR_ICE_CAVERN_BEFORE_FINAL_ROOM,     []{return AnyAgeTime([]{return logic->CanKillEnemy(RE_WOLFOS);});}),
@@ -165,7 +165,7 @@ void RegionTable_Init_IceCavern() {
         EventAccess(LOGIC_BLUE_FIRE_ACCESS, []{return logic->IsChild || logic->CanClearStalagmite() || ctx->GetTrickOption(RT_ICE_STALAGMITE_CLIP);}),
     }, {
         //Locations
-        LOCATION(RC_ICE_CAVERN_MQ_MAP_CHEST, logic->BlueFire() && AnyAgeTime([]{return logic->CanHitSwitch();})),
+        LOCATION(RC_ICE_CAVERN_MQ_MAP_CHEST, logic->BlueFire() && AnyAgeTime([]{return logic->CanHitSwitch();}) && logic->HasItem(RG_OPEN_CHEST)),
     }, {});
 
     areaTable[RR_ICE_CAVERN_MQ_SCARECROW_ROOM] = Region("Ice Cavern MQ Scarecrow Room", SCENE_ICE_CAVERN, {
@@ -197,7 +197,7 @@ void RegionTable_Init_IceCavern() {
         EventAccess(LOGIC_BLUE_FIRE_ACCESS, []{return true;}),
     }, {
         //Locations
-        LOCATION(RC_ICE_CAVERN_MQ_COMPASS_CHEST,    true),
+        LOCATION(RC_ICE_CAVERN_MQ_COMPASS_CHEST,    logic->HasItem(RG_OPEN_CHEST)),
         //It is possible for child with master, BGS or sticks, or adult with BGS, to hit this switch through the ice with a crouchstab, but it's precise and unintuitive for a trick
         LOCATION(RC_ICE_CAVERN_MQ_FREESTANDING_POH, logic->HasExplosives()), // can get with rang trick
         //doing RT_ICE_MQ_RED_ICE_GS as child is untested, as I could not perform the trick reliably even as adult
@@ -209,8 +209,8 @@ void RegionTable_Init_IceCavern() {
 
     areaTable[RR_ICE_CAVERN_MQ_STALFOS_ROOM] = Region("Ice Cavern MQ Stalfos Room", SCENE_ICE_CAVERN, {}, {
         //Locations
-        LOCATION(RC_ICE_CAVERN_MQ_IRON_BOOTS_CHEST, logic->CanKillEnemy(RE_STALFOS)),
-        LOCATION(RC_SHEIK_IN_ICE_CAVERN,            logic->CanKillEnemy(RE_STALFOS)), // rando enables this for child
+        LOCATION(RC_ICE_CAVERN_MQ_IRON_BOOTS_CHEST, logic->CanKillEnemy(RE_STALFOS) && logic->HasItem(RG_OPEN_CHEST)),
+        LOCATION(RC_SHEIK_IN_ICE_CAVERN,            logic->CanKillEnemy(RE_STALFOS) && logic->HasItem(RG_OPEN_CHEST)), // rando enables this for child
     }, {
         //Exits
         Entrance(RR_ICE_CAVERN_MQ_WEST_CORRIDOR,           []{return AnyAgeTime([]{return logic->CanKillEnemy(RE_STALFOS);});}),

@@ -92,7 +92,7 @@ void RegionTable_Init_LostWoods() {
 
     areaTable[RR_LW_NEAR_SHORTCUTS_GROTTO] = Region("LW Near Shortcuts Grotto", SCENE_GROTTOS, grottoEvents, {
         //Locations
-        LOCATION(RC_LW_NEAR_SHORTCUTS_GROTTO_CHEST,                  true),
+        LOCATION(RC_LW_NEAR_SHORTCUTS_GROTTO_CHEST,                  logic->HasItem(RG_OPEN_CHEST)),
         LOCATION(RC_LW_NEAR_SHORTCUTS_GROTTO_FISH,                   logic->HasBottle()),
         LOCATION(RC_LW_NEAR_SHORTCUTS_GROTTO_GOSSIP_STONE_FAIRY,     logic->CallGossipFairy()),
         LOCATION(RC_LW_NEAR_SHORTCUTS_GROTTO_GOSSIP_STONE_FAIRY_BIG, logic->CanUse(RG_SONG_OF_STORMS)),

@@ -1001,6 +1001,10 @@ void InitTrickNames() {
         // TODO_TRANSLATE
         Text{ "Crouch" },
     };
+    trickNameTable[RG_OPEN_CHEST] = {
+        // TODO_TRANSLATE
+        Text{ "Open Cheats" },
+    };
 
     trickNameTable[RG_OCARINA_A_BUTTON] = {
         Text{ "Ocarina J Button", "Touche Ha de l'Ocarina", "J-Taste der Okarina" },

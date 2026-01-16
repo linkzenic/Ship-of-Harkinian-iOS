@@ -247,7 +247,7 @@ void RegionTable_Init_Kakariko() {
 
     areaTable[RR_KAK_REDEAD_GROTTO] = Region("Kak Redead Grotto", SCENE_GROTTOS, {}, {
         //Locations
-        LOCATION(RC_KAK_REDEAD_GROTTO_CHEST, logic->CanKillEnemy(RE_REDEAD, ED_CLOSE, true, 2)),
+        LOCATION(RC_KAK_REDEAD_GROTTO_CHEST, logic->CanKillEnemy(RE_REDEAD, ED_CLOSE, true, 2) && logic->HasItem(RG_OPEN_CHEST)),
     }, {
         //Exits
         Entrance(RR_KAKARIKO_VILLAGE, []{return true;}),
@@ -255,7 +255,7 @@ void RegionTable_Init_Kakariko() {
 
     areaTable[RR_KAK_OPEN_GROTTO] = Region("Kak Open Grotto", SCENE_GROTTOS, grottoEvents, {
         //Locations
-        LOCATION(RC_KAK_OPEN_GROTTO_CHEST,                  true),
+        LOCATION(RC_KAK_OPEN_GROTTO_CHEST,                  logic->HasItem(RG_OPEN_CHEST)),
         LOCATION(RC_KAK_OPEN_GROTTO_FISH,                   logic->HasBottle()),
         LOCATION(RC_KAK_OPEN_GROTTO_GOSSIP_STONE_FAIRY,     logic->CallGossipFairy()),
         LOCATION(RC_KAK_OPEN_GROTTO_GOSSIP_STONE_FAIRY_BIG, logic->CanUse(RG_SONG_OF_STORMS)),

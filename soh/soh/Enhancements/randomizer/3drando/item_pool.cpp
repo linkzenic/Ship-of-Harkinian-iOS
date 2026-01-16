@@ -395,6 +395,9 @@ void GenerateItemPool() {
     if (ctx->GetOption(RSK_SHUFFLE_CRAWL)) {
         AddItemToPool(RG_CRAWL, 2, 1, 1, 1);
     }
+    if (ctx->GetOption(RSK_SHUFFLE_OPEN_CHEST)) {
+        AddItemToPool(RG_OPEN_CHEST, 2, 1, 1, 1);
+    }
 
     if (ctx->GetOption(RSK_SHUFFLE_BEEHIVES)) {
         PlaceItemsForType(RCTYPE_BEEHIVE, true, true);
@@ -897,7 +900,7 @@ void GenerateItemPool() {
         if (ctx->GetOption(RSK_ICE_TRAP_PERCENT).Is(100)) {
             iceTrapstoAdd = junkToAdd;
         } else if (ctx->GetOption(RSK_ICE_TRAP_PERCENT).Get() >= 0) {
-            for (int count = 0; count < junkToAdd; count++) {
+            for (size_t count = 0; count < junkToAdd; count++) {
                 if (Random(0, 101) < ctx->GetOption(RSK_ICE_TRAP_PERCENT).Get()) {
                     iceTrapstoAdd++;
                 }

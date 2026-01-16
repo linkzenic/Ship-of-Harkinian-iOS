@@ -229,6 +229,8 @@ bool Logic::HasItem(RandomizerGet itemName) {
             return CurrentUpgrade(UPG_SCALE) >= 2;
         case RG_CRAWL:
             return CheckRandoInf(RAND_INF_CAN_CRAWL);
+        case RG_OPEN_CHEST:
+            return CheckRandoInf(RAND_INF_CAN_OPEN_CHEST);
         case RG_POCKET_EGG:
             return CheckRandoInf(RAND_INF_ADULT_TRADES_HAS_POCKET_EGG);
         case RG_COJIRO:
@@ -462,7 +464,8 @@ bool Logic::CanMiddairGroundJump(bool hasBombflower) {
 }
 
 bool Logic::CanOpenUnderwaterChest() {
-    return ctx->GetTrickOption(RT_OPEN_UNDERWATER_CHEST) && CanUse(RG_IRON_BOOTS) && CanUse(RG_HOOKSHOT);
+    return ctx->GetTrickOption(RT_OPEN_UNDERWATER_CHEST) && CanUse(RG_IRON_BOOTS) && CanUse(RG_HOOKSHOT) &&
+           HasItem(RG_OPEN_CHEST);
 }
 
 uint8_t GetDifficultyValueFromString(Rando::Option& glitchOption) {
@@ -1720,6 +1723,9 @@ void Logic::ApplyItemEffect(Item& item, bool state) {
                 case RG_CRAWL:
                     SetRandoInf(RAND_INF_CAN_CRAWL, state);
                     break;
+                case RG_OPEN_CHEST:
+                    SetRandoInf(RAND_INF_CAN_OPEN_CHEST, state);
+                    break;
                 case RG_PROGRESSIVE_HOOKSHOT: {
                     uint8_t i;
                     for (i = 0; i < 3; i++) {
@@ -2586,6 +2592,11 @@ void Logic::Reset(bool resetSaveContext /*= true*/) {
         // If we're not shuffling crawl, we start with it
         if (ctx->GetOption(RSK_SHUFFLE_CRAWL).Is(false)) {
             SetRandoInf(RAND_INF_CAN_CRAWL, true);
+        }
+
+        // If we're not shuffling open chest, we start with it
+        if (ctx->GetOption(RSK_SHUFFLE_OPEN_CHEST).Is(false)) {
+            SetRandoInf(RAND_INF_CAN_OPEN_CHEST, true);
         }
 
         // If we're not shuffling child's wallet, we start with it

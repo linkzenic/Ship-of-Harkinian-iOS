@@ -28,7 +28,7 @@ void RegionTable_Init_DodongosCavern() {
         EventAccess(LOGIC_DC_EYES_LIT,  []{return ctx->GetTrickOption(RT_DC_EYES_CHU) && logic->CanUse(RG_BOMBCHU_5);}),
     }, {
         //Locations
-        LOCATION(RC_DODONGOS_CAVERN_MAP_CHEST,              logic->CanBreakMudWalls() || logic->HasItem(RG_GORONS_BRACELET);),
+        LOCATION(RC_DODONGOS_CAVERN_MAP_CHEST,              (logic->CanBreakMudWalls() || logic->HasItem(RG_GORONS_BRACELET)) && logic->HasItem(RG_OPEN_CHEST);),
         LOCATION(RC_DODONGOS_CAVERN_DEKU_SCRUB_LOBBY,       (logic->CanStunDeku() || logic->HasItem(RG_GORONS_BRACELET)) && GetCheckPrice() <= GetWalletCapacity()),
         LOCATION(RC_DODONGOS_CAVERN_GOSSIP_STONE_FAIRY,     AnyAgeTime([]{return logic->CanBreakMudWalls() || logic->HasItem(RG_GORONS_BRACELET); }) && logic->CallGossipFairy()),
         LOCATION(RC_DODONGOS_CAVERN_GOSSIP_STONE_FAIRY_BIG, AnyAgeTime([]{return logic->CanBreakMudWalls() || logic->HasItem(RG_GORONS_BRACELET); }) && logic->CanUse(RG_SONG_OF_STORMS)),
@@ -147,7 +147,7 @@ void RegionTable_Init_DodongosCavern() {
 
     areaTable[RR_DODONGOS_CAVERN_COMPASS_ROOM] = Region("Dodongos Cavern Compass Room", SCENE_DODONGOS_CAVERN, {}, {
         //Locations
-        LOCATION(RC_DODONGOS_CAVERN_COMPASS_CHEST, true),
+        LOCATION(RC_DODONGOS_CAVERN_COMPASS_CHEST, logic->HasItem(RG_OPEN_CHEST)),
     }, {
         //Exits
         Entrance(RR_DODONGOS_CAVERN_STAIRS_LOWER, []{return logic->CanUse(RG_MASTER_SWORD) || logic->CanUse(RG_BIGGORON_SWORD) || logic->CanUse(RG_MEGATON_HAMMER) || logic->HasExplosives() || logic->HasItem(RG_GORONS_BRACELET);}),
@@ -161,7 +161,7 @@ void RegionTable_Init_DodongosCavern() {
 
     areaTable[RR_DODONGOS_CAVERN_BOMB_ROOM_LOWER] = Region("Dodongos Cavern Bomb Room Lower", SCENE_DODONGOS_CAVERN, {}, {
         //Locations
-        LOCATION(RC_DODONGOS_CAVERN_BOMB_FLOWER_PLATFORM_CHEST, true),
+        LOCATION(RC_DODONGOS_CAVERN_BOMB_FLOWER_PLATFORM_CHEST, logic->HasItem(RG_OPEN_CHEST)),
         LOCATION(RC_DODONGOS_CAVERN_BLADE_ROOM_HEART,           true),
         LOCATION(RC_DODONGOS_CAVERN_FIRST_BRIDGE_GRASS,         logic->CanCutShrubs()),
         LOCATION(RC_DODONGOS_CAVERN_BLADE_GRASS,                logic->CanCutShrubs()),
@@ -225,7 +225,7 @@ void RegionTable_Init_DodongosCavern() {
 
     areaTable[RR_DODONGOS_CAVERN_BOMB_ROOM_UPPER] = Region("Dodongos Cavern Bomb Room Upper", SCENE_DODONGOS_CAVERN, {}, {
         //Locations
-        LOCATION(RC_DODONGOS_CAVERN_BOMB_BAG_CHEST, true),
+        LOCATION(RC_DODONGOS_CAVERN_BOMB_BAG_CHEST, logic->HasItem(RG_OPEN_CHEST)),
         LOCATION(RC_DODONGOS_CAVERN_BLADE_POT_1,    logic->CanBreakPots()),
         LOCATION(RC_DODONGOS_CAVERN_BLADE_POT_2,    logic->CanBreakPots()),
     }, {
@@ -241,7 +241,7 @@ void RegionTable_Init_DodongosCavern() {
         EventAccess(LOGIC_DC_LIFT_PLATFORM, []{return true;}),
     }, {
         //Locations
-        LOCATION(RC_DODONGOS_CAVERN_END_OF_BRIDGE_CHEST, logic->CanBreakMudWalls()),
+        LOCATION(RC_DODONGOS_CAVERN_END_OF_BRIDGE_CHEST, logic->CanBreakMudWalls() && logic->HasItem(RG_OPEN_CHEST)),
     }, {
         //Exits
         Entrance(RR_DODONGOS_CAVERN_LOBBY,           []{return true;}),
@@ -288,7 +288,7 @@ void RegionTable_Init_DodongosCavern() {
         EventAccess(LOGIC_DC_EYES_LIT, []{return ctx->GetTrickOption(RT_DC_EYES_CHU) && logic->CanUse(RG_BOMBCHU_5);}),
     }, {
         //Locations
-        LOCATION(RC_DODONGOS_CAVERN_MQ_MAP_CHEST,              logic->CanBreakMudWalls() || logic->HasItem(RG_GORONS_BRACELET)),
+        LOCATION(RC_DODONGOS_CAVERN_MQ_MAP_CHEST,              (logic->CanBreakMudWalls() || logic->HasItem(RG_GORONS_BRACELET)) && logic->HasItem(RG_OPEN_CHEST)),
         LOCATION(RC_DODONGOS_CAVERN_MQ_DEKU_SCRUB_LOBBY_REAR,  logic->CanStunDeku() && GetCheckPrice() <= GetWalletCapacity()),
         LOCATION(RC_DODONGOS_CAVERN_MQ_DEKU_SCRUB_LOBBY_FRONT, logic->CanStunDeku() && GetCheckPrice() <= GetWalletCapacity()),
     }, {
@@ -317,7 +317,7 @@ void RegionTable_Init_DodongosCavern() {
 
     areaTable[RR_DODONGOS_CAVERN_MQ_OUTSIDE_POES_ROOM] = Region("Dodongos Cavern MQ Outside Poes Room", SCENE_DODONGOS_CAVERN, {}, {
         //Locations
-        LOCATION(RC_DODONGOS_CAVERN_MQ_BOMB_BAG_CHEST, true),
+        LOCATION(RC_DODONGOS_CAVERN_MQ_BOMB_BAG_CHEST, logic->HasItem(RG_OPEN_CHEST)),
     }, {
         //Events
         Entrance(RR_DODONGOS_CAVERN_MQ_LOBBY,     []{return true;}),
@@ -390,7 +390,7 @@ void RegionTable_Init_DodongosCavern() {
 
     areaTable[RR_DODONGOS_CAVERN_MQ_DODONGO_ROOM] = Region("Dodongos Cavern MQ Dodongo Room", SCENE_DODONGOS_CAVERN, {}, {
         //Locations
-        LOCATION(RC_DODONGOS_CAVERN_MQ_COMPASS_CHEST,   logic->CanKillEnemy(RE_DODONGO) || logic->HasItem(RG_GORONS_BRACELET)),
+        LOCATION(RC_DODONGOS_CAVERN_MQ_COMPASS_CHEST,   (logic->CanKillEnemy(RE_DODONGO) || logic->HasItem(RG_GORONS_BRACELET)) && logic->HasItem(RG_OPEN_CHEST)),
         LOCATION(RC_DODONGOS_CAVERN_MQ_COMPASS_GRASS_1, logic->CanCutShrubs()),
         LOCATION(RC_DODONGOS_CAVERN_MQ_COMPASS_GRASS_2, logic->CanCutShrubs()),
         LOCATION(RC_DODONGOS_CAVERN_MQ_COMPASS_GRASS_3, logic->CanCutShrubs()),
@@ -431,7 +431,7 @@ void RegionTable_Init_DodongosCavern() {
 
     areaTable[RR_DODONGOS_CAVERN_MQ_LARVAE_ROOM] = Region("Dodongos Cavern MQ Larvae Room", SCENE_DODONGOS_CAVERN, {}, {
         //Locations
-        LOCATION(RC_DODONGOS_CAVERN_MQ_LARVAE_ROOM_CHEST,   true), //implied logic->CanKillEnemy(RE_GOHMA_LARVA) based on entry reqs with a trick to kill with nuts
+        LOCATION(RC_DODONGOS_CAVERN_MQ_LARVAE_ROOM_CHEST,   logic->HasItem(RG_OPEN_CHEST)), //implied logic->CanKillEnemy(RE_GOHMA_LARVA) based on entry reqs with a trick to kill with nuts
         LOCATION(RC_DODONGOS_CAVERN_MQ_GS_LARVAE_ROOM,      logic->CanBreakCrates()), //implied logic->CanKillEnemy(RE_GOLD_SKULTULLA) based on entry reqs. Add crate logic when BONKO is added
         LOCATION(RC_DODONGOS_CAVERN_MQ_LARVAE_ROOM_CRATE_1, logic->CanBreakCrates()),
         LOCATION(RC_DODONGOS_CAVERN_MQ_LARVAE_ROOM_CRATE_2, logic->CanBreakCrates()),
@@ -476,7 +476,7 @@ void RegionTable_Init_DodongosCavern() {
         EventAccess(LOGIC_DC_MQ_CLEAR_UPPER_LOBBY_ROCKS, []{return logic->CanDetonateUprightBombFlower() || logic->CanUse(RG_MEGATON_HAMMER);}),
     }, {
         //Locations
-        LOCATION(RC_DODONGOS_CAVERN_MQ_TORCH_PUZZLE_ROOM_CHEST, true),
+        LOCATION(RC_DODONGOS_CAVERN_MQ_TORCH_PUZZLE_ROOM_CHEST, logic->HasItem(RG_OPEN_CHEST)),
         LOCATION(RC_DODONGOS_CAVERN_MQ_TORCH_PUZZLE_CORNER_POT, logic->CanBreakPots()),
         LOCATION(RC_DODONGOS_CAVERN_MQ_TORCH_PUZZLE_MIDDLE_POT, logic->CanBreakPots()),
     }, {
@@ -582,7 +582,7 @@ void RegionTable_Init_DodongosCavern() {
     });
 
     areaTable[RR_DODONGOS_CAVERN_MQ_BACK_POE_ROOM] = Region("Dodongos Cavern MQ Back Poe Room", SCENE_DODONGOS_CAVERN, {}, {
-        LOCATION(RC_DODONGOS_CAVERN_MQ_UNDER_GRAVE_CHEST, true), //pulling the grave isn't required, as you can open the chest through it
+        LOCATION(RC_DODONGOS_CAVERN_MQ_UNDER_GRAVE_CHEST, logic->HasItem(RG_OPEN_CHEST)), //pulling the grave isn't required, as you can open the chest through it
         LOCATION(RC_DODONGOS_CAVERN_MQ_BACKROOM_POT_1,    logic->CanBreakPots()),
         LOCATION(RC_DODONGOS_CAVERN_MQ_BACKROOM_POT_2,    logic->CanBreakPots()),
         LOCATION(RC_DODONGOS_CAVERN_MQ_BACK_POE_GRASS,    logic->CanCutShrubs()),
@@ -629,7 +629,7 @@ void RegionTable_Init_DodongosCavern() {
                                                                            && logic->CanKillEnemy(RE_KING_DODONGO);}),
     }, {
         // Locations
-        LOCATION(RC_DODONGOS_CAVERN_BOSS_ROOM_CHEST,    true),
+        LOCATION(RC_DODONGOS_CAVERN_BOSS_ROOM_CHEST,    logic->HasItem(RG_OPEN_CHEST)),
         LOCATION(RC_DODONGOS_CAVERN_KING_DODONGO_HEART, logic->Get(LOGIC_DODONGOS_CAVERN_CLEAR)),
         LOCATION(RC_KING_DODONGO,                       logic->Get(LOGIC_DODONGOS_CAVERN_CLEAR)),
     }, {
