@@ -11,8 +11,6 @@ extern PlayState* gPlayState;
 #include <variables.h>
 }
 
-#define RAND_GET_OPTION(rsk) OTRGlobals::Instance->gRandoContext->GetOption(rsk)
-
 void BuildHintStoneMessage(uint16_t* textId, bool* loadFromMessageTable) {
     if ((RAND_GET_OPTION(RSK_GOSSIP_STONE_HINTS).Is(RO_GOSSIP_STONES_NEED_TRUTH) &&
          Player_GetMask(gPlayState) == PLAYER_MASK_TRUTH) ||

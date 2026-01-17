@@ -71,7 +71,6 @@
 #include <coreinit/debug.h> // OSFatal
 #endif
 
-#include "Enhancements/custom-message/CustomMessageTypes.h"
 #include <functions.h>
 #include "Enhancements/item-tables/ItemTableManager.h"
 #include "soh/SohGui/SohGui.hpp"
@@ -130,10 +129,6 @@
 
 #include "soh/config/ConfigUpdaters.h"
 #include "soh/ShipInit.hpp"
-
-extern "C" {
-#include "src/overlays/actors/ovl_En_Dns/z_en_dns.h"
-}
 
 bool SoH_HandleConfigDrop(char* filePath);
 
@@ -909,10 +904,9 @@ void OTRGlobals::Initialize() {
     // startup. We should probably find some code in db_camera that does initialization and only run once, and then
     // dealloc on deinitialization.
     cameraStrings = (char**)malloc(sizeof(constCameraStrings));
-    for (int32_t i = 0; i < sizeof(constCameraStrings) / sizeof(char*); i++) {
+    for (size_t i = 0; i < sizeof(constCameraStrings) / sizeof(char*); i++) {
         // OTRTODO: never deallocated...
-        auto dup = strdup(constCameraStrings[i]);
-        cameraStrings[i] = dup;
+        cameraStrings[i] = strdup(constCameraStrings[i]);
     }
 
     auto versions = context->GetResourceManager()->GetArchiveManager()->GetGameVersions();
@@ -1462,10 +1456,7 @@ extern "C" void Messagebox_ShowErrorBox(char* title, char* body) {
 }
 
 bool VerifyArchiveVersion(OTRVersion version) {
-    if (version.major != INT16_MAX && version.major != gBuildVersionMajor) {
-        return true;
-    }
-    return false;
+    return version.major != INT16_MAX && version.major != gBuildVersionMajor;
 }
 
 extern "C" void InitOTR(int argc, char* argv[]) {
@@ -1953,7 +1944,7 @@ void OTRGlobals::CheckSaveFile(size_t sramSize) const {
     std::fstream saveFile(savePath, std::fstream::in | std::fstream::out | std::fstream::binary);
     if (saveFile.fail()) {
         saveFile.open(savePath, std::fstream::in | std::fstream::out | std::fstream::binary | std::fstream::app);
-        for (int i = 0; i < sramSize; ++i) {
+        for (size_t i = 0; i < sramSize; i++) {
             saveFile.write("\0", 1);
         }
     }

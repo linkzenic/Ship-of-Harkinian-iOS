@@ -14,7 +14,6 @@ extern PlayState* gPlayState;
 #include <variables.h>
 }
 
-#define RAND_GET_OPTION(rsk) OTRGlobals::Instance->gRandoContext->GetOption(rsk)
 #define RAND_GET_HINT(rh) OTRGlobals::Instance->gRandoContext->GetHint(rh)
 #define RAND_GET_ITEM_LOC(rc) OTRGlobals::Instance->gRandoContext->GetItemLocation(rc)
 #define ANY_SKULLTULA_HINTS                                                                   \
@@ -75,7 +74,7 @@ void BuildSheikMessage(uint16_t* textId, bool* loadFromMessageTable) {
                     "Cherche l'%cÉpée de Légende%w, %rquelque chose pour ranger tes flèches%w et de la %gmagie%w pour "
                     "invoquer la %ylumière%w.");
             } else if (!Flags_GetEventChkInf(EVENTCHKINF_DISPELLED_GANONS_TOWER_BARRIER) &&
-                       !RAND_GET_OPTION(RSK_TRIAL_COUNT).Is(0)) {
+                       RAND_GET_OPTION(RSK_TRIAL_COUNT)) {
                 msg = CustomMessage(
                     "You may have what you need to defeat %rthe Evil King%w, but the %cbarrier%w still "
                     "stands.^Complete the remaining %gtrials%w to destroy it.",
@@ -191,7 +190,7 @@ void BuildMysteriousWarpMessage() {
 }
 
 void BuildMinuetWarpMessage(uint16_t* textId, bool* loadFromMessageTable) {
-    if (RAND_GET_OPTION(RSK_WARP_SONG_HINTS).Is(RO_GENERIC_OFF)) {
+    if (!RAND_GET_OPTION(RSK_WARP_SONG_HINTS)) {
         BuildMysteriousWarpMessage();
         *loadFromMessageTable = false;
         return;
@@ -202,7 +201,7 @@ void BuildMinuetWarpMessage(uint16_t* textId, bool* loadFromMessageTable) {
 }
 
 void BuildBoleroWarpMessage(uint16_t* textId, bool* loadFromMessageTable) {
-    if (RAND_GET_OPTION(RSK_WARP_SONG_HINTS).Is(RO_GENERIC_OFF)) {
+    if (!RAND_GET_OPTION(RSK_WARP_SONG_HINTS)) {
         BuildMysteriousWarpMessage();
         *loadFromMessageTable = false;
         return;
@@ -213,7 +212,7 @@ void BuildBoleroWarpMessage(uint16_t* textId, bool* loadFromMessageTable) {
 }
 
 void BuildSerenadeWarpMessage(uint16_t* textId, bool* loadFromMessageTable) {
-    if (RAND_GET_OPTION(RSK_WARP_SONG_HINTS).Is(RO_GENERIC_OFF)) {
+    if (!RAND_GET_OPTION(RSK_WARP_SONG_HINTS)) {
         BuildMysteriousWarpMessage();
         *loadFromMessageTable = false;
         return;
@@ -224,7 +223,7 @@ void BuildSerenadeWarpMessage(uint16_t* textId, bool* loadFromMessageTable) {
 }
 
 void BuildRequiemWarpMessage(uint16_t* textId, bool* loadFromMessageTable) {
-    if (RAND_GET_OPTION(RSK_WARP_SONG_HINTS).Is(RO_GENERIC_OFF)) {
+    if (!RAND_GET_OPTION(RSK_WARP_SONG_HINTS)) {
         BuildMysteriousWarpMessage();
         *loadFromMessageTable = false;
         return;
@@ -235,7 +234,7 @@ void BuildRequiemWarpMessage(uint16_t* textId, bool* loadFromMessageTable) {
 }
 
 void BuildNocturneWarpMessage(uint16_t* textId, bool* loadFromMessageTable) {
-    if (RAND_GET_OPTION(RSK_WARP_SONG_HINTS).Is(RO_GENERIC_OFF)) {
+    if (!RAND_GET_OPTION(RSK_WARP_SONG_HINTS)) {
         BuildMysteriousWarpMessage();
         *loadFromMessageTable = false;
         return;
@@ -246,7 +245,7 @@ void BuildNocturneWarpMessage(uint16_t* textId, bool* loadFromMessageTable) {
 }
 
 void BuildPreludeWarpMessage(uint16_t* textId, bool* loadFromMessageTable) {
-    if (RAND_GET_OPTION(RSK_WARP_SONG_HINTS).Is(RO_GENERIC_OFF)) {
+    if (!RAND_GET_OPTION(RSK_WARP_SONG_HINTS)) {
         BuildMysteriousWarpMessage();
         *loadFromMessageTable = false;
         return;

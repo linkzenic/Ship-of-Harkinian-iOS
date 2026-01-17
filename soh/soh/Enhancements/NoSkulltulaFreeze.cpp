@@ -4,10 +4,8 @@ extern "C" {
 #include "variables.h"
 }
 
-#define RAND_GET_OPTION(rsk) OTRGlobals::Instance->gRandoContext->GetOption(rsk)
-
 void AutoDismissSkulltulaMessage(uint16_t* textId, bool* loadFromMessageTable) {
-    if (IS_RANDO && RAND_GET_OPTION(RSK_SHUFFLE_TOKENS).IsNot(RO_TOKENSANITY_OFF)) {
+    if (IS_RANDO && RAND_GET_OPTION(RSK_SHUFFLE_TOKENS)) {
         *loadFromMessageTable = true;
         return;
     }
