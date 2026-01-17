@@ -25,6 +25,7 @@ extern "C" {
 #include "src/overlays/actors/ovl_Bg_Treemouth/z_bg_treemouth.h"
 #include "src/overlays/actors/ovl_Bg_Jya_Bigmirror/z_bg_jya_bigmirror.h"
 #include "src/overlays/actors/ovl_En_Si/z_en_si.h"
+#include "src/overlays/actors/ovl_En_Ossan/z_en_ossan.h"
 #include "src/overlays/actors/ovl_En_Shopnuts/z_en_shopnuts.h"
 #include "src/overlays/actors/ovl_En_Dns/z_en_dns.h"
 #include "src/overlays/actors/ovl_En_Gb/z_en_gb.h"
@@ -369,7 +370,7 @@ void RandomizerOnPlayerUpdateForRCQueueHandler() {
         iceTrapScale = 0.0f;
         randomizerQueuedCheck = rc;
         randomizerQueuedItemEntry = getItemEntry;
-        SPDLOG_INFO("Queueing Item mod {} item {} from RC {}", getItemEntry.modIndex, getItemEntry.itemId,
+        SPDLOG_INFO("Queuing Item mod {} item {} from RC {}", getItemEntry.modIndex, getItemEntry.itemId,
                     static_cast<uint32_t>(rc));
         if (
             // Skipping ItemGet animation incompatible with checks that require closing a text box to finish
@@ -2193,6 +2194,11 @@ void RandomizerOnActorInitHandler(void* actorRef) {
         if (CompletedAllTrials()) {
             Actor_Kill(actor);
         }
+    }
+
+    if (actor->id == ACTOR_EN_OSSAN && actor->params == OSSAN_TYPE_MASK &&
+        RAND_GET_OPTION(RSK_MASK_QUEST) == RO_MASK_QUEST_SHUFFLE) {
+        Actor_Kill(actor);
     }
 
     if (actor->id == ACTOR_BG_TREEMOUTH && LINK_IS_ADULT &&

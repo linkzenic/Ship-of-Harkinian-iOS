@@ -1038,7 +1038,7 @@ void RegionTable_Init_SpiritTemple() {
         //Exits
         Entrance(RR_SPIRIT_TEMPLE_MQ_BEAMOS_PITS,    []{return true;}),
         //technically we only need to avoid them, but the sheer height and the moving walls makes getting to the top after only stunning them very difficult/impossible
-        Entrance(RR_SPIRIT_TEMPLE_MQ_BIG_WALL_UPPER, []{return /*(*/logic->CanKillEnemy(RE_KEESE)/*|| CanUse(RG_SKULL_MASK)) && CanClimbHigh()*/;}),
+        Entrance(RR_SPIRIT_TEMPLE_MQ_BIG_WALL_UPPER, []{return /*(*/logic->CanKillEnemy(RE_KEESE) || logic->CanUse(RG_SKULL_MASK)/*) && CanClimbHigh()*/;}),
     });
 
     areaTable[RR_SPIRIT_TEMPLE_MQ_BIG_WALL_UPPER] = Region("Spirit Temple MQ Big Wall Upper", SCENE_SPIRIT_TEMPLE, {

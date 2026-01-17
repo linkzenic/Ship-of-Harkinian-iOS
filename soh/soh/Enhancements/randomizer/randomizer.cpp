@@ -120,46 +120,42 @@ std::unordered_map<std::string, SceneID> spoilerFileDungeonToScene = {
     { "Ganon's Castle", SCENE_INSIDE_GANONS_CASTLE }
 };
 
-std::unordered_map<s16, s16> getItemIdToItemId = {
-    { GI_BOW, ITEM_BOW },
-    { GI_ARROW_FIRE, ITEM_ARROW_FIRE },
-    { GI_DINS_FIRE, ITEM_DINS_FIRE },
-    { GI_SLINGSHOT, ITEM_SLINGSHOT },
-    { GI_OCARINA_FAIRY, ITEM_OCARINA_FAIRY },
-    { GI_OCARINA_OOT, ITEM_OCARINA_TIME },
-    { GI_HOOKSHOT, ITEM_HOOKSHOT },
-    { GI_LONGSHOT, ITEM_LONGSHOT },
-    { GI_ARROW_ICE, ITEM_ARROW_ICE },
-    { GI_FARORES_WIND, ITEM_FARORES_WIND },
-    { GI_BOOMERANG, ITEM_BOOMERANG },
-    { GI_LENS, ITEM_LENS },
-    { GI_HAMMER, ITEM_HAMMER },
-    { GI_ARROW_LIGHT, ITEM_ARROW_LIGHT },
-    { GI_NAYRUS_LOVE, ITEM_NAYRUS_LOVE },
-    { GI_BOTTLE, ITEM_BOTTLE },
-    { GI_POTION_RED, ITEM_POTION_RED },
-    { GI_POTION_GREEN, ITEM_POTION_GREEN },
-    { GI_POTION_BLUE, ITEM_POTION_BLUE },
-    { GI_FAIRY, ITEM_FAIRY },
-    { GI_FISH, ITEM_FISH },
-    { GI_MILK_BOTTLE, ITEM_MILK_BOTTLE },
-    { GI_LETTER_RUTO, ITEM_LETTER_RUTO },
-    { GI_BLUE_FIRE, ITEM_BLUE_FIRE },
-    { GI_BUGS, ITEM_BUG },
-    { GI_BIG_POE, ITEM_BIG_POE },
-    { GI_POE, ITEM_POE },
-    { GI_WEIRD_EGG, ITEM_WEIRD_EGG },
-    { GI_LETTER_ZELDA, ITEM_LETTER_ZELDA },
-    { GI_POCKET_EGG, ITEM_POCKET_EGG },
-    { GI_COJIRO, ITEM_COJIRO },
-    { GI_ODD_MUSHROOM, ITEM_ODD_MUSHROOM },
-    { GI_ODD_POTION, ITEM_ODD_POTION },
-    { GI_SAW, ITEM_SAW },
-    { GI_SWORD_BROKEN, ITEM_SWORD_BROKEN },
-    { GI_PRESCRIPTION, ITEM_PRESCRIPTION },
-    { GI_FROG, ITEM_FROG },
-    { GI_EYEDROPS, ITEM_EYEDROPS },
-    { GI_CLAIM_CHECK, ITEM_CLAIM_CHECK },
+// used for items that only set a rand inf when obtained
+std::map<RandomizerGet, RandomizerInf> randomizerGetToRandInf = {
+    { RG_FISHING_POLE, RAND_INF_FISHING_POLE_FOUND },
+    { RG_BRONZE_SCALE, RAND_INF_CAN_SWIM },
+    { RG_QUIVER_INF, RAND_INF_HAS_INFINITE_QUIVER },
+    { RG_BOMB_BAG_INF, RAND_INF_HAS_INFINITE_BOMB_BAG },
+    { RG_BULLET_BAG_INF, RAND_INF_HAS_INFINITE_BULLET_BAG },
+    { RG_STICK_UPGRADE_INF, RAND_INF_HAS_INFINITE_STICK_UPGRADE },
+    { RG_NUT_UPGRADE_INF, RAND_INF_HAS_INFINITE_NUT_UPGRADE },
+    { RG_MAGIC_INF, RAND_INF_HAS_INFINITE_MAGIC_METER },
+    { RG_BOMBCHU_INF, RAND_INF_HAS_INFINITE_BOMBCHUS },
+    { RG_WALLET_INF, RAND_INF_HAS_INFINITE_MONEY },
+    { RG_OCARINA_A_BUTTON, RAND_INF_HAS_OCARINA_A },
+    { RG_OCARINA_C_UP_BUTTON, RAND_INF_HAS_OCARINA_C_UP },
+    { RG_OCARINA_C_DOWN_BUTTON, RAND_INF_HAS_OCARINA_C_DOWN },
+    { RG_OCARINA_C_LEFT_BUTTON, RAND_INF_HAS_OCARINA_C_LEFT },
+    { RG_OCARINA_C_RIGHT_BUTTON, RAND_INF_HAS_OCARINA_C_RIGHT },
+    { RG_DEATH_MOUNTAIN_CRATER_BEAN_SOUL, RAND_INF_DEATH_MOUNTAIN_CRATER_BEAN_SOUL },
+    { RG_DEATH_MOUNTAIN_TRAIL_BEAN_SOUL, RAND_INF_DEATH_MOUNTAIN_TRAIL_BEAN_SOUL },
+    { RG_DESERT_COLOSSUS_BEAN_SOUL, RAND_INF_DESERT_COLOSSUS_BEAN_SOUL },
+    { RG_GERUDO_VALLEY_BEAN_SOUL, RAND_INF_GERUDO_VALLEY_BEAN_SOUL },
+    { RG_GRAVEYARD_BEAN_SOUL, RAND_INF_GRAVEYARD_BEAN_SOUL },
+    { RG_KOKIRI_FOREST_BEAN_SOUL, RAND_INF_KOKIRI_FOREST_BEAN_SOUL },
+    { RG_LAKE_HYLIA_BEAN_SOUL, RAND_INF_LAKE_HYLIA_BEAN_SOUL },
+    { RG_LOST_WOODS_BRIDGE_BEAN_SOUL, RAND_INF_LOST_WOODS_BRIDGE_BEAN_SOUL },
+    { RG_LOST_WOODS_BEAN_SOUL, RAND_INF_LOST_WOODS_BEAN_SOUL },
+    { RG_ZORAS_RIVER_BEAN_SOUL, RAND_INF_ZORAS_RIVER_BEAN_SOUL },
+    { RG_GOHMA_SOUL, RAND_INF_GOHMA_SOUL },
+    { RG_KING_DODONGO_SOUL, RAND_INF_KING_DODONGO_SOUL },
+    { RG_BARINADE_SOUL, RAND_INF_BARINADE_SOUL },
+    { RG_PHANTOM_GANON_SOUL, RAND_INF_PHANTOM_GANON_SOUL },
+    { RG_VOLVAGIA_SOUL, RAND_INF_VOLVAGIA_SOUL },
+    { RG_MORPHA_SOUL, RAND_INF_MORPHA_SOUL },
+    { RG_BONGO_BONGO_SOUL, RAND_INF_BONGO_BONGO_SOUL },
+    { RG_TWINROVA_SOUL, RAND_INF_TWINROVA_SOUL },
+    { RG_GANON_SOUL, RAND_INF_GANON_SOUL },
 };
 
 #ifdef _MSC_VER
@@ -299,6 +295,10 @@ ItemObtainability Randomizer::GetItemObtainabilityFromRandomizerCheck(Randomizer
 }
 
 ItemObtainability Randomizer::GetItemObtainabilityFromRandomizerGet(RandomizerGet randoGet) {
+    if (randomizerGetToRandInf.find(randoGet) != randomizerGetToRandInf.end()) {
+        return Flags_GetRandomizerInf(randomizerGetToRandInf.find(randoGet)->second) ? CANT_OBTAIN_ALREADY_HAVE
+                                                                                     : CAN_OBTAIN;
+    }
 
     // This is needed since Plentiful item pool also adds a third progressive wallet
     // but we should not get Tycoon's Wallet from it if it is off.
@@ -701,18 +701,6 @@ ItemObtainability Randomizer::GetItemObtainabilityFromRandomizerGet(RandomizerGe
             return !CHECK_QUEST_ITEM(QUEST_MEDALLION_SHADOW) ? CAN_OBTAIN : CANT_OBTAIN_ALREADY_HAVE;
         case RG_LIGHT_MEDALLION:
             return !CHECK_QUEST_ITEM(QUEST_MEDALLION_LIGHT) ? CAN_OBTAIN : CANT_OBTAIN_ALREADY_HAVE;
-
-        // Ocarina Buttons
-        case RG_OCARINA_A_BUTTON:
-            return Flags_GetRandomizerInf(RAND_INF_HAS_OCARINA_A) ? CANT_OBTAIN_ALREADY_HAVE : CAN_OBTAIN;
-        case RG_OCARINA_C_LEFT_BUTTON:
-            return Flags_GetRandomizerInf(RAND_INF_HAS_OCARINA_C_LEFT) ? CANT_OBTAIN_ALREADY_HAVE : CAN_OBTAIN;
-        case RG_OCARINA_C_RIGHT_BUTTON:
-            return Flags_GetRandomizerInf(RAND_INF_HAS_OCARINA_C_RIGHT) ? CANT_OBTAIN_ALREADY_HAVE : CAN_OBTAIN;
-        case RG_OCARINA_C_UP_BUTTON:
-            return Flags_GetRandomizerInf(RAND_INF_HAS_OCARINA_C_UP) ? CANT_OBTAIN_ALREADY_HAVE : CAN_OBTAIN;
-        case RG_OCARINA_C_DOWN_BUTTON:
-            return Flags_GetRandomizerInf(RAND_INF_HAS_OCARINA_C_DOWN) ? CANT_OBTAIN_ALREADY_HAVE : CAN_OBTAIN;
 
         case RG_RECOVERY_HEART:
         case RG_GREEN_RUPEE:
@@ -3886,6 +3874,12 @@ extern "C" u16 Randomizer_Item_Give(PlayState* play, GetItemEntry giEntry) {
     } else if (item >= RG_GUARD_HOUSE_KEY && item <= RG_FISHING_HOLE_KEY) {
         Flags_SetRandomizerInf(
             (RandomizerInf)((int)RAND_INF_GUARD_HOUSE_UNLOCKED + ((item - RG_GUARD_HOUSE_KEY) * 2) + 1));
+        return Return_Item_Entry(giEntry, RG_NONE);
+    } else if (item >= RG_KEATON_MASK && item <= RG_MASK_OF_TRUTH) {
+        Flags_SetRandomizerInf((RandomizerInf)((int)RAND_INF_CHILD_TRADES_HAS_MASK_KEATON + (item - RG_KEATON_MASK)));
+        if (INV_CONTENT(ITEM_TRADE_CHILD) == ITEM_NONE) {
+            INV_CONTENT(ITEM_TRADE_CHILD) = (int)ITEM_MASK_KEATON + (item - RG_KEATON_MASK);
+        }
         return Return_Item_Entry(giEntry, RG_NONE);
     }
 

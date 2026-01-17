@@ -110,8 +110,8 @@ void RegionTable_Init_LostWoods() {
 
     areaTable[RR_DEKU_THEATER] = Region("Deku Theater", SCENE_GROTTOS, {}, {
         //Locations
-        LOCATION(RC_DEKU_THEATER_SKULL_MASK,    logic->IsChild && logic->Get(LOGIC_BORROW_SKULL_MASK)),
-        LOCATION(RC_DEKU_THEATER_MASK_OF_TRUTH, logic->IsChild && logic->Get(LOGIC_BORROW_RIGHT_MASKS)),
+        LOCATION(RC_DEKU_THEATER_SKULL_MASK,    logic->CanUse(RG_SKULL_MASK)),
+        LOCATION(RC_DEKU_THEATER_MASK_OF_TRUTH, logic->CanUse(RG_MASK_OF_TRUTH)),
     }, {
         //Exits
         Entrance(RR_LW_BEYOND_MIDO, []{return true;}),

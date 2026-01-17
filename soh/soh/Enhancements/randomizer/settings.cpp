@@ -1188,7 +1188,7 @@ void Settings::CreateOptions() {
             mOptions[RSK_BIG_POES_HINT].Enable();
         }
     });
-    OPT_BOOL(RSK_COMPLETE_MASK_QUEST, "Complete Mask Quest", CVAR_RANDOMIZER_SETTING("CompleteMaskQuest"), mOptionDescriptions[RSK_COMPLETE_MASK_QUEST]);
+    OPT_U8(RSK_MASK_QUEST, "Mask Quest", {"Vanilla", "Completed", "Shuffle"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("CompleteMaskQuest"), mOptionDescriptions[RSK_MASK_QUEST], WIDGET_CVAR_COMBOBOX, 0);
     OPT_U8(RSK_GOSSIP_STONE_HINTS, "Gossip Stone Hints", {"No Hints", "Need Nothing", "Mask of Truth", "Stone of Agony"}, OptionCategory::Setting, CVAR_RANDOMIZER_SETTING("GossipStoneHints"), mOptionDescriptions[RSK_GOSSIP_STONE_HINTS], WIDGET_CVAR_COMBOBOX, RO_GOSSIP_STONES_NEED_NOTHING, false, nullptr, IMFLAG_NONE);
     OPT_CALLBACK(RSK_GOSSIP_STONE_HINTS, {
         if (CVarGetInteger(CVAR_RANDOMIZER_SETTING("GossipStoneHints"), RO_GOSSIP_STONES_NEED_NOTHING) ==
@@ -2193,7 +2193,7 @@ void Settings::CreateOptions() {
                                                                       &mOptions[RSK_FULL_WALLETS],
                                                                       &mOptions[RSK_SLINGBOW_BREAK_BEEHIVES],
                                                                       &mOptions[RSK_SKIP_CHILD_ZELDA],
-                                                                      &mOptions[RSK_COMPLETE_MASK_QUEST],
+                                                                      &mOptions[RSK_MASK_QUEST],
                                                                       &mOptions[RSK_SKIP_CHILD_STEALTH],
                                                                       &mOptions[RSK_SKIP_PLANTING_BEANS],
                                                                       &mOptions[RSK_SKIP_EPONA_RACE],
@@ -2704,7 +2704,6 @@ void Settings::CreateOptions() {
                                                                           &mOptions[RSK_SKIP_SCARECROWS_SONG],
                                                                           &mOptions[RSK_SKIP_PLANTING_BEANS],
                                                                           &mOptions[RSK_BIG_POE_COUNT],
-                                                                          &mOptions[RSK_COMPLETE_MASK_QUEST],
                                                                       });
     mOptionGroups[RSG_MISC] = OptionGroup("Miscellaneous Settings",
                                           {
