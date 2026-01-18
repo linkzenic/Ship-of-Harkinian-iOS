@@ -278,6 +278,10 @@ std::shared_ptr<GetItemEntry> Item::GetGIEntry() const { // NOLINT(*-no-recursio
             }
             break;
         case RG_PROGRESSIVE_STRENGTH:
+            if (!logic->CheckRandoInf(RAND_INF_CAN_GRAB)) {
+                actual = RG_POWER_BRACELET;
+                break;
+            }
             switch (logic->CurrentUpgrade(UPG_STRENGTH)) {
                 case 0:
                     actual = RG_GORONS_BRACELET;

@@ -155,7 +155,7 @@ void RegionTable_Init_FireTemple() {
     }, {
         //Exits
         Entrance(RR_FIRE_TEMPLE_LAVA_GEYSER_1F, []{return logic->TakeDamage();}),
-        Entrance(RR_FIRE_TEMPLE_LAVA_GEYSER_2F, []{return logic->SmallKeys(SCENE_FIRE_TEMPLE, 4) && logic->FireTimer() >= 48/* && str0*/;}),
+        Entrance(RR_FIRE_TEMPLE_LAVA_GEYSER_2F, []{return logic->FireTimer() >= 48 && logic->HasItem(RG_POWER_BRACELET);}),
     });
 
     //you can get the hearts with an indirect boomerang from here, but it's a trick
@@ -423,7 +423,7 @@ void RegionTable_Init_FireTemple() {
         //Exits
         Entrance(RR_FIRE_TEMPLE_TOP_OF_COLLAPSING_STAIRS, []{return logic->Get(LOGIC_FIRE_HIT_STAIRS) && logic->IsAdult;}),
         // this is here to maintain 1:1 door entrances between regions
-        Entrance(RR_FIRE_TEMPLE_ABOVE_FIRE_MAZE,          []{return logic->Get(LOGIC_FIRE_HIT_STAIRS) && (logic->IsAdult || logic->Get(LOGIC_FIRE_CHILD_AT_TOP_OF_STAIRS))/* && str0*/;}),
+        Entrance(RR_FIRE_TEMPLE_ABOVE_FIRE_MAZE,          []{return logic->Get(LOGIC_FIRE_HIT_STAIRS) && (logic->IsAdult || logic->Get(LOGIC_FIRE_CHILD_AT_TOP_OF_STAIRS)) && logic->HasItem(RG_POWER_BRACELET);}),
     });
 
     areaTable[RR_FIRE_TEMPLE_ABOVE_FIRE_MAZE] = Region("Fire Temple Above Fire Maze", SCENE_FIRE_TEMPLE, {
@@ -760,7 +760,7 @@ void RegionTable_Init_FireTemple() {
         //Exits
         Entrance(RR_FIRE_TEMPLE_MQ_UPPER_LIZALFOS_MAZE, []{return true;}),
         //Assumes maze access
-        Entrance(RR_FIRE_TEMPLE_MQ_MAZE_SWITCH_DOOR,    []{return logic->HasExplosives()/* && str0*/;}),
+        Entrance(RR_FIRE_TEMPLE_MQ_MAZE_SWITCH_DOOR,    []{return logic->HasExplosives() && logic->HasItem(RG_POWER_BRACELET);}),
     });
 
     areaTable[RR_FIRE_TEMPLE_MQ_ABOVE_MAZE] = Region("Fire Temple MQ Above Maze", SCENE_FIRE_TEMPLE, {}, {}, {
@@ -807,7 +807,8 @@ void RegionTable_Init_FireTemple() {
     areaTable[RR_FIRE_TEMPLE_MQ_BURNING_BLOCK] = Region("Fire Temple MQ Burning Block", SCENE_FIRE_TEMPLE, {}, {
         //Locations
         //There's definitely ways to do this hammerless, but with one points on it's a trick
-        LOCATION(RC_FIRE_TEMPLE_MQ_GS_SKULL_ON_FIRE, logic->CanUse(RG_MEGATON_HAMMER) && logic->CanUse(RG_HOOKSHOT)/* && (str0 || ctx->GetTrickOption(RT_HOOKSHOT_EXTENSION))*/),
+        //you can just hook through the block while next to it to kill the skull and get the token
+        LOCATION(RC_FIRE_TEMPLE_MQ_GS_SKULL_ON_FIRE, logic->CanUse(RG_MEGATON_HAMMER) && logic->CanUse(RG_HOOKSHOT) && (logic->HasItem(RG_POWER_BRACELET) || ctx->GetTrickOption(RT_VISIBLE_COLLISION))),
     }, {
         //Exits
         Entrance(RR_FIRE_TEMPLE_MQ_TORCH_SLUG_CLIMB, []{return true;}),
@@ -863,7 +864,7 @@ void RegionTable_Init_FireTemple() {
 
     areaTable[RR_FIRE_TEMPLE_MQ_HIGH_TORCH_ROOM_ABOVE_CAGE] = Region("Fire Temple MQ High Torch Room Above Cage", SCENE_FIRE_TEMPLE, {
         //Events
-        EventAccess(LOGIC_FIRE_MQ_HIGH_TORCH_LIT, []{return ((logic->CanUse(RG_FAIRY_BOW) && logic->CanUse(RG_HOOKSHOT)/*&& str0*/) && logic->FireTimer() >= 48);}),
+        EventAccess(LOGIC_FIRE_MQ_HIGH_TORCH_LIT, []{return ((logic->CanUse(RG_FAIRY_BOW) && logic->CanUse(RG_HOOKSHOT) && logic->HasItem(RG_POWER_BRACELET)) && logic->FireTimer() >= 48);}),
     }, {
         //Locations
         //Tunic logic for these checks is handled on entry

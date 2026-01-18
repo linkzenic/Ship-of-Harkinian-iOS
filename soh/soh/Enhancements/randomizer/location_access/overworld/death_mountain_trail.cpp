@@ -33,7 +33,7 @@ void RegionTable_Init_DeathMountainTrail() {
     areaTable[RR_DEATH_MOUNTAIN_SUMMIT] = Region("Death Mountain Summit", SCENE_DEATH_MOUNTAIN_TRAIL, {
         //Events
         EventAccess(LOGIC_FAIRY_ACCESS, []{return logic->CallGossipFairy();}),
-        EventAccess(LOGIC_BUG_ACCESS,   []{return logic->IsChild;}),
+        EventAccess(LOGIC_BUG_ACCESS,   []{return logic->IsChild && logic->HasItem(RG_POWER_BRACELET);}),
     }, {
         //Locations
         LOCATION(RC_DMT_TRADE_BROKEN_SWORD,     logic->IsAdult && logic->CanUse(RG_BROKEN_SWORD)),

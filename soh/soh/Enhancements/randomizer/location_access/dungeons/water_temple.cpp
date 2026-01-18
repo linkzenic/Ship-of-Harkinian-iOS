@@ -347,7 +347,8 @@ void RegionTable_Init_WaterTemple() {
 
     areaTable[RR_WATER_TEMPLE_GS_CAGE] = Region("Water Temple GS Cage", SCENE_WATER_TEMPLE, {}, {
         //Locations
-        LOCATION(RC_WATER_TEMPLE_GS_BEHIND_GATE,    logic->IsAdult || logic->HookshotOrBoomerang() || (ctx->GetTrickOption(RT_GROUND_JUMP_HARD) &&logic->CanGroundJump() && logic->CanJumpslash())),
+        LOCATION(RC_WATER_TEMPLE_GS_BEHIND_GATE,    (logic->IsAdult && (logic->HasItem(RG_POWER_BRACELET) || logic->CanKillEnemy(RE_GOLD_SKULLTULA))) || 
+                                                    logic->HookshotOrBoomerang() || (ctx->GetTrickOption(RT_GROUND_JUMP_HARD) &&logic->CanGroundJump() && logic->CanJumpslash())),
         LOCATION(RC_WATER_TEMPLE_BEHIND_GATE_POT_1, logic->CanBreakPots()),
         LOCATION(RC_WATER_TEMPLE_BEHIND_GATE_POT_2, logic->CanBreakPots()),
         LOCATION(RC_WATER_TEMPLE_BEHIND_GATE_POT_3, logic->CanBreakPots()),
@@ -736,7 +737,7 @@ void RegionTable_Init_WaterTemple() {
         //Exits
         Entrance(RR_WATER_TEMPLE_MQ_2F_CENTRAL_A,     []{return true;}),
         Entrance(RR_WATER_TEMPLE_MQ_PILLAR_2F,        []{return true;}),
-        Entrance(RR_WATER_TEMPLE_MQ_HIDDEN_SWITCH_2F, []{return (logic->IsAdult || logic->CanUse(RG_HOVER_BOOTS)) && logic->CanUse(RG_HOOKSHOT);}),
+        Entrance(RR_WATER_TEMPLE_MQ_HIDDEN_SWITCH_2F, []{return (logic->IsAdult || logic->CanUse(RG_HOVER_BOOTS)) && logic->CanUse(RG_HOOKSHOT) && logic->HasItem(RG_POWER_BRACELET);}),
         Entrance(RR_WATER_TEMPLE_MQ_LIZALFOS_LOOP_LM, []{return logic->CanUse(RG_HOVER_BOOTS);}),
     });
 
@@ -954,7 +955,9 @@ void RegionTable_Init_WaterTemple() {
 
     areaTable[RR_WATER_TEMPLE_MQ_HIDDEN_SWITCH_3F] = Region("Water Temple MQ Hidden Switch 3F", SCENE_WATER_TEMPLE, {}, {
         //Locations
-        LOCATION(RC_WATER_TEMPLE_MQ_GS_BEFORE_UPPER_WATER_SWITCH,      logic->CanGetEnemyDrop(RE_GOLD_SKULLTULA)),
+        //Boxes can kill Gold Skulltulas.
+        LOCATION(RC_WATER_TEMPLE_MQ_GS_BEFORE_UPPER_WATER_SWITCH,      (logic->CanBreakCrates() && logic->HasItem(RG_POWER_BRACELET)) ||
+                                                                       (logic->CanBreakCrates() || ctx->GetTrickOption(RT_VISIBLE_COLLISION)) && logic->CanKillEnemy(RE_GOLD_SKULLTULA)),
         LOCATION(RC_WATER_TEMPLE_MQ_GS_STORAGE_ROOM_UPPER_CRATE_1,     logic->CanBreakCrates()),
         LOCATION(RC_WATER_TEMPLE_MQ_GS_STORAGE_ROOM_UPPER_CRATE_2,     logic->CanBreakCrates()),
         LOCATION(RC_WATER_TEMPLE_MQ_GS_STORAGE_ROOM_UPPER_SMALL_CRATE, logic->CanBreakSmallCrates()),
@@ -1007,6 +1010,7 @@ void RegionTable_Init_WaterTemple() {
     //Assumes WL_LOW_OR_MID is checked on entry
     areaTable[RR_WATER_TEMPLE_MQ_LIZALFOS_CAGE] = Region("Water Temple MQ Lizalfos Cage", SCENE_WATER_TEMPLE, {}, {
         //Locations
+        //Technically hidden within a crate, but the act of opening the cage kills it and spawns the token on top so it's except from RT_VISUAL_COLLISION
         LOCATION(RC_WATER_TEMPLE_MQ_GS_LIZALFOS_HALLWAY,           logic->CanKillEnemy(RE_GOLD_SKULLTULA)),
         LOCATION(RC_WATER_TEMPLE_MQ_LIZALFOS_CAGE_SOUTH_POT,       logic->CanBreakPots()),
         LOCATION(RC_WATER_TEMPLE_MQ_LIZALFOS_CAGE_NORTH_POT,       logic->CanBreakPots()),

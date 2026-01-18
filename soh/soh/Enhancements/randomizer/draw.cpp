@@ -15,6 +15,7 @@ extern "C" {
 #include "objects/object_box/object_box.h"
 #include "objects/object_gi_key/object_gi_key.h"
 #include "objects/object_gi_bosskey/object_gi_bosskey.h"
+#include "objects/object_gi_bracelet/object_gi_bracelet.h"
 #include "objects/object_gi_compass/object_gi_compass.h"
 #include "objects/object_gi_map/object_gi_map.h"
 #include "objects/object_gi_hearts/object_gi_hearts.h"
@@ -1151,6 +1152,22 @@ extern "C" void Randomizer_DrawKneePads(PlayState* play, GetItemEntry* getItemEn
     Matrix_Translate(35, -7, 4, MTXMODE_APPLY);
     gSPMatrix(POLY_OPA_DISP++, MATRIX_NEWMTX(play->state.gfxCtx), G_MTX_MODELVIEW | G_MTX_LOAD);
     gSPDisplayList(POLY_OPA_DISP++, (Gfx*)gGiDekuShieldDL);
+
+    CLOSE_DISPS(play->state.gfxCtx);
+}
+
+extern "C" void Randomizer_DrawPowerBracelet(PlayState* play, GetItemEntry* getItemEntry) {
+    OPEN_DISPS(play->state.gfxCtx);
+
+    Gfx_SetupDL_25Opa(play->state.gfxCtx);
+
+    gSPMatrix(POLY_OPA_DISP++, Matrix_NewMtx(play->state.gfxCtx, (char*)__FILE__, __LINE__),
+              G_MTX_MODELVIEW | G_MTX_LOAD);
+
+    gSPGrayscale(POLY_OPA_DISP++, true);
+    gDPSetGrayscaleColor(POLY_OPA_DISP++, 80, 80, 80, 255);
+    gSPDisplayList(POLY_OPA_DISP++, (Gfx*)gGiGoronBraceletDL);
+    gSPGrayscale(POLY_OPA_DISP++, false);
 
     CLOSE_DISPS(play->state.gfxCtx);
 }

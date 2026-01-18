@@ -357,7 +357,7 @@ void RegionTable_Init_ForestTemple() {
 
     areaTable[RR_FOREST_TEMPLE_GREEN_POE_ROOM] = Region("Forest Temple Green Poe Room", SCENE_FOREST_TEMPLE, {
         //Events
-        EventAccess(LOGIC_FOREST_AMY, []{return logic->CanUse(RG_FAIRY_BOW);}),
+        EventAccess(LOGIC_FOREST_AMY, []{return logic->CanUse(RG_FAIRY_BOW) && logic->HasItem(RG_POWER_BRACELET);}),
     }, {
         //Locations
         LOCATION(RC_FOREST_TEMPLE_GREEN_POE_POT_1, logic->CanBreakPots()),
@@ -382,11 +382,11 @@ void RegionTable_Init_ForestTemple() {
 
     areaTable[RR_FOREST_TEMPLE_BASEMENT] = Region("Forest Temple Basement", SCENE_FOREST_TEMPLE, {
         //Events
-        EventAccess(LOGIC_FOREST_OPEN_BOSS_HALLWAY, []{return true;}),
+        EventAccess(LOGIC_FOREST_OPEN_BOSS_HALLWAY, []{return logic->HasItem(RG_POWER_BRACELET);}),
     }, {
         //Locations
-        LOCATION(RC_FOREST_TEMPLE_BASEMENT_CHEST, logic->HasItem(RG_OPEN_CHEST)),
-        LOCATION(RC_FOREST_TEMPLE_GS_BASEMENT,    logic->HookshotOrBoomerang()),
+        LOCATION(RC_FOREST_TEMPLE_BASEMENT_CHEST, logic->HasItem(RG_POWER_BRACELET) && logic->HasItem(RG_OPEN_CHEST)),
+        LOCATION(RC_FOREST_TEMPLE_GS_BASEMENT,    logic->HasItem(RG_POWER_BRACELET) && logic->HookshotOrBoomerang()),
     }, {
         //Exits
         Entrance(RR_FOREST_TEMPLE_LOBBY,         []{return true;}),
@@ -709,7 +709,7 @@ void RegionTable_Init_ForestTemple() {
         LOCATION(RC_FOREST_TEMPLE_MQ_FROZEN_EYE_SWITCH_SMALL_CRATE_3, logic->CanBreakSmallCrates()),
     }, {
         //Exits
-        Entrance(RR_FOREST_TEMPLE_MQ_FALLING_ROOM, []{return logic->CanUse(RG_FAIRY_BOW) || logic->CanUse(RG_DINS_FIRE);}),
+        Entrance(RR_FOREST_TEMPLE_MQ_FALLING_ROOM, []{return logic->CanUse(logic->HasItem(RG_POWER_BRACELET) ? RG_FAIRY_BOW : RG_FIRE_ARROWS) || logic->CanUse(RG_DINS_FIRE);}),
         Entrance(RR_FOREST_TEMPLE_MQ_BETH_ROOM,    []{return logic->SmallKeys(SCENE_FOREST_TEMPLE, 6);}),
     });
 
@@ -724,7 +724,7 @@ void RegionTable_Init_ForestTemple() {
 
     areaTable[RR_FOREST_TEMPLE_MQ_AMY_ROOM] = Region("Forest Temple MQ Amy Room", SCENE_FOREST_TEMPLE, {
         //Events
-        EventAccess(LOGIC_FOREST_AMY, []{return logic->CanUse(RG_FAIRY_BOW);}),
+        EventAccess(LOGIC_FOREST_AMY, []{return logic->CanUse(RG_FAIRY_BOW) && logic->HasItem(RG_POWER_BRACELET);}),
     }, {
         //Locations
         LOCATION(RC_FOREST_TEMPLE_MQ_GREEN_POE_POT_1, logic->CanBreakPots()),
@@ -744,14 +744,14 @@ void RegionTable_Init_ForestTemple() {
     areaTable[RR_FOREST_TEMPLE_MQ_BASEMENT] = Region("Forest Temple MQ Basement", SCENE_FOREST_TEMPLE, {
         //Events
         //Implies CanHitSwitch()
-        EventAccess(LOGIC_FOREST_OPEN_BOSS_HALLWAY, []{return logic->CanHitEyeTargets();}),
+        EventAccess(LOGIC_FOREST_OPEN_BOSS_HALLWAY, []{return logic->HasItem(RG_POWER_BRACELET) && logic->CanHitEyeTargets();}),
     }, {
         //Locations
-        LOCATION(RC_FOREST_TEMPLE_MQ_BASEMENT_CHEST, logic->HasItem(RG_OPEN_CHEST)),
+        LOCATION(RC_FOREST_TEMPLE_MQ_BASEMENT_CHEST, logic->HasItem(RG_POWER_BRACELET) && logic->HasItem(RG_OPEN_CHEST)),
     }, {
         //Exits
         Entrance(RR_FOREST_TEMPLE_MQ_LOBBY,             []{return true;}),
-        Entrance(RR_FOREST_TEMPLE_MQ_BASEMENT_POT_ROOM, []{return logic->CanPassEnemy(RE_BIG_SKULLTULA) || logic->TakeDamage();}),
+        Entrance(RR_FOREST_TEMPLE_MQ_BASEMENT_POT_ROOM, []{return  logic->HasItem(RG_POWER_BRACELET) && (logic->CanPassEnemy(RE_BIG_SKULLTULA) || logic->TakeDamage());}),
         Entrance(RR_FOREST_TEMPLE_BOSS_ENTRYWAY,        []{return logic->Get(LOGIC_FOREST_OPEN_BOSS_HALLWAY);}),
     });
 

@@ -8,8 +8,8 @@ void RegionTable_Init_ZorasDomain() {
     areaTable[RR_ZORAS_DOMAIN] = Region("Zoras Domain", SCENE_ZORAS_DOMAIN, {
         //Events
         EventAccess(LOGIC_FAIRY_ACCESS,         []{return logic->CallGossipFairyExceptSuns();}),
-        EventAccess(LOGIC_NUT_ACCESS,           []{return true;}),
-        EventAccess(LOGIC_STICK_ACCESS,         []{return logic->IsChild;}),
+        EventAccess(LOGIC_NUT_ACCESS,           []{return logic->CanBreakPots();}),
+        EventAccess(LOGIC_STICK_ACCESS,         []{return logic->IsChild && logic->CanBreakPots();}),
         EventAccess(LOGIC_FISH_ACCESS,          []{return logic->IsChild;}),
         EventAccess(LOGIC_KING_ZORA_THAWED,     []{return logic->IsAdult && logic->BlueFire();}),
         EventAccess(LOGIC_DELIVER_RUTOS_LETTER, []{return logic->CanUse(RG_RUTOS_LETTER) && logic->IsChild && ctx->GetOption(RSK_ZORAS_FOUNTAIN).IsNot(RO_ZF_OPEN);}),

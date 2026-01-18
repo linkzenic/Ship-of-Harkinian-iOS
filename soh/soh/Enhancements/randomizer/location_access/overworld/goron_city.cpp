@@ -9,7 +9,7 @@ void RegionTable_Init_GoronCity() {
         //Events
         EventAccess(LOGIC_FAIRY_ACCESS,                           []{return logic->CallGossipFairyExceptSuns();}),
         EventAccess(LOGIC_STICK_ACCESS,                           []{return logic->IsChild && logic->CanBreakPots();}),
-        EventAccess(LOGIC_BUG_ACCESS,                             []{return logic->BlastOrSmash() || logic->CanUse(RG_SILVER_GAUNTLETS);}),
+        EventAccess(LOGIC_BUG_ACCESS,                             []{return (logic->BlastOrSmash() && logic->HasItem(RG_POWER_BRACELET)) || logic->CanUse(RG_SILVER_GAUNTLETS);}),
         EventAccess(LOGIC_GORON_CITY_CHILD_FIRE,                  []{return logic->IsChild && logic->CanUse(RG_DINS_FIRE);}),
         EventAccess(LOGIC_GORON_CITY_WOODS_WARP_OPEN,             []{return logic->CanDetonateUprightBombFlower() || logic->CanUse(RG_MEGATON_HAMMER) || logic->Get(LOGIC_GORON_CITY_CHILD_FIRE);}),
         EventAccess(LOGIC_GORON_CITY_DARUNIAS_DOOR_OPEN_CHILD,    []{return logic->IsChild && logic->CanUse(RG_ZELDAS_LULLABY);}),
@@ -82,7 +82,7 @@ void RegionTable_Init_GoronCity() {
     }, {
         //Exits
         Entrance(RR_GORON_CITY,      []{return true;}),
-        Entrance(RR_DMC_LOWER_LOCAL, []{return logic->IsAdult;}),
+        Entrance(RR_DMC_LOWER_LOCAL, []{return logic->IsAdult && logic->HasItem(RG_POWER_BRACELET);}),
     });
 
     areaTable[RR_GC_GROTTO_PLATFORM] = Region("GC Grotto Platform", SCENE_GORON_CITY, {}, {}, {

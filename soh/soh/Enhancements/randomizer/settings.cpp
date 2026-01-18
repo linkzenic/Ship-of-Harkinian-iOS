@@ -778,6 +778,7 @@ void Settings::CreateOptions() {
     });
     OPT_BOOL(RSK_SHUFFLE_OCARINA_BUTTONS, "Shuffle Ocarina Buttons", CVAR_RANDOMIZER_SETTING("ShuffleOcarinaButtons"), mOptionDescriptions[RSK_SHUFFLE_OCARINA_BUTTONS]);
     OPT_BOOL(RSK_SHUFFLE_SWIM, "Shuffle Swim", CVAR_RANDOMIZER_SETTING("ShuffleSwim"), mOptionDescriptions[RSK_SHUFFLE_SWIM]);
+    OPT_BOOL(RSK_SHUFFLE_GRAB, "Shuffle Grab", CVAR_RANDOMIZER_SETTING("ShuffleGrab"), mOptionDescriptions[RSK_SHUFFLE_GRAB]);
     OPT_BOOL(RSK_SHUFFLE_CRAWL, "Shuffle Crawl", CVAR_RANDOMIZER_SETTING("ShuffleCrawl"), mOptionDescriptions[RSK_SHUFFLE_CRAWL]);
     OPT_BOOL(RSK_SHUFFLE_OPEN_CHEST, "Shuffle Open Chest", CVAR_RANDOMIZER_SETTING("ShuffleOpenChest"), mOptionDescriptions[RSK_SHUFFLE_OPEN_CHEST]);
     OPT_BOOL(RSK_SHUFFLE_WEIRD_EGG, "Shuffle Weird Egg", CVAR_RANDOMIZER_SETTING("ShuffleWeirdEgg"), mOptionDescriptions[RSK_SHUFFLE_WEIRD_EGG]);
@@ -1407,6 +1408,8 @@ void Settings::CreateOptions() {
               "Enables ground jumps which require some precision outside of setting up jump:\n- While using Hover "
               "Boots in Forest Temple Courtyard to reach upper ledge\n- While using Hover Boots in Shadow Temple "
               "invisible spike room to reach door\n- Jumping past second step in Ice Cavern");
+    OPT_TRICK(RT_SLIDE_JUMP, RCQUEST_BOTH, RA_NONE, { Tricks::Tag::NOVICE }, "Sliding Jumps",
+              "Running forward while sliding sideways on ice can be used to jump on platforms.");
     OPT_TRICK(RT_KF_ADULT_GS, RCQUEST_BOTH, RA_KOKIRI_FOREST, { Tricks::Tag::NOVICE },
               "Adult Kokiri Forest GS with Hover Boots",
               "Can be obtained without Hookshot by using the Hover Boots off of one of the roots.");
@@ -2060,7 +2063,8 @@ void Settings::CreateOptions() {
     OPT_TRICK(RT_SPIRIT_SUN_CHEST, RCQUEST_VANILLA, RA_SPIRIT_TEMPLE, { Tricks::Tag::ADVANCED },
               "Spirit Temple Sun Block Room Chest with Bow",
               "Using the blocks in the room as platforms you can get lines of sight to all three torches. The timer on "
-              "the torches is quite short so you must move quickly in order to light all three.");
+              "the torches is quite short so you must move quickly in order to light all three.\n"
+              "A backflip can be used instead to light torches without pushing blocks.");
     OPT_TRICK(
         RT_SPIRIT_WALL, RCQUEST_VANILLA, RA_SPIRIT_TEMPLE, { Tricks::Tag::INTERMEDIATE },
         "Spirit Temple Shifting Wall with No Additional Items",
@@ -2093,6 +2097,7 @@ void Settings::CreateOptions() {
     OPT_TRICK(RT_ICE_STALAGMITE_HOOKSHOT, RCQUEST_BOTH, RA_ICE_CAVERN, { Tricks::Tag::NOVICE },
               "Ice Cavern Stalagmites with Hookshot",
               "Shooting stalagmites with hookshot in the right way also breaks them. Also applies to Water Trial.");
+    // RANDOTO sweep trick descriptions and make sure they match a post-refactor, post shuffles reality
     OPT_TRICK(RT_ICE_BLOCK_GS, RCQUEST_VANILLA, RA_ICE_CAVERN, { Tricks::Tag::INTERMEDIATE },
               "Ice Cavern Block Room GS with Hover Boots",
               "The Hover Boots can be used to get in front of the Skulltula to kill it with a jump slash. Then, the "
@@ -2101,9 +2106,6 @@ void Settings::CreateOptions() {
               "Ice Cavern MQ Red Ice GS without Song of Time",
               "If you side-hop into the perfect position, you can briefly stand on the platform with the red ice just "
               "long enough to dump some blue fire.");
-    OPT_TRICK(RT_ICE_MQ_SCARECROW, RCQUEST_MQ, RA_ICE_CAVERN, { Tricks::Tag::INTERMEDIATE },
-              "Ice Cavern MQ Scarecrow GS with No Additional Items",
-              "As adult a precise jump can be used to reach this alcove.");
     OPT_TRICK(RT_LENS_GTG, RCQUEST_VANILLA, RA_GERUDO_TRAINING_GROUND, { Tricks::Tag::NOVICE },
               "Gerudo Training Ground without Lens of Truth",
               "Removes the requirements for the Lens of Truth in Gerudo Training Ground.");
@@ -2390,6 +2392,7 @@ void Settings::CreateOptions() {
                                                                                  &mOptions[RSK_SHUFFLE_DEKU_NUT_BAG],
                                                                                  &mOptions[RSK_SHUFFLE_OCARINA_BUTTONS],
                                                                                  &mOptions[RSK_SHUFFLE_SWIM],
+                                                                                 &mOptions[RSK_SHUFFLE_GRAB],
                                                                                  &mOptions[RSK_SHUFFLE_CRAWL],
                                                                                  &mOptions[RSK_SHUFFLE_OPEN_CHEST],
                                                                                  &mOptions[RSK_SHUFFLE_BEAN_SOULS],
@@ -2609,6 +2612,7 @@ void Settings::CreateOptions() {
                                             &mOptions[RSK_SHUFFLE_OCARINA],
                                             &mOptions[RSK_SHUFFLE_OCARINA_BUTTONS],
                                             &mOptions[RSK_SHUFFLE_SWIM],
+                                            &mOptions[RSK_SHUFFLE_GRAB],
                                             &mOptions[RSK_SHUFFLE_CRAWL],
                                             &mOptions[RSK_SHUFFLE_OPEN_CHEST],
                                             &mOptions[RSK_SHUFFLE_WEIRD_EGG],

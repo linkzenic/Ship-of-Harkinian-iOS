@@ -251,12 +251,14 @@ void Settings::CreateOptionDescriptions() {
         "This will require finding the buttons before being able to use them in songs.";
 
     mOptionDescriptions[RSK_SHUFFLE_SWIM] =
-        "Shuffles the ability to Swim into the item pool.\n"
-        "The ability to swim has to be found as an item (you can still be underwater if you use iron boots).\n"
+        "Shuffles the ability to Swim into the item pool as a progressive upgrade before Silver Scale.\n"
+        "The ability to swim has to be found as an item (you can still be underwater with iron boots).\n"
         "\n"
         "If you enter a water entrance without swim you will be respawned on land to prevent infinite death loops.\n"
         "If you void out in Water Temple you will immediately be kicked out to prevent a softlock.";
     mOptionDescriptions[RSK_SHUFFLE_CRAWL] = "Shuffles the ability to use crawlspaces into the item pool.";
+    mOptionDescriptions[RSK_SHUFFLE_GRAB] =
+        "Shuffle the ability to grab as a progressive upgrade before Goron Bracelet.";
     mOptionDescriptions[RSK_SHUFFLE_OPEN_CHEST] = "Shuffles the ability to open chests into the item pool.";
     mOptionDescriptions[RSK_SHUFFLE_WEIRD_EGG] = "Shuffles the Weird Egg from Malon in to the item pool. Enabling "
                                                  "\"Skip Child Zelda\" disables this feature.\n"

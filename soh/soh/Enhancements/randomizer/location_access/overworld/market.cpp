@@ -56,7 +56,7 @@ void RegionTable_Init_Market() {
     }, {
         //Locations
         LOCATION(RC_MARKET_10_BIG_POES,          logic->IsAdult && (logic->Get(LOGIC_BIG_POE_KILL) || logic->BigPoes >= ctx->GetOption(RSK_BIG_POE_COUNT).Get())),
-        LOCATION(RC_MARKET_GS_GUARD_HOUSE,       logic->IsChild),
+        LOCATION(RC_MARKET_GS_GUARD_HOUSE,       logic->IsChild && (logic->HasItem(RG_POWER_BRACELET) || logic->CanKillEnemy(RE_GOLD_SKULLTULA))),
         LOCATION(RC_MK_GUARD_HOUSE_CHILD_POT_1,  logic->IsChild && logic->CanBreakPots()),
         LOCATION(RC_MK_GUARD_HOUSE_CHILD_POT_2,  logic->IsChild && logic->CanBreakPots()),
         LOCATION(RC_MK_GUARD_HOUSE_CHILD_POT_3,  logic->IsChild && logic->CanBreakPots()),

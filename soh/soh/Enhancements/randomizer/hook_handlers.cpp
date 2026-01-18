@@ -1063,6 +1063,13 @@ void RandomizerOnVanillaBehaviorHandler(GIVanillaBehavior id, bool* should, va_l
             *should = false;
             break;
         }
+        case VB_PREVENT_STRENGTH: {
+            if (!Flags_GetRandomizerInf(RAND_INF_CAN_GRAB)) {
+                GET_PLAYER(gPlayState)->stateFlags2 &= ~PLAYER_STATE2_MOVING_DYNAPOLY;
+                *should = true;
+            }
+            break;
+        }
         case VB_GORONS_CONSIDER_FIRE_TEMPLE_FINISHED: {
             *should = Flags_GetEventChkInf(EVENTCHKINF_USED_FIRE_TEMPLE_BLUE_WARP);
             break;

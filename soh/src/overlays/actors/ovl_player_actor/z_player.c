@@ -5578,8 +5578,9 @@ void func_8083A0F4(PlayState* play, Player* this) {
             } else if ((interactActorId == ACTOR_EN_ISHI) && ((interactRangeActor->params & 0xF) == 1)) {
                 Player_SetupAction(play, this, Player_Action_80846260, 0);
                 anim = &gPlayerAnim_link_silver_carry;
-            } else if (((interactActorId == ACTOR_EN_BOMBF) || (interactActorId == ACTOR_EN_KUSA)) &&
-                       (Player_GetStrength() <= PLAYER_STR_NONE)) {
+            } else if (GameInteractor_Should(VB_PREVENT_STRENGTH, ((interactActorId == ACTOR_EN_BOMBF) ||
+                                                                   (interactActorId == ACTOR_EN_KUSA)) &&
+                                                                      (Player_GetStrength() <= PLAYER_STR_NONE))) {
                 Player_SetupAction(play, this, Player_Action_80846408, 0);
                 this->actor.world.pos.x =
                     (Math_SinS(interactRangeActor->yawTowardsPlayer) * 20.0f) + interactRangeActor->world.pos.x;
@@ -13168,7 +13169,7 @@ void Player_Action_8084B78C(Player* this, PlayState* play) {
 }
 
 void func_8084B840(PlayState* play, Player* this, f32 arg2) {
-    if (this->actor.wallBgId != BGCHECK_SCENE) {
+    if (!GameInteractor_Should(VB_PREVENT_STRENGTH, false) && this->actor.wallBgId != BGCHECK_SCENE) {
         DynaPolyActor* dynaPolyActor = DynaPoly_GetActor(&play->colCtx, this->actor.wallBgId);
 
         if (dynaPolyActor != NULL) {
