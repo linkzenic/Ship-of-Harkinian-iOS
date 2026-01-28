@@ -22,14 +22,14 @@ void RegionTable_Init_CastleGrounds() {
         EVENT_ACCESS(LOGIC_BUG_ACCESS,   logic->HasItem(RG_POWER_BRACELET)),
     }, {
         //Locations
-        LOCATION(RC_HC_MALON_EGG,      true),
+        LOCATION(RC_HC_MALON_EGG,      logic->HasItem(RG_SPEAK_HYLIAN)),
         LOCATION(RC_HC_GS_TREE,        logic->CanBonkTrees() && logic->CanKillEnemy(RE_GOLD_SKULLTULA, ED_CLOSE)),
         LOCATION(RC_HC_SKULLTULA_TREE, logic->CanBonkTrees()),
     }, {
         //Exits
         ENTRANCE(RR_CASTLE_GROUNDS, true),
         ENTRANCE(RR_HC_ABOVE_VINE,  logic->HasItem(RG_CLIMB) || logic->CanUse(RG_HOOKSHOT)),
-        ENTRANCE(RR_HC_PAST_GATE,   logic->HasItem(RG_CHILD_WALLET)),
+        ENTRANCE(RR_HC_PAST_GATE,   logic->HasItem(RG_CHILD_WALLET) && logic->HasItem(RG_SPEAK_HYLIAN)),
     });
 
     areaTable[RR_HC_ABOVE_VINE] = Region("Hyrule Castle Above Vine", SCENE_HYRULE_CASTLE, {
@@ -90,7 +90,8 @@ void RegionTable_Init_CastleGrounds() {
         //Exits
         ENTRANCE(RR_HC_GATE,          true),
         ENTRANCE(RR_HC_STORMS_GROTTO, logic->CanOpenStormsGrotto()),
-        ENTRANCE(RR_HC_GARDEN,        (logic->CanUse(RG_WEIRD_EGG) && logic->HasItem(RG_POWER_BRACELET)) || (ctx->GetTrickOption(RT_DAMAGE_BOOST_SIMPLE) && logic->TakeDamage() && logic->HasExplosives() && logic->CanJumpslash())),
+        ENTRANCE(RR_HC_GARDEN,        (logic->CanUse(RG_WEIRD_EGG) && logic->HasItem(RG_POWER_BRACELET) && logic->HasItem(RG_SPEAK_HYLIAN)) || 
+                                      (ctx->GetTrickOption(RT_DAMAGE_BOOST_SIMPLE) && logic->TakeDamage() && logic->HasExplosives() && logic->CanJumpslash())),
     });
 
     areaTable[RR_HC_DRAIN_LEDGE] = Region("Hyrule Castle Drain Ledge", SCENE_HYRULE_CASTLE, {}, {}, {
@@ -101,8 +102,8 @@ void RegionTable_Init_CastleGrounds() {
 
     areaTable[RR_HC_GARDEN] = Region("HC Garden", SCENE_CASTLE_COURTYARD_ZELDA, {}, {
         //Locations
-        LOCATION(RC_HC_ZELDAS_LETTER, true),
-        LOCATION(RC_SONG_FROM_IMPA,   true),
+        LOCATION(RC_HC_ZELDAS_LETTER, logic->HasItem(RG_SPEAK_HYLIAN)),
+        LOCATION(RC_SONG_FROM_IMPA,   logic->HasItem(RG_SPEAK_HYLIAN)),
     }, {
         //Exits
         ENTRANCE(RR_HC_DRAIN_LEDGE, true), // if this ever gets shuffled leaving garden area should come out crawlspace
