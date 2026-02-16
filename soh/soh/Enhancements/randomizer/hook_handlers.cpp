@@ -2301,8 +2301,8 @@ void RandomizerOnActorInitHandler(void* actorRef) {
     }
 
     if (RAND_GET_OPTION(RSK_SHUFFLE_BEAN_SOULS)) {
+        RandomizerInf currentBeanSoulRandInf = RAND_INF_MAX;
         if (actor->id == ACTOR_OBJ_BEAN) {
-            RandomizerInf currentBeanSoulRandInf = RAND_INF_MAX;
             switch (gPlayState->sceneNum) {
                 case SCENE_DEATH_MOUNTAIN_CRATER:
                     currentBeanSoulRandInf = RAND_INF_DEATH_MOUNTAIN_CRATER_BEAN_SOUL;
@@ -2336,13 +2336,7 @@ void RandomizerOnActorInitHandler(void* actorRef) {
                     currentBeanSoulRandInf = RAND_INF_ZORAS_RIVER_BEAN_SOUL;
                     break;
             }
-            if (currentBeanSoulRandInf != RAND_INF_MAX && !Flags_GetRandomizerInf(currentBeanSoulRandInf)) {
-                Actor_Kill(actor);
-                return;
-            }
-        }
-        if (actor->id == ACTOR_OBJ_MAKEKINSUTA) {
-            RandomizerInf currentBeanSoulRandInf = RAND_INF_MAX;
+        } else if (actor->id == ACTOR_OBJ_MAKEKINSUTA) {
             switch (gPlayState->sceneNum) {
                 case SCENE_DEATH_MOUNTAIN_CRATER:
                     currentBeanSoulRandInf = RAND_INF_DEATH_MOUNTAIN_CRATER_BEAN_SOUL;
@@ -2376,10 +2370,10 @@ void RandomizerOnActorInitHandler(void* actorRef) {
                     currentBeanSoulRandInf = RAND_INF_ZORAS_RIVER_BEAN_SOUL;
                     break;
             }
-            if (currentBeanSoulRandInf != RAND_INF_MAX && !Flags_GetRandomizerInf(currentBeanSoulRandInf)) {
-                Actor_Kill(actor);
-                return;
-            }
+        }
+        if (currentBeanSoulRandInf != RAND_INF_MAX && !Flags_GetRandomizerInf(currentBeanSoulRandInf)) {
+            Actor_Kill(actor);
+            return;
         }
     }
 
