@@ -11,7 +11,6 @@
 #include "vt.h"
 
 #include "soh/frame_interpolation.h"
-#include "soh/OTRGlobals.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 
 #define FLAGS ACTOR_FLAG_UPDATE_CULLING_DISABLED

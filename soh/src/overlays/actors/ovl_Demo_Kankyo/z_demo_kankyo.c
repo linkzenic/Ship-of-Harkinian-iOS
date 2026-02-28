@@ -5,7 +5,6 @@
 #include "objects/object_toki_objects/object_toki_objects.h"
 #include "soh/frame_interpolation.h"
 #include <assert.h>
-#include "soh/OTRGlobals.h"
 
 #define FLAGS (ACTOR_FLAG_UPDATE_CULLING_DISABLED | ACTOR_FLAG_DRAW_CULLING_DISABLED)
 

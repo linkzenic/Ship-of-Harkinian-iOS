@@ -7,7 +7,6 @@
 #include "z_en_gb.h"
 #include "objects/object_ps/object_ps.h"
 #include "soh/frame_interpolation.h"
-#include "soh/OTRGlobals.h"
 #include "soh/ResourceManagerHelpers.h"
 #include "soh/Enhancements/game-interactor/GameInteractor_Hooks.h"
 
