@@ -1829,7 +1829,7 @@ void SohMenu::AddMenuEnhancements() {
         .CVar(CVAR_CHEAT("SpeedModifier.SpeedToggle"));
     AddWidget(path, "Don't affect jump distance/velocity", WIDGET_CVAR_CHECKBOX)
         .CVar(CVAR_CHEAT("SpeedModifier.DoesntChangeJump"));
-    AddWidget(path, "Nultiplier:", WIDGET_CVAR_SLIDER_FLOAT)
+    AddWidget(path, "Multiplier:", WIDGET_CVAR_SLIDER_FLOAT)
         .CVar(CVAR_CHEAT("SpeedModifier.Value"))
         .Options(FloatSliderOptions().IsPercentage().Min(1.0f).Max(5.0f).DefaultValue(1.0f).ShowButtons(true).Format(
             "%.0f%%"));
