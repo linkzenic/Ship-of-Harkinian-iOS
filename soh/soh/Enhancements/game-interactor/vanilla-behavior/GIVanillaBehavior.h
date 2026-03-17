@@ -304,6 +304,14 @@ typedef enum {
 
     // #### `result`
     // ```c
+    // INV_CONTENT(ITEM_TRADE_CHILD) == ITEM_SOLD_OUT
+    // ```
+    // #### `args`
+    // - `*EnOssan` (Happy Mask Shopkeeper)
+    VB_HAPPY_MASK_SHOP_CHECK_SOLD_OUT,
+
+    // #### `result`
+    // ```c
     // true
     // ```
     // #### `args`
