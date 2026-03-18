@@ -3430,7 +3430,7 @@ void Settings::ParseJson(nlohmann::json spoilerFileJson) {
     nlohmann::json settingsJson = spoilerFileJson["settings"];
     for (auto it = settingsJson.begin(); it != settingsJson.end(); ++it) {
         // todo load into cvars for UI
-        // RANDOTODO handle numeric value to options conversion better than brute froce
+        // RANDOTODO handle numeric value to options conversion better than brute force
         if (StaticData::optionNameToEnum.contains(it.key())) {
             const RandomizerSettingKey index = StaticData::optionNameToEnum[it.key()];
             mContext->GetOption(index).Set(mOptions[index].GetValueFromText(it.value()));
