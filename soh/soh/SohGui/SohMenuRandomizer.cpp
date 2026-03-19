@@ -105,7 +105,7 @@ void DrawLocationsMenu(WidgetInfo& info) {
                                     if (!excludedLocationString.empty()) {
                                         excludedLocationString += ",";
                                     }
-                                    excludedLocationString += excludedLocationIt;
+                                    excludedLocationString += std::to_string(excludedLocationIt);
                                 }
                                 CVarSetString(CVAR_RANDOMIZER_SETTING("ExcludedLocations"),
                                               excludedLocationString.c_str());
@@ -152,7 +152,7 @@ void DrawLocationsMenu(WidgetInfo& info) {
                                     if (!excludedLocationString.empty()) {
                                         excludedLocationString += ",";
                                     }
-                                    excludedLocationString += excludedLocationIt;
+                                    excludedLocationString += std::to_string(excludedLocationIt);
                                 }
                                 if (excludedLocationString == "") {
                                     CVarClear(CVAR_RANDOMIZER_SETTING("ExcludedLocations"));
@@ -188,7 +188,9 @@ void UpdateMenuLocations() {
     std::string excludedLocationString;
     excludedLocations.clear();
     while (getline(excludedLocationStringStream, excludedLocationString, ',')) {
-        excludedLocations.insert((RandomizerCheck)std::stoi(excludedLocationString));
+        if (!excludedLocationString.empty()) {
+            excludedLocations.insert((RandomizerCheck)std::stoi(excludedLocationString));
+        }
     }
 }
 
@@ -207,7 +209,9 @@ void UpdateMenuTricks() {
     std::string enabledGlitchString;
     enabledGlitches.clear();
     while (getline(enabledGlitchStringStream, enabledGlitchString, ',')) {
-        enabledGlitches.insert((RandomizerTrick)std::stoi(enabledGlitchString));
+        if (!enabledGlitchString.empty()) {
+            enabledGlitches.insert((RandomizerTrick)std::stoi(enabledGlitchString));
+        }
     }
 }
 
