@@ -576,7 +576,7 @@ void SohMenu::AddMenuRandomizer() {
             GenerateRandomizer(CVarGetInteger(CVAR_RANDOMIZER_SETTING("ManualSeedEntry"), 0) ? seedString : "");
         })
         .PreFunc([](WidgetInfo& info) {
-            info.options->Disabled((gSaveContext.gameMode != GAMEMODE_FILE_SELECT) || GameInteractor::IsSaveLoaded());
+            info.options->disabled = (gSaveContext.gameMode != GAMEMODE_FILE_SELECT) || GameInteractor::IsSaveLoaded();
         })
         .Options(ButtonOptions()
                      .Size(ImVec2(250.f, 0.f))
@@ -615,17 +615,6 @@ void SohMenu::AddMenuRandomizer() {
                 .DefaultValue(true));
     AddWidget(path, "Map & Compass Colors Match Dungeon", WIDGET_CVAR_CHECKBOX)
         .CVar(CVAR_RANDOMIZER_ENHANCEMENT("ColoredMapsAndCompasses"))
-        .PreFunc([](WidgetInfo& info) {
-            info.options->disabled = !(OTRGlobals::Instance->gRandoContext->GetOption(RSK_SHUFFLE_MAPANDCOMPASS)
-                                           .IsNot(RO_DUNGEON_ITEM_LOC_STARTWITH) &&
-                                       OTRGlobals::Instance->gRandoContext->GetOption(RSK_SHUFFLE_MAPANDCOMPASS)
-                                           .IsNot(RO_DUNGEON_ITEM_LOC_VANILLA) &&
-                                       OTRGlobals::Instance->gRandoContext->GetOption(RSK_SHUFFLE_MAPANDCOMPASS)
-                                           .IsNot(RO_DUNGEON_ITEM_LOC_OWN_DUNGEON));
-            info.options->disabledTooltip =
-                "This setting is disabled because a savefile is loaded without the map & compass.\n"
-                "Shuffle settings set to \"Any Dungeon\", \"Overworld\" or \"Anywhere\".";
-        })
         .Options(
             CheckboxOptions()
                 .Tooltip("Matches the color of maps & compasses to the dungeon they belong to. "
@@ -635,11 +624,6 @@ void SohMenu::AddMenuRandomizer() {
                 .DefaultValue(true));
     AddWidget(path, "Jabber Nut Colors Match Kind", WIDGET_CVAR_CHECKBOX)
         .CVar(CVAR_RANDOMIZER_ENHANCEMENT("GenericJabberNutModel"))
-        .PreFunc([](WidgetInfo& info) {
-            info.options->disabled = !OTRGlobals::Instance->gRandoContext->GetOption(RSK_SHUFFLE_SPEAK);
-            info.options->disabledTooltip =
-                "This setting is disabled because a savefile is loaded without Shuffle Speak.";
-        })
         .RaceDisable(false)
         .Options(CheckboxOptions()
                      .Tooltip("With Shuffle Speak, jabber nut model & color will be generic.")
