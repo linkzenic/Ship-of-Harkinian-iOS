@@ -1,6 +1,5 @@
 #include "Anchor.h"
 #include "soh/Enhancements/nametag.h"
-#include "soh/frame_interpolation.h"
 
 extern "C" {
 #include "macros.h"
