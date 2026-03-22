@@ -164,7 +164,7 @@ static int enemiesToRandomize[] = {
 bool IsEnemyAllowedToSpawn(int16_t sceneNum, int8_t roomNum, EnemyEntry enemy) {
     uint32_t isMQ = ResourceMgr_IsSceneMasterQuest(sceneNum);
 
-    // Freezard - Child Link can only kill this with jump slash Deku Sticks or other equipment like bombs.
+    // Freezard - Child Link can only kill this with Deku Stick jumpslash or other equipment like bombs.
     // Beamos - Needs bombs.
     // Anubis - Needs fire.
     // Shell Blade & Spike - Child Link can't kill these with sword or Deku Stick.
