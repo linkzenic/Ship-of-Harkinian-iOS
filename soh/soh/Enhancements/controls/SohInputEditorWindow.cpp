@@ -9,6 +9,9 @@
 #ifndef __WIIU__
 #include <ship/controller/controldevice/controller/mapping/sdl/SDLAxisDirectionToButtonMapping.h>
 #endif
+#ifdef __ANDROID__
+#include <ship/port/mobile/MobileImpl.h>
+#endif
 
 #define SCALE_IMGUI_SIZE(value) ((value / 13.0f) * ImGui::GetFontSize())
 
@@ -1626,6 +1629,28 @@ void SohInputEditorWindow::DrawLinkTab() {
             ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
             ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
         }
+
+#ifdef __ANDROID__
+        if (ImGui::CollapsingHeader("Touch Controls")) {
+            ImGui::PopStyleColor();
+            ImGui::PopStyleColor();
+            ImGui::PopStyleColor();
+
+            bool hideToggleBtn = CVarGetInteger("gDroidHideToggleButton", 0) != 0;
+            if (ImGui::Checkbox("Hide Overlay Toggle Button##HideToggleBtn", &hideToggleBtn)) {
+                CVarSetInteger("gDroidHideToggleButton", hideToggleBtn ? 1 : 0);
+                Ship::Context::GetInstance()->GetWindow()->GetGui()->SaveConsoleVariablesNextFrame();
+                Ship::Mobile::SetToggleButtonVisible(!hideToggleBtn);
+            }
+            if (ImGui::IsItemHovered()) {
+                ImGui::SetTooltip("Hide the eye button that toggles\non-screen touch controls visibility");
+            }
+
+            ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.133f, 0.133f, 0.133f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
+        }
+#endif
 
         ImGui::PopStyleColor();
         ImGui::PopStyleColor();

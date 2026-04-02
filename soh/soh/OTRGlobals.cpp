@@ -122,6 +122,9 @@
 
 #include "soh/config/ConfigUpdaters.h"
 #include "soh/ShipInit.hpp"
+#ifdef __ANDROID__
+#include <ship/port/mobile/MobileImpl.h>
+#endif
 
 bool SoH_HandleConfigDrop(char* filePath);
 
@@ -280,6 +283,10 @@ OTRGlobals::OTRGlobals() {
 
     context->InitConfiguration();
     context->InitConsoleVariables();
+
+#ifdef __ANDROID__
+    Ship::Mobile::SetToggleButtonVisible(CVarGetInteger("gDroidHideToggleButton", 0) == 0);
+#endif
 
     auto controlDeck = std::make_shared<LUS::ControlDeck>(std::vector<CONTROLLERBUTTONS_T>({
         BTN_CUSTOM_MODIFIER1,
@@ -467,6 +474,13 @@ void OTRGlobals::RunExtract(int argc, char* argv[]) {
                     extractStep = ES_EXTRACT;
 #endif
                 } else {
+#if defined(__ANDROID__)
+                    // On Android, missing soh.o2r means we need to extract from ROM
+                    if (!std::filesystem::exists(portArchivePath)) {
+                        extractStep = ES_EXTRACT;
+                        continue;
+                    }
+#endif
                     std::string msg;
 
 #if defined(__SWITCH__)
@@ -565,6 +579,11 @@ void OTRGlobals::RunExtract(int argc, char* argv[]) {
             case ES_EXTRACT_ARGS: {
 #if !defined(__SWITCH__) && !defined(__WIIU__)
                 if (args.size() == 0) {
+#ifdef __ANDROID__
+                    // Skip "Run SoH?" popup on Android — ImGui popups don't register touch reliably
+                    extractStep = ES_VERIFY;
+                    continue;
+#else
                     SohGui::RegisterPopup(
                         "Run Ship of Harkinian", "All files have been processed. Run SoH?", "Yes", "No",
                         [&]() {
@@ -580,6 +599,7 @@ void OTRGlobals::RunExtract(int argc, char* argv[]) {
                         },
                         [&]() { exit(0); });
                     break;
+#endif
                 }
                 file = args.at(0);
                 args.erase(args.begin());
@@ -631,6 +651,11 @@ void OTRGlobals::RunExtract(int argc, char* argv[]) {
                         continue;
                     }
                     case PS_LOCAL: {
+#ifdef __ANDROID__
+                        // On Android, skip auto-discovery and use file picker instead
+                        promptStep = PS_FIRST;
+                        continue;
+#endif
                         extract = Extractor();
                         extract.SetSearchPath(installPath);
                         extract.GetRoms(args);
@@ -648,6 +673,21 @@ void OTRGlobals::RunExtract(int argc, char* argv[]) {
                         continue;
                     }
                     case PS_FIRST: {
+#ifdef __ANDROID__
+                        // On Android, file picker blocks SDL thread — run on thread pool so render loop stays alive
+                        extractionTask = threadPool->submit_task([&]() -> void {
+                            if (!extract.ManuallySearchForRomMatchingType(RomSearchMode::Both)) {
+                                promptStep = PS_FILE_CHECK;
+                                return;
+                            }
+                            extract.CallZapd(installPath, Ship::Context::GetAppDirectoryPath(appShortName),
+                                             &extractCount, &totalExtract);
+                            generatedIsMQ = extract.IsMasterQuest();
+                            promptStep = PS_SECOND;
+                            extractCount = 0;
+                            totalExtract = 0;
+                        });
+#else
                         if (!extract.ManuallySearchForRomMatchingType(RomSearchMode::Both)) {
                             promptStep = PS_FILE_CHECK;
                             continue;
@@ -660,12 +700,31 @@ void OTRGlobals::RunExtract(int argc, char* argv[]) {
                             extractCount = 0;
                             totalExtract = 0;
                         });
+#endif
                         continue;
                     }
                     case PS_SECOND: {
                         SohGui::RegisterPopup(
                             "Extraction Complete", "ROM Extracted. Extract another?", "Yes", "No",
                             [&]() {
+#ifdef __ANDROID__
+                                // nativeDialogResult fires on the Java UI thread.
+                                // ManuallySearchForRomMatchingType opens a file picker and busy-waits
+                                // for nativeHandleSelectedFile — also dispatched on the UI thread — deadlock.
+                                // Run on the thread pool so the UI thread stays free to receive the result.
+                                extractionTask = threadPool->submit_task([&]() -> void {
+                                    if (!extract.ManuallySearchForRomMatchingType(generatedIsMQ ? RomSearchMode::Vanilla
+                                                                                                : RomSearchMode::MQ)) {
+                                        extractStep = ES_VERIFY;
+                                        return;
+                                    }
+                                    extract.CallZapd(installPath, Ship::Context::GetAppDirectoryPath(appShortName),
+                                                     &extractCount, &totalExtract);
+                                    extractStep = ES_VERIFY;
+                                    extractCount = 0;
+                                    totalExtract = 0;
+                                });
+#else
                                 if (!extract.ManuallySearchForRomMatchingType(generatedIsMQ ? RomSearchMode::Vanilla
                                                                                             : RomSearchMode::MQ)) {
                                     extractStep = ES_VERIFY;
@@ -678,6 +737,7 @@ void OTRGlobals::RunExtract(int argc, char* argv[]) {
                                         totalExtract = 0;
                                     });
                                 }
+#endif
                             },
                             [&]() { extractStep = ES_VERIFY; });
                         continue;

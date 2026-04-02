@@ -1,3 +1,4 @@
+#include <sstream>
 #include "SohMenu.h"
 #include "soh/Enhancements/enhancementTypes.h"
 #include "soh/Enhancements/randomizer/randomizer.h"
