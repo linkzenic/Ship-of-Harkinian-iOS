@@ -504,7 +504,14 @@ public class MainActivity extends SDLActivity{
         addTouchListener(buttonZ, ControllerButtons.AXIS_RT); // SDL Button 5 (Z)
 
         addTouchListener(buttonStart, ControllerButtons.BUTTON_START); // SDL Button 7 (Start)
-        addTouchListener(buttonBack, ControllerButtons.BUTTON_BACK); // SDL Button 6 (Back)
+        // Overlay BACK routes through nativeGamepadBackPressed (same as physical gamepad BACK)
+        // so it hits ConsumeGamepadBackPress() in Gui.cpp without double-firing ImGuiKey_GamepadBack.
+        buttonBack.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                nativeGamepadBackPressed();
+            }
+            return true;
+        });
 
 
         // Setup joystick movement
