@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 import android.util.Log;
 
+import android.view.KeyEvent;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -47,13 +48,13 @@ public class MainActivity extends SDLActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Log.i("SoHGyroFix", "onCreate start");
+        Log.i("SoH", "onCreate start");
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         preferences = getSharedPreferences("com.dishii.soh.prefs", Context.MODE_PRIVATE);
 
-        Log.i("SoHGyroFix", "hasStoragePermission=" + hasStoragePermission());
+        Log.i("SoH", "hasStoragePermission=" + hasStoragePermission());
 
         // Check if storage permissions are granted
         if (hasStoragePermission()) {
@@ -66,7 +67,7 @@ public class MainActivity extends SDLActivity{
         setupControllerOverlay();
         attachController();
 
-        Log.i("SoHGyroFix", "onCreate complete");
+        Log.i("SoH", "onCreate complete");
     }
 
     public static void waitForSetupFromNative() {
@@ -79,7 +80,7 @@ public class MainActivity extends SDLActivity{
 
     private void doVersionCheck(){
         int currentVersion = BuildConfig.VERSION_CODE;
-        int storedVersion = preferences.getInt("appVersion", 1);
+        int storedVersion = preferences.getInt("appVersion", currentVersion);
 
         if (currentVersion > storedVersion) {
             deleteOutdatedAssets();
@@ -187,10 +188,15 @@ public class MainActivity extends SDLActivity{
     public void checkAndSetupFiles() {
         File targetRootFolder = new File(Environment.getExternalStorageDirectory(), "SOH");
         File assetsFolder = new File(targetRootFolder, "assets");
+        // Support both .otr (9.0.x) and .o2r (9.2.x) archive formats
         File sohOtrFile = new File(targetRootFolder, "soh.o2r");
+        File sohOtrFileLegacy = new File(targetRootFolder, "soh.otr");
+        // oot.o2r / oot-mq.o2r also count — soh.o2r is not bundled, game can run with just the ROM archive
+        File ootO2rFile = new File(targetRootFolder, "oot.o2r");
+        File ootMqO2rFile = new File(targetRootFolder, "oot-mq.o2r");
 
         boolean isMissingAssets = !assetsFolder.exists() || assetsFolder.listFiles() == null || assetsFolder.listFiles().length == 0;
-        boolean isMissingSohOtr = !sohOtrFile.exists();
+        boolean isMissingSohOtr = !sohOtrFile.exists() && !sohOtrFileLegacy.exists() && !ootO2rFile.exists() && !ootMqO2rFile.exists();
 
         if (!targetRootFolder.exists() || isMissingAssets || isMissingSohOtr) {
             new AlertDialog.Builder(this)
@@ -205,8 +211,27 @@ public class MainActivity extends SDLActivity{
                     })
                     .show();
         } else {
-            // No setup needed, still need to count down
-            setupLatch.countDown();
+            // No setup needed — but always ensure soh.o2r is present from APK assets
+            if (!sohOtrFile.exists()) {
+                Executors.newSingleThreadExecutor().execute(() -> {
+                    try {
+                        getAssets().open("soh.o2r").close();
+                        try (InputStream in = getAssets().open("soh.o2r");
+                             OutputStream out = new FileOutputStream(sohOtrFile)) {
+                            byte[] buffer = new byte[65536];
+                            int read;
+                            while ((read = in.read(buffer)) != -1) {
+                                out.write(buffer, 0, read);
+                            }
+                        }
+                    } catch (IOException e) {
+                        // not bundled, nothing to do
+                    }
+                    setupLatch.countDown();
+                });
+            } else {
+                setupLatch.countDown();
+            }
         }
     }
 
@@ -274,22 +299,24 @@ public class MainActivity extends SDLActivity{
             runOnUiThread(() -> Toast.makeText(this, "Error copying assets", Toast.LENGTH_LONG).show());
         }
 
-        // Copy soh.o2r from internal assets
-        File targetOtrFile = new File(targetRootFolder, "soh.o2r");
-        try (InputStream in = getAssets().open("soh.o2r");
-             OutputStream out = new FileOutputStream(targetOtrFile)) {
-
-            byte[] buffer = new byte[1024];
-            int read;
-            while ((read = in.read(buffer)) != -1) {
-                out.write(buffer, 0, read);
+        // Copy soh.o2r from internal assets if bundled (optional)
+        try {
+            getAssets().open("soh.o2r").close(); // check if it exists
+            File targetOtrFile = new File(targetRootFolder, "soh.o2r");
+            try (InputStream in = getAssets().open("soh.o2r");
+                 OutputStream out = new FileOutputStream(targetOtrFile)) {
+                byte[] buffer = new byte[1024];
+                int read;
+                while ((read = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, read);
+                }
+                runOnUiThread(() -> Toast.makeText(this, "soh.o2r copied", Toast.LENGTH_SHORT).show());
+            } catch (IOException e) {
+                e.printStackTrace();
+                runOnUiThread(() -> Toast.makeText(this, "Error copying soh.o2r", Toast.LENGTH_LONG).show());
             }
-
-            runOnUiThread(() -> Toast.makeText(this, "soh.o2r copied", Toast.LENGTH_SHORT).show());
-
         } catch (IOException e) {
-            e.printStackTrace();
-            runOnUiThread(() -> Toast.makeText(this, "Error copying soh.o2r", Toast.LENGTH_LONG).show());
+            // soh.o2r not bundled in APK assets — user must provide their own
         }
 
         setupLatch.countDown();
@@ -299,6 +326,7 @@ public class MainActivity extends SDLActivity{
 
 
     private native void nativeHandleSelectedFile(String filePath);
+    private native void nativeDialogResult(int result);
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -345,13 +373,29 @@ public class MainActivity extends SDLActivity{
         }
     }
 
+    public void showAlertDialog(String title, String message, String btn1, String btn2) {
+        runOnUiThread(() -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                    .setTitle(title)
+                    .setMessage(message)
+                    .setCancelable(false)
+                    .setPositiveButton(btn1, (dialog, which) -> nativeDialogResult(0));
+            if (btn2 != null && !btn2.isEmpty()) {
+                builder.setNegativeButton(btn2, (dialog, which) -> nativeDialogResult(1));
+            }
+            AlertDialog dialog = builder.create();
+            // FLAG_NOT_FOCUSABLE prevents stealing SDL window focus so onWindowFocusChanged
+            // is never called — SDL never fires FOCUS_LOST, ImGui keeps gamepad state intact,
+            // SELECT/BACK menu toggle continues to work after dialog dismissal.
+            dialog.getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+            dialog.show();
+        });
+    }
+
     public void openFilePicker() {
-        // Create an Intent to open the file picker dialog
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.setType("*/*");
-
-        // Start the file picker dialog
-        startActivityForResult(intent, 0);
+        runOnUiThread(() -> startActivityForResult(intent, 0));
     }
 
     // Check if external storage is available and writable
@@ -368,6 +412,28 @@ public class MainActivity extends SDLActivity{
 
     // Native method for setting joystick axis value
     public native void setAxis(int axis, short value);
+
+    // Signals C++ that the controller SELECT/BACK button was pressed.
+    // Called from dispatchKeyEvent so it works even when SDL loses controller tracking
+    // after an activity transition (e.g. file picker). Android delivers key events to the
+    // activity regardless of SDL's internal InputDevice state.
+    public native void nativeGamepadBackPressed();
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event.getAction() == KeyEvent.ACTION_DOWN && event.getRepeatCount() == 0) {
+            int keyCode = event.getKeyCode();
+            // KEYCODE_BUTTON_SELECT (109): controller SELECT/BACK button → SDL_CONTROLLER_BUTTON_BACK
+            // KEYCODE_BACK (4) from gamepad source: supplemental Retroid button (also SDL_CONTROLLER_BUTTON_BACK)
+            // Guard by SOURCE_GAMEPAD so the Android system Back key (keyboard source) is unaffected.
+            boolean isGamepad = (event.getSource() & android.view.InputDevice.SOURCE_GAMEPAD) != 0;
+            if (keyCode == KeyEvent.KEYCODE_BUTTON_SELECT ||
+                    (keyCode == KeyEvent.KEYCODE_BACK && isGamepad)) {
+                nativeGamepadBackPressed();
+            }
+        }
+        return super.dispatchKeyEvent(event);
+    }
 
     private Button button1, button2, button3, button4;
     private Button buttonA, buttonB, buttonX, buttonY;
@@ -391,7 +457,7 @@ public class MainActivity extends SDLActivity{
         );
         overlayView.setLayoutParams(layoutParams);
         // Add overlay view to the main layout (you may need to add it to a container like FrameLayout)
-        ViewGroup view = (ViewGroup) getContentView();
+        ViewGroup view = (ViewGroup) findViewById(android.R.id.content);
         view.addView(overlayView);
         view.setKeepScreenOn(true);
 

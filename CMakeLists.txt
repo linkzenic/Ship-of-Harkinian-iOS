@@ -175,6 +175,30 @@ add_compile_definitions(CONTROLLERBUTTONS_T=uint32_t)
 ################################################################################
 # Sub-projects
 ################################################################################
+# libpng is not in the Android NDK sysroot; build it from source for Android
+# so that ZAPDTR/ZAPD/CMakeLists.txt's find_package(PNG REQUIRED) succeeds.
+if(CMAKE_SYSTEM_NAME STREQUAL "Android")
+    include(FetchContent)
+    set(PNG_STATIC ON CACHE BOOL "" FORCE)
+    set(PNG_SHARED OFF CACHE BOOL "" FORCE)
+    set(PNG_TESTS OFF CACHE BOOL "" FORCE)
+    set(PNG_TOOLS OFF CACHE BOOL "" FORCE)
+    set(SKIP_INSTALL_ALL ON CACHE BOOL "" FORCE)
+    FetchContent_Declare(
+        PNG
+        GIT_REPOSITORY https://github.com/pnggroup/libpng.git
+        GIT_TAG v1.6.43
+        OVERRIDE_FIND_PACKAGE
+    )
+    FetchContent_MakeAvailable(PNG)
+    # libpng creates 'png_static'; ZAPDTR/ZAPD expects 'PNG::PNG' (what FindPNG.cmake provides)
+    if(NOT TARGET PNG::PNG)
+        add_library(PNG::PNG ALIAS png_static)
+    endif()
+    # Populate PNG_PNG_INCLUDE_DIR which ZAPDTR/ZAPD uses directly as an include path
+    set(PNG_PNG_INCLUDE_DIR ${png_SOURCE_DIR} ${png_BINARY_DIR} CACHE PATH "" FORCE)
+endif()
+
 add_subdirectory(libultraship ${CMAKE_BINARY_DIR}/libultraship)
 target_compile_options(libultraship PRIVATE "${WARNING_OVERRIDE}")
 target_compile_definitions(libultraship PUBLIC INCLUDE_MPQ_SUPPORT)
@@ -199,6 +223,8 @@ install(DIRECTORY "${CMAKE_SOURCE_DIR}/soh/assets/xml/" DESTINATION ./assets/xml
 endif()
 
 find_package(Python3 COMPONENTS Interpreter)
+
+if(NOT CMAKE_SYSTEM_NAME STREQUAL "Android")
 
 # Target to generate OTRs
 add_custom_target(
@@ -241,6 +267,8 @@ add_custom_target(
     COMMENT "Generating soh.o2r..."
     DEPENDS ZAPD
 )
+
+endif() # NOT Android
 
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
     find_package(ImageMagick COMPONENTS convert)
