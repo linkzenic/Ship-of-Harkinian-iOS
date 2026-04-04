@@ -30,10 +30,13 @@ import android.view.KeyEvent;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.graphics.Rect;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
+import java.util.Arrays;
 
 import java.util.concurrent.Executors;
 import android.app.AlertDialog;
@@ -413,20 +416,19 @@ public class MainActivity extends SDLActivity{
     // Native method for setting joystick axis value
     public native void setAxis(int axis, short value);
 
-    // Signals C++ that the controller SELECT/BACK button was pressed.
-    // Called from dispatchKeyEvent so it works even when SDL loses controller tracking
-    // after an activity transition (e.g. file picker). Android delivers key events to the
-    // activity regardless of SDL's internal InputDevice state.
+    // Gamepad BACK/SELECT: bypasses SDL, consumed by ConsumeGamepadBackPress().
     public native void nativeGamepadBackPressed();
+    // D-pad nav for menu: dir 0=up 1=down 2=left 3=right, injected via InjectMenuNavKeys().
+    public native void nativeMenuNavKey(int dir, boolean pressed);
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (event.getAction() == KeyEvent.ACTION_DOWN && event.getRepeatCount() == 0) {
             int keyCode = event.getKeyCode();
-            // KEYCODE_BUTTON_SELECT (109): controller SELECT/BACK button → SDL_CONTROLLER_BUTTON_BACK
-            // KEYCODE_BACK (4) from gamepad source: supplemental Retroid button (also SDL_CONTROLLER_BUTTON_BACK)
-            // Guard by SOURCE_GAMEPAD so the Android system Back key (keyboard source) is unaffected.
-            boolean isGamepad = (event.getSource() & android.view.InputDevice.SOURCE_GAMEPAD) != 0;
+            // Accept both SOURCE_GAMEPAD and SOURCE_JOYSTICK - some BT controllers report the latter.
+            // Excludes SOURCE_KEYBOARD so the system soft Back key is unaffected.
+            boolean isGamepad = (event.getSource() & android.view.InputDevice.SOURCE_GAMEPAD) != 0
+                             || (event.getSource() & android.view.InputDevice.SOURCE_JOYSTICK) != 0;
             if (keyCode == KeyEvent.KEYCODE_BUTTON_SELECT ||
                     (keyCode == KeyEvent.KEYCODE_BACK && isGamepad)) {
                 nativeGamepadBackPressed();
@@ -488,24 +490,23 @@ public class MainActivity extends SDLActivity{
 
         FrameLayout rightScreenArea = overlayView.findViewById(R.id.right_screen_area);
 
-        // Set OnTouchListeners for the Xbox controller buttons
-        addTouchListener(buttonA, ControllerButtons.BUTTON_A); // SDL Button 0 (A)
-        addTouchListener(buttonB, ControllerButtons.BUTTON_B); // SDL Button 1 (B)
-        addTouchListener(buttonX, ControllerButtons.BUTTON_X); // SDL Button 2 (X)
-        addTouchListener(buttonY, ControllerButtons.BUTTON_Y); // SDL Button 3 (Y)
+        addTouchListener(buttonA, ControllerButtons.BUTTON_A);
+        addTouchListener(buttonB, ControllerButtons.BUTTON_B);
+        addTouchListener(buttonX, ControllerButtons.BUTTON_X);
+        addTouchListener(buttonY, ControllerButtons.BUTTON_Y);
 
-        setupCButtons(buttonDpadUp, ControllerButtons.AXIS_RY, 1); // SDL Button 10 (D-Pad Up)
-        setupCButtons(buttonDpadDown, ControllerButtons.AXIS_RY , -1); // SDL Button 11 (D-Pad Down)
-        setupCButtons(buttonDpadLeft, ControllerButtons.AXIS_RX, 1); // SDL Button 12 (D-Pad Left)
-        setupCButtons(buttonDpadRight, ControllerButtons.AXIS_RX, -1); // SDL Button 13 (D-Pad Right)
+        setupCButtons(buttonDpadUp, ControllerButtons.AXIS_RY, 1, ControllerButtons.BUTTON_DPAD_UP);
+        setupCButtons(buttonDpadDown, ControllerButtons.AXIS_RY, -1, ControllerButtons.BUTTON_DPAD_DOWN);
+        setupCButtons(buttonDpadLeft, ControllerButtons.AXIS_RX, 1, ControllerButtons.BUTTON_DPAD_LEFT);
+        setupCButtons(buttonDpadRight, ControllerButtons.AXIS_RX, -1, ControllerButtons.BUTTON_DPAD_RIGHT);
 
-        addTouchListener(buttonLB, ControllerButtons.BUTTON_LB); // SDL Button 4 (LB)
-        addTouchListener(buttonRB, ControllerButtons.BUTTON_RB); // SDL Button 5 (RB)
-        addTouchListener(buttonZ, ControllerButtons.AXIS_RT); // SDL Button 5 (Z)
+        addTouchListener(buttonLB, ControllerButtons.BUTTON_LB);
+        addTouchListener(buttonRB, ControllerButtons.BUTTON_RB);
+        addTouchListener(buttonZ, ControllerButtons.AXIS_RT);
 
-        addTouchListener(buttonStart, ControllerButtons.BUTTON_START); // SDL Button 7 (Start)
-        // Overlay BACK routes through nativeGamepadBackPressed (same as physical gamepad BACK)
-        // so it hits ConsumeGamepadBackPress() in Gui.cpp without double-firing ImGuiKey_GamepadBack.
+        addTouchListener(buttonStart, ControllerButtons.BUTTON_START);
+        // BACK uses nativeGamepadBackPressed directly - setButton(BUTTON_BACK) feeds ImGuiKey_GamepadBack
+        // which is intentionally not checked on Android (unreliable when SDL Gamepads list is empty).
         buttonBack.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 nativeGamepadBackPressed();
@@ -514,18 +515,29 @@ public class MainActivity extends SDLActivity{
         });
 
 
-        // Setup joystick movement
-        setupJoystick(leftJoystick, leftJoystickKnob, true); // Left joystick
+        setupJoystick(leftJoystick, leftJoystickKnob, true);
 
         setupLookAround(rightScreenArea);
 
         setupToggleButton(buttonToggle,buttonGroup);
+
+        // Exclude Back/Start from gesture nav zones (they sit at screen edges in landscape).
+        // Must be called on each button in its own local coordinates.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            overlayView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+                Rect selfRect = new Rect(0, 0, buttonBack.getWidth(), buttonBack.getHeight());
+                buttonBack.setSystemGestureExclusionRects(Arrays.asList(selfRect));
+                selfRect = new Rect(0, 0, buttonStart.getWidth(), buttonStart.getHeight());
+                buttonStart.setSystemGestureExclusionRects(Arrays.asList(selfRect));
+            });
+        }
 
     }
 
     private void setupToggleButton(Button button, ViewGroup uiGroup){
         boolean isHidden = preferences.getBoolean("controlsVisible", false); // Default to 'false' (visible)
         uiGroup.setVisibility(isHidden ? View.INVISIBLE : View.VISIBLE); // Set the initial visibility based on the saved state
+        if (isHidden) { DisableTouchArea(); } else { EnableTouchArea(); }
         boolean toggleVisible = preferences.getBoolean("toggleButtonVisible", true); // Default to visible
         button.setVisibility(toggleVisible ? View.VISIBLE : View.GONE);
         //if(isHidden){
@@ -536,10 +548,12 @@ public class MainActivity extends SDLActivity{
             @Override
             public void onClick(View v) {
                 if (isHidden) {
-                    uiGroup.setVisibility(View.VISIBLE); // Show UI elements
+                    uiGroup.setVisibility(View.VISIBLE);
+                    EnableTouchArea();
                     //attachController();
                 } else {
-                    uiGroup.setVisibility(View.INVISIBLE); // Hide UI elements
+                    uiGroup.setVisibility(View.INVISIBLE);
+                    DisableTouchArea();
                     //detachController();
                 }
                 preferences.edit().putBoolean("controlsVisible", !isHidden).apply();
@@ -550,20 +564,26 @@ public class MainActivity extends SDLActivity{
 
     // Function to set a touch listener for each button
     private void addTouchListener(Button button, int buttonNum) {
+        // dir>=4: face button nav keys (4=A/select, 5=B/back). -1 = no nav injection.
+        int navDir = (buttonNum == ControllerButtons.BUTTON_A) ? 4
+                   : (buttonNum == ControllerButtons.BUTTON_B) ? 5 : -1;
         button.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         setButton(buttonNum, true);
+                        if (navDir >= 0) nativeMenuNavKey(navDir, true);
                         button.setPressed(true);
                         return true;
                     case MotionEvent.ACTION_UP:
                         setButton(buttonNum, false);
+                        if (navDir >= 0) nativeMenuNavKey(navDir, false);
                         button.setPressed(false);
                         return true;
                     case MotionEvent.ACTION_CANCEL:
                         setButton(buttonNum, false);
+                        if (navDir >= 0) nativeMenuNavKey(navDir, false);
                         return true;
                 }
                 return false;
@@ -571,21 +591,27 @@ public class MainActivity extends SDLActivity{
         });
     }
 
-    private void setupCButtons(Button button, int buttonNum, int direction) {
+    private void setupCButtons(Button button, int axisNum, int direction, int dpadButton) {
         button.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        setAxis(buttonNum, direction<0 ? Short.MAX_VALUE : Short.MIN_VALUE);
+                        setAxis(axisNum, direction<0 ? Short.MAX_VALUE : Short.MIN_VALUE);
+                        setButton(dpadButton, true);
+                        nativeMenuNavKey(dpadButton - 11, true);
                         button.setPressed(true);
                         return true;
                     case MotionEvent.ACTION_UP:
-                        setAxis(buttonNum, (short) 0);
+                        setAxis(axisNum, (short) 0);
+                        setButton(dpadButton, false);
+                        nativeMenuNavKey(dpadButton - 11, false);
                         button.setPressed(false);
                         return true;
                     case MotionEvent.ACTION_CANCEL:
-                        setAxis(buttonNum, (short) 0);
+                        setAxis(axisNum, (short) 0);
+                        setButton(dpadButton, false);
+                        nativeMenuNavKey(dpadButton - 11, false);
                         return true;
                 }
                 return false;
