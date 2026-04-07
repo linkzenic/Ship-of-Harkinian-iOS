@@ -41,6 +41,10 @@ import java.util.Arrays;
 import java.util.concurrent.Executors;
 import android.app.AlertDialog;
 
+import android.view.InputDevice;
+import android.os.Vibrator;
+import android.os.VibrationEffect;
+
 //This class is the main SDLActivity and just sets up a bunch of default files
 public class MainActivity extends SDLActivity{
 
@@ -754,5 +758,46 @@ public class MainActivity extends SDLActivity{
 
     }
 
+    public void startRumble(int lowIntensity, int highIntensity) {
+        int amplitude = Math.max(lowIntensity, highIntensity);
+        for (int id : InputDevice.getDeviceIds()) {
+            InputDevice device = InputDevice.getDevice(id);
+            if (device == null) continue;
+            int sources = device.getSources();
+            if ((sources & InputDevice.SOURCE_GAMEPAD) != InputDevice.SOURCE_GAMEPAD &&
+                (sources & InputDevice.SOURCE_JOYSTICK) != InputDevice.SOURCE_JOYSTICK) continue;
+            Vibrator dv = device.getVibrator();
+            if (dv != null && dv.hasVibrator()) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    dv.vibrate(VibrationEffect.createOneShot(5000, amplitude > 0 ? amplitude : VibrationEffect.DEFAULT_AMPLITUDE));
+                } else {
+                    dv.vibrate(5000);
+                }
+                return;
+            }
+        }
+        Vibrator sv = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        if (sv != null && sv.hasVibrator()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                sv.vibrate(VibrationEffect.createOneShot(5000, amplitude > 0 ? amplitude : VibrationEffect.DEFAULT_AMPLITUDE));
+            } else {
+                sv.vibrate(5000);
+            }
+        }
+    }
+
+    public void stopRumble() {
+        for (int id : InputDevice.getDeviceIds()) {
+            InputDevice device = InputDevice.getDevice(id);
+            if (device == null) continue;
+            int sources = device.getSources();
+            if ((sources & InputDevice.SOURCE_GAMEPAD) != InputDevice.SOURCE_GAMEPAD &&
+                (sources & InputDevice.SOURCE_JOYSTICK) != InputDevice.SOURCE_JOYSTICK) continue;
+            Vibrator dv = device.getVibrator();
+            if (dv != null && dv.hasVibrator()) dv.cancel();
+        }
+        Vibrator sv = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        if (sv != null) sv.cancel();
+    }
 
 }
