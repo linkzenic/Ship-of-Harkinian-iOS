@@ -126,6 +126,10 @@ static void openFilePickerFromC(JNIEnv* env, jobject javaObject) {
 }
 
 extern "C" void JNICALL Java_com_dishii_soh_MainActivity_nativeHandleSelectedFile(JNIEnv* env, jobject obj, jstring filePath) {
+    if (filePath == nullptr) {
+        fileDialogOpen = false;
+        return;
+    }
     const char* filePathStr = env->GetStringUTFChars(filePath, 0);
     javaRomPath = strdup(filePathStr);
     fileDialogOpen = false;

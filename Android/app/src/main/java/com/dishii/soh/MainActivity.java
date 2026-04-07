@@ -275,7 +275,8 @@ public class MainActivity extends SDLActivity{
 
         // Ensure root folder exists
         if (!targetRootFolder.exists()) {
-            if (!targetRootFolder.mkdirs()) {
+            targetRootFolder.mkdirs();
+            if (!targetRootFolder.exists()) {
                 Log.e("setupFiles", "Failed to create root folder");
                 runOnUiThread(() -> Toast.makeText(this, "Failed to create folder", Toast.LENGTH_LONG).show());
                 setupLatch.countDown();
@@ -306,6 +307,7 @@ public class MainActivity extends SDLActivity{
         try {
             getAssets().open("soh.o2r").close(); // check if it exists
             File targetOtrFile = new File(targetRootFolder, "soh.o2r");
+            targetOtrFile.delete();
             try (InputStream in = getAssets().open("soh.o2r");
                  OutputStream out = new FileOutputStream(targetOtrFile)) {
                 byte[] buffer = new byte[1024];
@@ -319,7 +321,7 @@ public class MainActivity extends SDLActivity{
                 runOnUiThread(() -> Toast.makeText(this, "Error copying soh.o2r", Toast.LENGTH_LONG).show());
             }
         } catch (IOException e) {
-            // soh.o2r not bundled in APK assets — user must provide their own
+            // soh.o2r not bundled in APK assets, user must provide their own
         }
 
         setupLatch.countDown();
@@ -343,26 +345,26 @@ public class MainActivity extends SDLActivity{
             File destinationDirectory = new File(Environment.getExternalStorageDirectory(), "SOH");
             File destinationFile = new File(destinationDirectory, fileName);
 
-            if (destinationDirectory != null && selectedFileUri != null) {
-                try {
-                    InputStream in = getContentResolver().openInputStream(selectedFileUri);
-                    OutputStream out = new FileOutputStream(destinationFile);
-
-                    byte[] buffer = new byte[4096];
+            if (selectedFileUri != null) {
+                destinationFile.delete();
+                try (InputStream in = getContentResolver().openInputStream(selectedFileUri);
+                     OutputStream out = new FileOutputStream(destinationFile)) {
+                    byte[] buffer = new byte[65536];
                     int bytesRead;
                     while ((bytesRead = in.read(buffer)) != -1) {
                         out.write(buffer, 0, bytesRead);
                     }
-
-                    in.close();
-                    out.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
 
-            // Now pass the path of the file in the new folder
-            nativeHandleSelectedFile(destinationFile.getPath());
+            if (destinationFile.exists() && destinationFile.length() > 0) {
+                nativeHandleSelectedFile(destinationFile.getPath());
+            } else {
+                runOnUiThread(() -> Toast.makeText(this, "Failed to copy ROM file", Toast.LENGTH_LONG).show());
+                nativeHandleSelectedFile(null);
+            }
 
         } else if (requestCode == STORAGE_PERMISSION_REQUEST_CODE) {
             // Handle MANAGE_EXTERNAL_STORAGE result

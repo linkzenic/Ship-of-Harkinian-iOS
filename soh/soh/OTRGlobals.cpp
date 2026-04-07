@@ -6,6 +6,7 @@
 #include <fstream>
 #include <vector>
 #include <chrono>
+#include <thread>
 #include <optional>
 
 #include "ResourceManagerHelpers.h"
@@ -460,6 +461,13 @@ void OTRGlobals::RunExtract(int argc, char* argv[]) {
 #endif
 
     while (!extractDone) {
+#ifdef __ANDROID__
+        // Popups are Java dialogs, sleep instead of rendering to avoid SDL surface flicker.
+        if (SohGui::PopupsQueued() > 0 && !extractionTask.has_value()) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(16));
+            continue;
+        }
+#endif
         if (SohGui::PopupsQueued() > 0 || extractionTask.has_value()) {
             goto render;
         }

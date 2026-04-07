@@ -73,7 +73,8 @@
         android:allowBackup="true"
         android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
         android:hardwareAccelerated="true"
-        android:appCategory="game" >
+        android:appCategory="game"
+        android:requestLegacyExternalStorage="true" >
 
 
         <!-- Example of setting SDL hints from AndroidManifest.xml:
