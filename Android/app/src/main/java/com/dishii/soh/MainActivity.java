@@ -552,22 +552,18 @@ public class MainActivity extends SDLActivity{
         }
         boolean toggleVisible = preferences.getBoolean("toggleButtonVisible", true); // Default to visible
         button.setVisibility(toggleVisible ? View.VISIBLE : View.GONE);
-        button.setOnClickListener(new View.OnClickListener() {
-            boolean isHidden = false;
-            @Override
-            public void onClick(View v) {
-                if (isHidden) {
-                    uiGroup.setVisibility(View.VISIBLE);
-                    EnableTouchArea();
-                    overlayView.setOnTouchListener((vv, e) -> true);
-                } else {
-                    uiGroup.setVisibility(View.INVISIBLE);
-                    DisableTouchArea();
-                    overlayView.setOnTouchListener(null);
-                }
-                preferences.edit().putBoolean("controlsVisible", !isHidden).apply();
-                isHidden = !isHidden;
+        button.setOnClickListener(v -> {
+            boolean currentlyHidden = uiGroup.getVisibility() != View.VISIBLE;
+            if (currentlyHidden) {
+                uiGroup.setVisibility(View.VISIBLE);
+                EnableTouchArea();
+                overlayView.setOnTouchListener((vv, e) -> true);
+            } else {
+                uiGroup.setVisibility(View.INVISIBLE);
+                DisableTouchArea();
+                overlayView.setOnTouchListener(null);
             }
+            preferences.edit().putBoolean("controlsVisible", !currentlyHidden).apply();
         });
     }
 
