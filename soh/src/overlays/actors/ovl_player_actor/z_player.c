@@ -37,6 +37,11 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#ifdef __ANDROID__
+extern bool Ship_Mobile_HasTouchCameraInput(void);
+extern void Ship_Mobile_HandleTouchCamera(f32* camX, f32* camY);
+#endif
+
 // Some player animations are played at this reduced speed, for reasons yet unclear.
 // This is called "adjusted" for now.
 #define PLAYER_ANIM_ADJUSTED_SPEED (2.0f / 3.0f)
@@ -12655,6 +12660,11 @@ s16 func_8084ABD8(PlayState* play, Player* this, s32 arg2, s16 arg3) {
 
     GameInteractor_ExecuteOnPlayerFirstPersonControl(this);
 
+#ifdef __ANDROID__
+    f32 touchCamX = 0.0f, touchCamY = 0.0f;
+    Ship_Mobile_HandleTouchCamera(&touchCamX, &touchCamY);
+#endif
+
     if (!func_8002DD78(this) && !func_808334B4(this) && (arg2 == 0)) { // First person without weapon
         // Y Axis
         if (!(CVarGetInteger(CVAR_SETTING("MoveInFirstPerson"), 0) &&
@@ -12706,6 +12716,9 @@ s16 func_8084ABD8(PlayState* play, Player* this, s32 arg2, s16 arg3) {
         if (fabsf(sControlInput->cur.gyro_x) > 0.01f) {
             temp3 += (-sControlInput->cur.gyro_x) * 750.0f;
         }
+#ifdef __ANDROID__
+        temp3 += (s32)(touchCamY * -5.0f * invertYAxisMulti * yAxisMulti);
+#endif
         this->actor.focus.rot.x += temp3;
         this->actor.focus.rot.x = CLAMP(this->actor.focus.rot.x, -temp1, temp1);
 
@@ -12727,6 +12740,9 @@ s16 func_8084ABD8(PlayState* play, Player* this, s32 arg2, s16 arg3) {
         if (fabsf(sControlInput->cur.gyro_y) > 0.01f) {
             temp3 += (sControlInput->cur.gyro_y) * 750.0f * invertXAxisMulti;
         }
+#ifdef __ANDROID__
+        temp3 += (s32)(touchCamX * -5.0f * invertXAxisMulti * xAxisMulti);
+#endif
         temp2 += temp3;
         this->actor.focus.rot.y = CLAMP(temp2, -temp1, temp1) + this->actor.shape.rot.y;
     }
