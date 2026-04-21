@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+
 import android.provider.Settings;
 import java.io.File;
 import java.io.IOException;
@@ -50,6 +51,7 @@ public class MainActivity extends SDLActivity{
 
     SharedPreferences preferences;
     private static final CountDownLatch setupLatch = new CountDownLatch(1);
+    private volatile boolean mIsAiming = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -418,6 +420,8 @@ public class MainActivity extends SDLActivity{
     // Native method for setting button state
     public native void setButton(int button, boolean value);
     public native void setCameraState(int axis, float value);
+    private native void setItemButtonPulse();
+    private native void setItemButtonHeld(boolean held);
 
     // Native method for setting joystick axis value
     public native void setAxis(int axis, short value);
@@ -426,6 +430,17 @@ public class MainActivity extends SDLActivity{
     public native void nativeGamepadBackPressed();
     // D-pad nav for menu: dir 0=up 1=down 2=left 3=right, injected via InjectMenuNavKeys().
     public native void nativeMenuNavKey(int dir, boolean pressed);
+
+    public void SetFirstPersonAimingActive(boolean active) {
+        mIsAiming = active;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        setItemButtonHeld(false);
+        mIsAiming = false;
+    }
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
@@ -572,6 +587,10 @@ public class MainActivity extends SDLActivity{
         // dir>=4: face button nav keys (4=A/select, 5=B/back). -1 = no nav injection.
         int navDir = (buttonNum == ControllerButtons.BUTTON_A) ? 4
                    : (buttonNum == ControllerButtons.BUTTON_B) ? 5 : -1;
+        boolean trackAsItem = (buttonNum != ControllerButtons.BUTTON_A &&
+                               buttonNum != ControllerButtons.BUTTON_B &&
+                               buttonNum != ControllerButtons.BUTTON_BACK &&
+                               buttonNum != ControllerButtons.BUTTON_START);
         button.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -653,6 +672,10 @@ public class MainActivity extends SDLActivity{
                         lastX = event.getX();
                         lastY = event.getY();
                         isTouching = true;
+                        if (mIsAiming && TouchAreaEnabled) {
+                            setItemButtonPulse();
+                            setItemButtonHeld(true);
+                        }
                         break;
 
                     case MotionEvent.ACTION_MOVE:
@@ -683,6 +706,9 @@ public class MainActivity extends SDLActivity{
                         isTouching = false;
                         setCameraState(0, 0.0f); // Reset right stick X axis
                         setCameraState(1, 0.0f); // Reset right stick Y axis
+                        if (mIsAiming && TouchAreaEnabled) {
+                            setItemButtonHeld(false);
+                        }
                         break;
                 }
                 return TouchAreaEnabled; // Event full handled

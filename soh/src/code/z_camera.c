@@ -1502,7 +1502,10 @@ s32 Camera_Free(Camera* camera) {
     if (!(camera->player->stateFlags1 & 0x400000)) {
         Mouse_HandleThirdPerson(&newCamX, &newCamY);
 #ifdef __ANDROID__
-        Ship_Mobile_HandleTouchCamera(&newCamX, &newCamY);
+        f32 touchX = 0.0f, touchY = 0.0f;
+        Ship_Mobile_HandleTouchCamera(&touchX, &touchY);
+        newCamX += touchX * 5.0f;
+        newCamY += touchY * 5.0f;
 #endif
     }
 

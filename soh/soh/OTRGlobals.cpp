@@ -125,6 +125,10 @@
 #include "soh/ShipInit.hpp"
 #ifdef __ANDROID__
 #include <ship/port/mobile/MobileImpl.h>
+extern "C" int func_808334B4(Player* player);
+static bool sAimingThisFrame = false;
+static bool sWasAimingLastFrame = false;
+static int sAimingGraceFrames = 0;
 #endif
 
 bool SoH_HandleConfigDrop(char* filePath);
@@ -1534,6 +1538,24 @@ extern "C" void InitOTR(int argc, char* argv[]) {
     CustomMessageManager::Instance = new CustomMessageManager();
     ItemTableManager::Instance = new ItemTableManager();
     GameInteractor::Instance = new GameInteractor();
+#ifdef __ANDROID__
+    GameInteractor::Instance->RegisterGameHook<GameInteractor::OnPlayerFirstPersonControl>([](Player* player) {
+        sAimingThisFrame = true;
+    });
+    GameInteractor::Instance->RegisterGameHook<GameInteractor::OnPlayerUpdate>([]() {
+        if (sAimingThisFrame) {
+            sAimingGraceFrames = 15;
+        } else if (sAimingGraceFrames > 0) {
+            sAimingGraceFrames--;
+            sAimingThisFrame = true;
+        }
+        if (sAimingThisFrame != sWasAimingLastFrame) {
+            Ship::Mobile::SetFirstPersonAimingActive(sAimingThisFrame);
+        }
+        sWasAimingLastFrame = sAimingThisFrame;
+        sAimingThisFrame = false;
+    });
+#endif
     SaveManager::Instance = new SaveManager();
 
     std::shared_ptr<Ship::Config> conf = OTRGlobals::Instance->context->GetConfig();

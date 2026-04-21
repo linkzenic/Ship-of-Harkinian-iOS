@@ -40,6 +40,8 @@
 #ifdef __ANDROID__
 extern bool Ship_Mobile_HasTouchCameraInput(void);
 extern void Ship_Mobile_HandleTouchCamera(f32* camX, f32* camY);
+extern bool Ship_Mobile_IsTouchItemButtonPulse(void);
+extern bool Ship_Mobile_IsItemButtonHeld(void);
 #endif
 
 // Some player animations are played at this reduced speed, for reasons yet unclear.
@@ -2552,6 +2554,12 @@ void Player_ProcessItemButtons(Player* this, PlayState* play) {
             }
         }
 
+#ifdef __ANDROID__
+        if (Ship_Mobile_IsTouchItemButtonPulse() && this->heldItemButton > 0 &&
+            this->heldItemButton < (s8)ARRAY_COUNT(sItemButtons)) {
+            sControlInput->press.button |= sItemButtons[this->heldItemButton];
+        }
+#endif
         for (i = 0; i < ARRAY_COUNT(sItemButtons); i++) {
             if (CHECK_BTN_ALL(sControlInput->press.button, sItemButtons[i])) {
                 break;
@@ -2572,6 +2580,11 @@ void Player_ProcessItemButtons(Player* this, PlayState* play) {
             if ((item < ITEM_NONE_FE) && (Player_ItemToItemAction(item) == this->heldItemAction)) {
                 sHeldItemButtonIsHeldDown = true;
             }
+#ifdef __ANDROID__
+            if (Ship_Mobile_IsItemButtonHeld()) {
+                sHeldItemButtonIsHeldDown = true;
+            }
+#endif
         } else if (GameInteractor_Should(VB_CHANGE_HELD_ITEM_AND_USE_ITEM, true, item)) {
             this->heldItemButton = i;
             Player_UseItem(play, this, item);
