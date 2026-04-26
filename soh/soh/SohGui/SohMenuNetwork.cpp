@@ -28,6 +28,7 @@ void SohMenu::AddMenuNetwork() {
     return;
 #endif
 
+#ifndef __ANDROID__
     // Sail
     path = { "Network", "Sail", SECTION_COLUMN_1 };
     AddSidebarEntry("Network", path.sidebarName, 3);
@@ -180,6 +181,7 @@ void SohMenu::AddMenuNetwork() {
         .RaceDisable(true)
         .Options(CheckboxOptions().Tooltip("Enemies spawned by CrowdControl won't be considered for \"clear enemy "
                                            "rooms\", so they don't need to be killed to complete these rooms."));
+#endif
     path.sidebarName = "Anchor";
     AddSidebarEntry("Network", path.sidebarName, 2);
 }

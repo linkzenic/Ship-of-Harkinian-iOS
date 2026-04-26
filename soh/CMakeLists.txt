@@ -364,13 +364,21 @@ endif()
 set(SDL2-INCLUDE ${SDL2_INCLUDE_DIRS})
 
 if (BUILD_REMOTE_CONTROL)
-    find_package(SDL2_net)
-
-    if(NOT SDL2_net_FOUND)
-        message(STATUS "SDL2_net not found (it's possible the version installed is too old). Disabling BUILD_REMOTE_CONTROL.")
-        set(BUILD_REMOTE_CONTROL 0)
+    if (CMAKE_SYSTEM_NAME STREQUAL "Android")
+        FetchContent_Declare(
+            SDL2_net
+            GIT_REPOSITORY https://github.com/libsdl-org/SDL_net.git
+            GIT_TAG release-2.2.0
+        )
+        FetchContent_MakeAvailable(SDL2_net)
     else()
-        set(SDL2-NET-INCLUDE ${SDL_NET_INCLUDE_DIRS})
+        find_package(SDL2_net)
+        if(NOT SDL2_net_FOUND)
+            message(STATUS "SDL2_net not found (it's possible the version installed is too old). Disabling BUILD_REMOTE_CONTROL.")
+            set(BUILD_REMOTE_CONTROL 0)
+        else()
+            set(SDL2-NET-INCLUDE ${SDL_NET_INCLUDE_DIRS})
+        endif()
     endif()
 endif()
 
@@ -816,6 +824,7 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Android")
         vorbisfile
         opusfile
         Threads::Threads
+        "$<$<BOOL:${BUILD_REMOTE_CONTROL}>:SDL2_net::SDL2_net-static>"
     )
 else()
     find_package(SDL2)
