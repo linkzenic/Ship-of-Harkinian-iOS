@@ -1,6 +1,8 @@
 ![Ship of Harkinian](docs/shiptitle.darkmode.png#gh-dark-mode-only)
 ![Ship of Harkinian](docs/shiptitle.lightmode.png#gh-light-mode-only)
 
+A port of Ship of Harkinian for Android.
+
 ## Website
 
 Official Website: https://www.shipofharkinian.com/
@@ -13,104 +15,109 @@ If you're having any trouble after reading through this `README`, feel free to a
 
 # Quick Start
 
-The Ship does not include any copyrighted assets.  You are required to provide a supported copy of the game.
+The Ship does not include any copyrighted assets. You are required to provide a supported copy of the game.
 
 ### 1. Verify your ROM dump
 You can verify you have dumped a supported copy of the game by using the compatibility checker at https://ship.equipment/. If you'd prefer to manually validate your ROM dump, you can cross-reference its `sha1` hash with the hashes [here](docs/supportedHashes.json).
 
-### 2. Download The Ship of Harkinian from [Releases](https://github.com/HarbourMasters/Shipwright/releases)
+### 2. Install the APK
+Download and install the APK from the [Releases](https://github.com/please-be-nice/Shipwright-android/releases) page.
 
-### 3. Launch the Game!
-#### Windows
-* Extract the zip
-* Launch `soh.exe`
+### 3. Set up the game
 
-#### Linux
-* Place your supported copy of the game in the same folder as the appimage.
-* Execute `soh.appimage`.  You may have to `chmod +x` the appimage via terminal.
+1. Open the app and allow all file permissions. It will ask to set up files, let it finish.
 
-#### macOS
-* Run `soh.app`. When prompted, select your supported copy of the game.
-* You should see a notification saying `Processing OTR`, then, once the process is complete, you should get a notification saying `OTR Successfully Generated`, then the game should start.
+2. When prompted, select "Yes" to generate an OTR and "Yes" to look for a ROM. Navigate to your ROM and select it. Extraction will begin.
 
-#### Nintendo Switch
-* Run one of the PC releases to generate an `oot.o2r` and/or `oot-mq.o2r` file. After launching the game on PC, you will be able to find these files in the same directory as `soh.exe` or `soh.appimage`. On macOS, these files can be found in `/Users/<username>/Library/Application Support/com.shipofharkinian.soh/`
-* Copy the files to your sd card
-```
-sdcard
-└── switch
-    └── soh
-        ├── oot-mq.o2r
-        ├── oot.o2r
-        ├── soh.nro
-        └── soh.o2r
-```
-* Launch via Atmosphere's `Game+R` launcher method.
+3. When asked whether to extract another ROM, select "Yes" if you have a Master Quest ROM or "No" to start the game.
+
+4. On subsequent launches the game starts directly. To get the ROM selection dialog back, delete the `.otr` files in the `SOH` folder at the root of your device storage.
+
+Use the *Back/Select/-* button on your controller to open the **Enhancements menu**. Use touch controls or a controller to navigate menus.
 
 ### 4. Play!
 
 Congratulations, you are now sailing with the Ship of Harkinian! Have fun!
 
-# Configuration
+# FAQ
 
-### Default keyboard configuration
-| N64 | A | B | Z | Start | Analog stick | C buttons | D-Pad |
-| - | - | - | - | - | - | - | - |
-| Keyboard | X | C | Z | Space | WASD | Arrow keys | TFGH |
+**Q: How do I add mods?**
 
-### Other shortcuts
-| Keys | Action |
-| - | - |
-| ESC | Toggle menu |
-| F2 | Toggle capture mouse input |
-| F5 | Save state |
-| F6 | Change state |
-| F7 | Load state |
-| F9 | Toggle Text-to-Speech (Windows and Mac only) |
-| F11 | Fullscreen |
-| Tab | Toggle Alternate assets |
-| Ctrl+R | Reset |
+A: Place mod `.otr` and `.o2r` files in the `SOH` folder at the root of your device storage. Then enable them in the Enhancements menu under Mods.
 
-# Project Overview
-Ship of Harkinian (SOH) is built atop a custom library dubbed libultraship (LUS). Back in the N64 days, there was an SDK distributed to developers named libultra; LUS is designed to mimic the functionality of libultra on modern hardware. In addition, we are dependant on the source code provided by the OOT decompilation project.
+**Q: The game crashes immediately on launch.**
 
-In order for the game to function, you will require a **legally acquired** ROM for Ocarina of Time. Click [here](https://ship.equipment/) to check the compatibility of your specific rom. Any copyrighted assets are extracted from the ROM and reformatted as a .o2r archive file which the code uses.
+A: Delete the `SOH` folder and let the app set up its files again. Be patient during black screens; extraction can take a minute.
 
-### Graphics Backends
-Currently, there are three rendering APIs supported: DirectX11 (Windows), OpenGL (all platforms), and Metal (MacOS). You can change which API to use in the `Settings` menu of the menubar, which requires a restart.  If you're having an issue with crashing, you can change the API in the `shipofharkinian.json` file by finding the line `gfxbackend:""` and changing the value to `sdl` for OpenGL. DirectX 11 is the default on Windows.
+**Q: The game opened once but now shows a black screen.**
 
-# Custom Assets
+A: Delete `imgui.ini` from your `SOH` folder. Also ensure MSAA is set to 1 in the graphics settings, as higher values cause a black screen on many devices.
 
-Custom assets are packed in `.otr` archive files. To use custom assets, place them in the `mods` folder.
+**Q: My controller's menu button isn't opening the Enhancements menu.**
 
-If you're interested in creating and/or packing your own custom asset `.otr` files, check out the following tools:
-* [**retro - OTR generator**](https://github.com/HarbourMasters64/retro)
-* [**fast64 - Blender plugin**](https://github.com/HarbourMasters/fast64)
+A: This is a known first-launch issue caused by Android's input device registration. Close and reopen the app; the controller will work correctly on the second launch.
 
-# Development
-### Building
+**Q: D-pad doesn't navigate the menu on first launch.**
 
-If you want to manually compile SoH, please consult the [building instructions](docs/BUILDING.md).
+A: Same cause as above. Close and reopen the app after the initial ROM extraction completes.
 
-### Playtesting
-If you want to playtest a continuous integration build, you can find them at the links below. Keep in mind that these are for playtesting only, and you will likely encounter bugs and possibly crashes. 
+**Q: Touch overlay buttons aren't remappable in the controls editor.**
 
-* [Windows](https://nightly.link/HarbourMasters/Shipwright/workflows/generate-builds/develop/soh-windows.zip)
-* [macOS](https://nightly.link/HarbourMasters/Shipwright/workflows/generate-builds/develop/soh-mac.zip)
-* [Linux](https://nightly.link/HarbourMasters/Shipwright/workflows/generate-builds/develop/soh-linux.zip)
+A: Open the controls editor (Enhancements menu) and look for the "Touch Controls" section under the Link tab. Touch overlay buttons appear as "Touch Overlay" in the device list and can be remapped there.
 
-### Further Reading
-More detailed documentation can be found in the 'docs' directory, including the aforementioned [building instructions](docs/BUILDING.md).
+**Q: Rumble doesn't work with my Bluetooth controller.**
 
-* [Credits](docs/CREDITS.md)
-* [Custom Music](docs/CUSTOM_MUSIC.md)
-* [Controller Mapping](docs/GAME_CONTROLLER_DB.md)
-* [Modding](docs/MODDING.md)
-* [Versioning](docs/VERSIONING.md)
+A: External Bluetooth controller rumble is not currently supported. Rumble works via device vibration on handheld devices (e.g. Retroid Pocket). A fix for Bluetooth controller rumble is planned.
 
-<a href="https://github.com/Kenix3/libultraship/">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./docs/poweredbylus.darkmode.png">
-    <img alt="Powered by libultraship" src="./docs/poweredbylus.lightmode.png">
-  </picture>
-</a>
+# Known Bugs
+
+- External Bluetooth controller rumble is not supported. Device vibration is used as a fallback.
+- Touch overlay and physical controller button mappings share the same slot per port, so you cannot assign different actions to the same button on each.
+
+# Build
+
+### Build Tools
+
+- [Ubuntu Noble Numbat | 24.04.2 LTS](https://releases.ubuntu.com/noble/)
+- [CMake 3.31.5](https://github.com/Kitware/CMake/releases)
+- [OpenJDK 17](https://jdk.java.net/archive/)
+- Android SDK 31
+- Android NDK 26.0.10792818
+- Android Gradle Plugin (AGP) 8.10.1
+- Gradle 8.11.1
+
+### Build Instructions
+
+Building requires [Docker](https://docs.docker.com/get-docker/) (or any OCI-compatible tool such as Podman) on a Linux environment. Windows users should use WSL2 and clone the repository to a native Linux path (e.g. `~/Shipwright`) rather than a Windows-mounted path (e.g. `/mnt/c/...`), as NTFS mounts can cause build issues.
+
+1. Clone the repository and submodules:
+
+    ```bash
+    git clone https://github.com/please-be-nice/Shipwright-android.git
+    cd Shipwright-android
+    git submodule update --init --recursive
+    ```
+
+2. Pull the build container:
+
+    ```bash
+    cd docker
+    make setup
+    ```
+
+    If you prefer not to use the published image, you can build it locally from the included `Containerfile` instead:
+
+    ```bash
+    cd docker
+    make create_container
+    ```
+
+3. Build the APK:
+
+    ```bash
+    make build_release
+    ```
+
+The resulting APK will be at `Android/app/build/outputs/apk/release/`.
+
+`make setup` only needs to be run once. On subsequent builds, `make build_release` is all that's needed.
