@@ -52,6 +52,8 @@ public class MainActivity extends SDLActivity{
     SharedPreferences preferences;
     private static final CountDownLatch setupLatch = new CountDownLatch(1);
     private volatile boolean mIsAiming = false;
+    private static final int COPY_BUFFER_SIZE = 65536;
+    private static final int RUMBLE_MAX_DURATION_MS = 5000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -226,7 +228,7 @@ public class MainActivity extends SDLActivity{
                     try {
                         try (InputStream in = getAssets().open("soh.o2r");
                              OutputStream out = new FileOutputStream(sohOtrFile)) {
-                            byte[] buffer = new byte[65536];
+                            byte[] buffer = new byte[COPY_BUFFER_SIZE];
                             int read;
                             while ((read = in.read(buffer)) != -1) {
                                 out.write(buffer, 0, read);
@@ -313,7 +315,7 @@ public class MainActivity extends SDLActivity{
             File targetOtrFile = new File(targetRootFolder, "soh.o2r");
             targetOtrFile.delete();
             try (OutputStream out = new FileOutputStream(targetOtrFile)) {
-                byte[] buffer = new byte[65536];
+                byte[] buffer = new byte[COPY_BUFFER_SIZE];
                 int read;
                 while ((read = assetIn.read(buffer)) != -1) {
                     out.write(buffer, 0, read);
@@ -349,7 +351,7 @@ public class MainActivity extends SDLActivity{
                 destinationFile.delete();
                 try (InputStream in = getContentResolver().openInputStream(selectedFileUri);
                      OutputStream out = new FileOutputStream(destinationFile)) {
-                    byte[] buffer = new byte[65536];
+                    byte[] buffer = new byte[COPY_BUFFER_SIZE];
                     int bytesRead;
                     while ((bytesRead = in.read(buffer)) != -1) {
                         out.write(buffer, 0, bytesRead);
@@ -560,7 +562,7 @@ public class MainActivity extends SDLActivity{
             overlayView.setOnTouchListener(null);
         } else {
             EnableTouchArea();
-            overlayView.setOnTouchListener((v, e) -> true);
+            overlayView.setOnTouchListener((view, e) -> true);
         }
         boolean toggleVisible = preferences.getBoolean("toggleButtonVisible", true); // Default to visible
         button.setVisibility(toggleVisible ? View.VISIBLE : View.GONE);
@@ -569,7 +571,7 @@ public class MainActivity extends SDLActivity{
             if (currentlyHidden) {
                 uiGroup.setVisibility(View.VISIBLE);
                 EnableTouchArea();
-                overlayView.setOnTouchListener((vv, e) -> true);
+                overlayView.setOnTouchListener((view, e) -> true);
             } else {
                 uiGroup.setVisibility(View.INVISIBLE);
                 DisableTouchArea();
@@ -781,9 +783,9 @@ public class MainActivity extends SDLActivity{
             Vibrator dv = device.getVibrator();
             if (dv != null && dv.hasVibrator()) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    dv.vibrate(VibrationEffect.createOneShot(5000, amplitude > 0 ? amplitude : VibrationEffect.DEFAULT_AMPLITUDE));
+                    dv.vibrate(VibrationEffect.createOneShot(RUMBLE_MAX_DURATION_MS, amplitude > 0 ? amplitude : VibrationEffect.DEFAULT_AMPLITUDE));
                 } else {
-                    dv.vibrate(5000);
+                    dv.vibrate(RUMBLE_MAX_DURATION_MS);
                 }
                 return;
             }
@@ -791,9 +793,9 @@ public class MainActivity extends SDLActivity{
         Vibrator sv = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         if (sv != null && sv.hasVibrator()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                sv.vibrate(VibrationEffect.createOneShot(5000, amplitude > 0 ? amplitude : VibrationEffect.DEFAULT_AMPLITUDE));
+                sv.vibrate(VibrationEffect.createOneShot(RUMBLE_MAX_DURATION_MS, amplitude > 0 ? amplitude : VibrationEffect.DEFAULT_AMPLITUDE));
             } else {
-                sv.vibrate(5000);
+                sv.vibrate(RUMBLE_MAX_DURATION_MS);
             }
         }
     }

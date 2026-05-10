@@ -467,7 +467,7 @@ void OTRGlobals::RunExtract(int argc, char* argv[]) {
 
     while (!extractDone) {
 #ifdef __ANDROID__
-        // Popups are Java dialogs, sleep instead of rendering to avoid SDL surface flicker.
+        // Rendering while a Java dialog is open causes the SDL surface to flicker; yield instead.
         if (SohGui::PopupsQueued() > 0 && !extractionTask.has_value()) {
             std::this_thread::sleep_for(std::chrono::milliseconds(16));
             continue;
