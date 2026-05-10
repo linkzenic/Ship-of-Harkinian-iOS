@@ -200,7 +200,7 @@ public class MainActivity extends SDLActivity{
         // Support both .otr (9.0.x) and .o2r (9.2.x) archive formats
         File sohOtrFile = new File(targetRootFolder, "soh.o2r");
         File sohOtrFileLegacy = new File(targetRootFolder, "soh.otr");
-        // oot.o2r / oot-mq.o2r also count — soh.o2r is not bundled, game can run with just the ROM archive
+        // oot.o2r / oot-mq.o2r also count; soh.o2r is not bundled, game can run with just the ROM archive
         File ootO2rFile = new File(targetRootFolder, "oot.o2r");
         File ootMqO2rFile = new File(targetRootFolder, "oot-mq.o2r");
 
@@ -220,11 +220,10 @@ public class MainActivity extends SDLActivity{
                     })
                     .show();
         } else {
-            // No setup needed — but always ensure soh.o2r is present from APK assets
+            // No setup needed; but always ensure soh.o2r is present from APK assets
             if (!sohOtrFile.exists()) {
                 Executors.newSingleThreadExecutor().execute(() -> {
                     try {
-                        getAssets().open("soh.o2r").close();
                         try (InputStream in = getAssets().open("soh.o2r");
                              OutputStream out = new FileOutputStream(sohOtrFile)) {
                             byte[] buffer = new byte[65536];
@@ -310,24 +309,19 @@ public class MainActivity extends SDLActivity{
         }
 
         // Copy soh.o2r from internal assets if bundled (optional)
-        try {
-            getAssets().open("soh.o2r").close(); // check if it exists
+        try (InputStream assetIn = getAssets().open("soh.o2r")) {
             File targetOtrFile = new File(targetRootFolder, "soh.o2r");
             targetOtrFile.delete();
-            try (InputStream in = getAssets().open("soh.o2r");
-                 OutputStream out = new FileOutputStream(targetOtrFile)) {
-                byte[] buffer = new byte[1024];
+            try (OutputStream out = new FileOutputStream(targetOtrFile)) {
+                byte[] buffer = new byte[65536];
                 int read;
-                while ((read = in.read(buffer)) != -1) {
+                while ((read = assetIn.read(buffer)) != -1) {
                     out.write(buffer, 0, read);
                 }
-                runOnUiThread(() -> Toast.makeText(this, "soh.o2r copied", Toast.LENGTH_SHORT).show());
-            } catch (IOException e) {
-                e.printStackTrace();
-                runOnUiThread(() -> Toast.makeText(this, "Error copying soh.o2r", Toast.LENGTH_LONG).show());
             }
+            runOnUiThread(() -> Toast.makeText(this, "soh.o2r copied", Toast.LENGTH_SHORT).show());
         } catch (IOException e) {
-            // soh.o2r not bundled in APK assets, user must provide their own
+            // soh.o2r not bundled in APK assets or copy failed; user must provide their own
         }
 
         setupLatch.countDown();
@@ -426,9 +420,9 @@ public class MainActivity extends SDLActivity{
     // Native method for setting joystick axis value
     public native void setAxis(int axis, short value);
 
-    // Gamepad BACK/SELECT: bypasses SDL, consumed by ConsumeGamepadBackPress().
+    // Signals C++ that the gamepad BACK/SELECT button was pressed, bypassing SDL.
     public native void nativeGamepadBackPressed();
-    // D-pad nav for menu: dir 0=up 1=down 2=left 3=right, injected via InjectMenuNavKeys().
+    // Injects a directional menu nav key: dir 0=up 1=down 2=left 3=right.
     public native void nativeMenuNavKey(int dir, boolean pressed);
 
     public void SetFirstPersonAimingActive(boolean active) {
@@ -446,8 +440,7 @@ public class MainActivity extends SDLActivity{
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (event.getAction() == KeyEvent.ACTION_DOWN && event.getRepeatCount() == 0) {
             int keyCode = event.getKeyCode();
-            // Accept both SOURCE_GAMEPAD and SOURCE_JOYSTICK - some BT controllers report the latter.
-            // Excludes SOURCE_KEYBOARD so the system soft Back key is unaffected.
+            // SDL loses controller tracking after activity transitions; catch BACK at the activity level.
             boolean isGamepad = (event.getSource() & android.view.InputDevice.SOURCE_GAMEPAD) != 0
                              || (event.getSource() & android.view.InputDevice.SOURCE_JOYSTICK) != 0;
             if (keyCode == KeyEvent.KEYCODE_BUTTON_SELECT ||
@@ -526,8 +519,7 @@ public class MainActivity extends SDLActivity{
         addTouchListener(buttonZ, ControllerButtons.AXIS_RT);
 
         addTouchListener(buttonStart, ControllerButtons.BUTTON_START);
-        // BACK uses nativeGamepadBackPressed directly - setButton(BUTTON_BACK) feeds ImGuiKey_GamepadBack
-        // which is intentionally not checked on Android (unreliable when SDL Gamepads list is empty).
+        // BACK uses nativeGamepadBackPressed directly; setButton(BUTTON_BACK) feeds ImGuiKey_GamepadBack, unreliable when SDL Gamepads list is empty.
         buttonBack.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 nativeGamepadBackPressed();
@@ -545,12 +537,17 @@ public class MainActivity extends SDLActivity{
         // Exclude Back/Start from gesture nav zones (they sit at screen edges in landscape).
         // Must be called on each button in its own local coordinates.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            overlayView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
-                Rect selfRect = new Rect(0, 0, buttonBack.getWidth(), buttonBack.getHeight());
-                buttonBack.setSystemGestureExclusionRects(Arrays.asList(selfRect));
-                selfRect = new Rect(0, 0, buttonStart.getWidth(), buttonStart.getHeight());
-                buttonStart.setSystemGestureExclusionRects(Arrays.asList(selfRect));
-            });
+            ViewTreeObserver.OnGlobalLayoutListener gestureListener = new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    overlayView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    Rect selfRect = new Rect(0, 0, buttonBack.getWidth(), buttonBack.getHeight());
+                    buttonBack.setSystemGestureExclusionRects(Arrays.asList(selfRect));
+                    selfRect = new Rect(0, 0, buttonStart.getWidth(), buttonStart.getHeight());
+                    buttonStart.setSystemGestureExclusionRects(Arrays.asList(selfRect));
+                }
+            };
+            overlayView.getViewTreeObserver().addOnGlobalLayoutListener(gestureListener);
         }
 
     }
@@ -587,10 +584,6 @@ public class MainActivity extends SDLActivity{
         // dir>=4: face button nav keys (4=A/select, 5=B/back). -1 = no nav injection.
         int navDir = (buttonNum == ControllerButtons.BUTTON_A) ? 4
                    : (buttonNum == ControllerButtons.BUTTON_B) ? 5 : -1;
-        boolean trackAsItem = (buttonNum != ControllerButtons.BUTTON_A &&
-                               buttonNum != ControllerButtons.BUTTON_B &&
-                               buttonNum != ControllerButtons.BUTTON_BACK &&
-                               buttonNum != ControllerButtons.BUTTON_START);
         button.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -622,17 +615,17 @@ public class MainActivity extends SDLActivity{
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         setButton(dpadButton, true);
-                        nativeMenuNavKey(dpadButton - 11, true);
+                        nativeMenuNavKey(dpadButton - ControllerButtons.BUTTON_DPAD_UP, true);
                         button.setPressed(true);
                         return true;
                     case MotionEvent.ACTION_UP:
                         setButton(dpadButton, false);
-                        nativeMenuNavKey(dpadButton - 11, false);
+                        nativeMenuNavKey(dpadButton - ControllerButtons.BUTTON_DPAD_UP, false);
                         button.setPressed(false);
                         return true;
                     case MotionEvent.ACTION_CANCEL:
                         setButton(dpadButton, false);
-                        nativeMenuNavKey(dpadButton - 11, false);
+                        nativeMenuNavKey(dpadButton - ControllerButtons.BUTTON_DPAD_UP, false);
                         return true;
                 }
                 return false;

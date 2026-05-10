@@ -195,7 +195,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Android")
     if(NOT TARGET PNG::PNG)
         add_library(PNG::PNG ALIAS png_static)
     endif()
-    # Populate PNG_PNG_INCLUDE_DIR which ZAPDTR/ZAPD uses directly as an include path
+    # PNG_PNG_INCLUDE_DIR is the legacy variable for the PNG include path
     set(PNG_PNG_INCLUDE_DIR ${png_SOURCE_DIR} ${png_BINARY_DIR} CACHE PATH "" FORCE)
 endif()
 

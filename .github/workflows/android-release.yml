@@ -57,6 +57,6 @@ jobs:
             --notes "## Changes
           - Built from ${{ github.ref_name }} via CI
 
-          **SHA256:** ${{ steps.sha256.outputs.hash }}
-          **Verify:** \`gh attestation verify soh-${{ github.ref_name }}.apk --owner please-be-nice\`
-          **Build:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          SHA256: ${{ steps.sha256.outputs.hash }}
+          Verify: \`gh attestation verify soh-${{ github.ref_name }}.apk --owner please-be-nice\`
+          Build: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
