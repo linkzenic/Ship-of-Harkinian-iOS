@@ -9,7 +9,7 @@ jobs:
   build:
     runs-on: ubuntu-24.04
     container:
-      image: djvdw7f2ro/android-builder-soh:v1.0.2
+      image: djvdw7f2ro/android-builder-soh:v1.0.3
     permissions:
       id-token: write
       attestations: write

@@ -61,7 +61,11 @@ RUN apt-get update && \
         opus-tools \
         libopusfile-dev \
         libvorbis-dev \
-        libespeak-ng-dev && \
+        libespeak-ng-dev \
+        zipcmp \
+        ziptool \
+        libbz2-dev \
+        libx11-dev && \
     apt-get clean --yes && \
     rm -rf /var/lib/apt/lists/*
 
