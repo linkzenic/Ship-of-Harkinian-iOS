@@ -20,7 +20,11 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
-          fetch-tags: true
+
+      - name: Fetch annotated tag
+        run: |
+          git config --global --add safe.directory "${GITHUB_WORKSPACE}"
+          git fetch origin "+refs/tags/${{ github.ref_name }}:refs/tags/${{ github.ref_name }}"
 
       - name: Write local.properties
         run: |
@@ -52,7 +56,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          git config --global --add safe.directory "${GITHUB_WORKSPACE}"
           TAG="${{ github.ref_name }}"
           OBJ_TYPE=$(git tag -l --format='%(objecttype)' "${TAG}")
           if [ "${OBJ_TYPE}" != "tag" ]; then
