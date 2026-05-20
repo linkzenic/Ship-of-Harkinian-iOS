@@ -63,6 +63,7 @@ RUN apt-get update && \
         libvorbis-dev \
         libespeak-ng-dev \
         zipcmp \
+        zipmerge \
         ziptool \
         libbz2-dev \
         libx11-dev && \
