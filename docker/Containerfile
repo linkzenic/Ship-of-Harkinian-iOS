@@ -42,7 +42,26 @@ RUN apt-get update && \
         zip \
         ninja-build \
         build-essential \
-        ca-certificates && \
+        ca-certificates \
+        python3 \
+        pkg-config \
+        lsb-release \
+        libzip-dev \
+        libusb-dev \
+        libusb-1.0-0-dev \
+        libsdl2-dev \
+        libsdl2-net-dev \
+        libpng-dev \
+        libglew-dev \
+        nlohmann-json3-dev \
+        libtinyxml2-dev \
+        libspdlog-dev \
+        libogg-dev \
+        libopus-dev \
+        opus-tools \
+        libopusfile-dev \
+        libvorbis-dev \
+        libespeak-ng-dev && \
     apt-get clean --yes && \
     rm -rf /var/lib/apt/lists/*
 
