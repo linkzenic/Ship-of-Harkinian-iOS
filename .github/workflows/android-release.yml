@@ -51,12 +51,26 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "${{ github.ref_name }}" \
-            "soh-${{ github.ref_name }}.apk" \
-            --title "${{ github.ref_name }}" \
-            --notes "## Changes
-          - Built from ${{ github.ref_name }} via CI
+          TAG="${{ github.ref_name }}"
+          OBJ_TYPE=$(git tag -l --format='%(objecttype)' "${TAG}")
+          if [ "${OBJ_TYPE}" != "tag" ]; then
+            echo "ERROR: '${TAG}' is a lightweight tag. Push an annotated tag to trigger a release."
+            exit 1
+          fi
 
-          SHA256: ${{ steps.sha256.outputs.hash }}
-          Verify: \`gh attestation verify soh-${{ github.ref_name }}.apk --owner please-be-nice\`
-          Build: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          ANNOTATION_BODY=$(git tag -l --format='%(contents:body)' "${TAG}")
+          if [ -z "${ANNOTATION_BODY}" ]; then
+            ANNOTATION_BODY="## Changes
+- Built from ${TAG} via CI"
+          fi
+
+          FOOTER="SHA256: ${{ steps.sha256.outputs.hash }}
+Verify: \`gh attestation verify soh-${TAG}.apk --owner please-be-nice\`
+Build: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+          printf '%s\n\n%s\n' "${ANNOTATION_BODY}" "${FOOTER}" > /tmp/release-notes.md
+
+          gh release create "${TAG}" \
+            "soh-${TAG}.apk" \
+            --title "${TAG}" \
+            --notes-file /tmp/release-notes.md
