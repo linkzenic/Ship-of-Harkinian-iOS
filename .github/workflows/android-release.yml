@@ -44,7 +44,7 @@ jobs:
 
       - name: Decode keystore
         run: |
-          echo '${{ secrets.SIGNING_KEYSTORE_B64 }}' | base64 -d > Android/app/release.jks
+          echo '${{ secrets.ANDROID_KEYSTORE_BASE64 }}' | base64 -d > Android/app/release.jks
 
       - name: Build release APK
         env:
@@ -52,9 +52,9 @@ jobs:
         run: |
           cd Android && ./gradlew assembleRelease \
             -PstoreFile=release.jks \
-            -PstorePassword=${{ secrets.SIGNING_KEY_PASSWORD }} \
-            -PkeyAlias=${{ secrets.SIGNING_KEY_ALIAS }} \
-            -PkeyPassword=${{ secrets.SIGNING_KEY_PASSWORD }}
+            -PstorePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }} \
+            -PkeyAlias=${{ secrets.ANDROID_KEY_ALIAS }} \
+            -PkeyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}
 
       - name: Rename APK
         run: |
