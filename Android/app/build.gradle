@@ -1,5 +1,6 @@
 def buildAsLibrary = project.hasProperty('BUILD_AS_LIBRARY');
 def buildAsApplication = !buildAsLibrary
+def androidAppVersionName = "9.2.3-linkzenic.2"
 if (buildAsApplication) {
     apply plugin: 'com.android.application'
 }
@@ -21,7 +22,7 @@ android {
         minSdkVersion 24
         targetSdkVersion 33
         versionCode 12
-        versionName "9.2.3-linkzenic.2"
+        versionName androidAppVersionName
     }
     signingConfigs {
         release {
@@ -38,7 +39,7 @@ android {
         debug {
             externalNativeBuild {
                 cmake {
-                    arguments "-DSDL_SHARED=ON", "-DANDROID_STL=c++_static", "-DHAVE_LD_VERSION_SCRIPT=OFF",'-DUSE_OPENGLES=ON', "-DBUILD_REMOTE_CONTROL=1"
+                    arguments "-DSDL_SHARED=ON", "-DANDROID_STL=c++_static", "-DHAVE_LD_VERSION_SCRIPT=OFF",'-DUSE_OPENGLES=ON', "-DBUILD_REMOTE_CONTROL=1", "-DANDROID_APP_VERSION_NAME=${androidAppVersionName}"
                     abiFilters 'arm64-v8a'
                 }
             }
@@ -51,7 +52,7 @@ android {
             signingConfig signingConfigs.release
             externalNativeBuild {
                 cmake {
-                    arguments "-DSDL_SHARED=ON", "-DANDROID_STL=c++_static", "-DHAVE_LD_VERSION_SCRIPT=OFF",'-DUSE_OPENGLES=ON', "-DBUILD_REMOTE_CONTROL=1"
+                    arguments "-DSDL_SHARED=ON", "-DANDROID_STL=c++_static", "-DHAVE_LD_VERSION_SCRIPT=OFF",'-DUSE_OPENGLES=ON', "-DBUILD_REMOTE_CONTROL=1", "-DANDROID_APP_VERSION_NAME=${androidAppVersionName}"
                     abiFilters 'arm64-v8a'
                 }
             }

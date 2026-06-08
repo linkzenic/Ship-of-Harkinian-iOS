@@ -320,6 +320,9 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Android")
         GIT_REPOSITORY https://github.com/xiph/opus.git
         GIT_TAG v1.5.2
     )
+    set(OPUS_FLOAT_APPROX ON CACHE BOOL "Enable Opus floating point approximations for Android fast-math builds" FORCE)
+    set(OPUS_BUILD_TESTING OFF CACHE BOOL "Disable Opus test targets for Android APK builds" FORCE)
+    set(BUILD_TESTING OFF CACHE BOOL "Disable third-party test targets for Android APK builds" FORCE)
     FetchContent_MakeAvailable(opus)
 
     # Point vorbis to the FetchContent-provided ogg
@@ -680,6 +683,9 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
                 -Wno-implicit-int
             >
         )
+        if(DEFINED ANDROID_APP_VERSION_NAME)
+            target_compile_definitions(${PROJECT_NAME} PRIVATE ANDROID_APP_VERSION_NAME="${ANDROID_APP_VERSION_NAME}")
+        endif()
     else()
         if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
         set(CPU_OPTION -msse2 -mfpmath=sse)

@@ -54,6 +54,9 @@ public class MainActivity extends SDLActivity{
     private volatile boolean mIsAiming = false;
     private static final int COPY_BUFFER_SIZE = 65536;
     private static final int RUMBLE_MAX_DURATION_MS = 5000;
+    private static final String PREF_TOUCH_CONTROLS_DISABLED = "touchControlsDisabled";
+    // Legacy key name: true means the touch controls are hidden, not visible.
+    private static final String PREF_TOUCH_CONTROLS_HIDDEN = "controlsVisible";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -405,6 +408,15 @@ public class MainActivity extends SDLActivity{
         runOnUiThread(() -> startActivityForResult(intent, 0));
     }
 
+    public String getAndroidVersionFromNative() {
+        String release = Build.VERSION.RELEASE;
+        if (release == null || release.isEmpty()) {
+            return "Android API " + Build.VERSION.SDK_INT;
+        }
+
+        return "Android " + release + " (API " + Build.VERSION.SDK_INT + ")";
+    }
+
     // Check if external storage is available and writable
     private boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
@@ -461,6 +473,7 @@ public class MainActivity extends SDLActivity{
     private FrameLayout leftJoystick;
     private ImageView leftJoystickKnob;
     private View overlayView;
+    private ViewGroup buttonGroup;
 
     // Function to set up the controller overlay (inflate layout and initialize buttons)
     private void setupControllerOverlay() {
@@ -479,7 +492,7 @@ public class MainActivity extends SDLActivity{
         view.addView(overlayView);
         view.setKeepScreenOn(true);
 
-        final ViewGroup buttonGroup = overlayView.findViewById(R.id.button_group);
+        buttonGroup = overlayView.findViewById(R.id.button_group);
 
         buttonA = overlayView.findViewById(R.id.buttonA);
         buttonB = overlayView.findViewById(R.id.buttonB);
@@ -535,6 +548,7 @@ public class MainActivity extends SDLActivity{
         setupLookAround(rightScreenArea);
 
         setupToggleButton(buttonToggle,buttonGroup);
+        applyTouchControlsVisibility();
 
         // Exclude Back/Start from gesture nav zones (they sit at screen edges in landscape).
         // Must be called on each button in its own local coordinates.
@@ -554,30 +568,42 @@ public class MainActivity extends SDLActivity{
 
     }
 
-    private void setupToggleButton(Button button, ViewGroup uiGroup){
-        boolean isHidden = preferences.getBoolean("controlsVisible", false); // Default to 'false' (visible)
-        uiGroup.setVisibility(isHidden ? View.INVISIBLE : View.VISIBLE);
-        if (isHidden) {
-            DisableTouchArea();
-            overlayView.setOnTouchListener(null);
-        } else {
-            EnableTouchArea();
-            overlayView.setOnTouchListener((view, e) -> true);
+    public void setTouchControlsDisabledFromNative(boolean disabled) {
+        preferences.edit().putBoolean(PREF_TOUCH_CONTROLS_DISABLED, disabled).apply();
+        runOnUiThread(this::applyTouchControlsVisibility);
+    }
+
+    private void applyTouchControlsVisibility() {
+        if (overlayView == null) {
+            return;
         }
-        boolean toggleVisible = preferences.getBoolean("toggleButtonVisible", true); // Default to visible
-        button.setVisibility(toggleVisible ? View.VISIBLE : View.GONE);
-        button.setOnClickListener(v -> {
-            boolean currentlyHidden = uiGroup.getVisibility() != View.VISIBLE;
-            if (currentlyHidden) {
-                uiGroup.setVisibility(View.VISIBLE);
-                EnableTouchArea();
-                overlayView.setOnTouchListener((view, e) -> true);
-            } else {
-                uiGroup.setVisibility(View.INVISIBLE);
+
+        boolean touchControlsDisabled = preferences.getBoolean(PREF_TOUCH_CONTROLS_DISABLED, false);
+        overlayView.setVisibility(touchControlsDisabled ? View.GONE : View.VISIBLE);
+
+        if (buttonGroup != null) {
+            boolean controlsHidden = preferences.getBoolean(PREF_TOUCH_CONTROLS_HIDDEN, false);
+            buttonGroup.setVisibility(controlsHidden ? View.INVISIBLE : View.VISIBLE);
+            if (controlsHidden || touchControlsDisabled) {
                 DisableTouchArea();
                 overlayView.setOnTouchListener(null);
+            } else {
+                EnableTouchArea();
+                overlayView.setOnTouchListener((view, e) -> true);
             }
-            preferences.edit().putBoolean("controlsVisible", !currentlyHidden).apply();
+        }
+
+        if (buttonToggle != null) {
+            boolean toggleVisible = preferences.getBoolean("toggleButtonVisible", true);
+            buttonToggle.setVisibility(!touchControlsDisabled && toggleVisible ? View.VISIBLE : View.GONE);
+        }
+    }
+
+    private void setupToggleButton(Button button, ViewGroup uiGroup){
+        button.setOnClickListener(v -> {
+            boolean currentlyHidden = uiGroup.getVisibility() != View.VISIBLE;
+            preferences.edit().putBoolean(PREF_TOUCH_CONTROLS_HIDDEN, !currentlyHidden).apply();
+            applyTouchControlsVisibility();
         });
     }
 
@@ -646,10 +672,8 @@ public class MainActivity extends SDLActivity{
 
     void SetToggleButtonVisible(boolean visible) {
         runOnUiThread(() -> {
-            if (buttonToggle != null) {
-                buttonToggle.setVisibility(visible ? View.VISIBLE : View.GONE);
-            }
             preferences.edit().putBoolean("toggleButtonVisible", visible).apply();
+            applyTouchControlsVisibility();
         });
     }
 
