@@ -70,6 +70,8 @@ public class MainActivity extends SDLActivity{
     // Legacy key name: true means the touch controls are hidden, not visible.
     private static final String PREF_TOUCH_CONTROLS_HIDDEN = "controlsVisible";
     private static final String SUPPORT_FILES_VERSION_MARKER = ".android_support_files_version";
+    // Bump this only when bundled Android support assets or archive layout changes.
+    private static final String SUPPORT_FILES_VERSION = "soh-android-support-1";
     private AlertDialog dataRootMigrationDialog;
     private AlertDialog setupProgressDialog;
 
@@ -115,8 +117,11 @@ public class MainActivity extends SDLActivity{
         int currentVersion = BuildConfig.VERSION_CODE;
         int storedVersion = preferences.getInt("appVersion", 1);
 
-        if (currentVersion > storedVersion || !isSupportFilesMarkerCurrent()) {
+        if (!isSupportFilesMarkerCurrent()) {
             deleteOutdatedAssets();
+        }
+
+        if (currentVersion > storedVersion) {
             preferences.edit().putInt("appVersion", currentVersion).apply();
         }
     }
@@ -151,7 +156,7 @@ public class MainActivity extends SDLActivity{
                 return false;
             }
             String markerVersion = new String(buffer, 0, read).trim();
-            return markerVersion.equals(String.valueOf(BuildConfig.VERSION_CODE));
+            return markerVersion.equals(SUPPORT_FILES_VERSION);
         } catch (IOException e) {
             Log.w("setupFiles", "Unable to read support files marker", e);
             return false;
@@ -161,7 +166,7 @@ public class MainActivity extends SDLActivity{
     private void writeSupportFilesMarker(File targetRootFolder) throws IOException {
         File markerFile = getSupportFilesMarkerFile(targetRootFolder);
         try (OutputStream out = new FileOutputStream(markerFile)) {
-            out.write(String.valueOf(BuildConfig.VERSION_CODE).getBytes());
+            out.write(SUPPORT_FILES_VERSION.getBytes());
         }
     }
 
