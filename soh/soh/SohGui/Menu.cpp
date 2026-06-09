@@ -868,6 +868,12 @@ void Menu::DrawElement() {
         columns = 1;
     }
     float columnWidth = (sectionWidth - style.ItemSpacing.x * columns) / columns;
+    std::vector<float> columnWidths(columns, columnWidth);
+    if (columns == 2 && headerIndex == "Settings" && sectionIndex == "General") {
+        float availableColumnWidth = sectionWidth - style.ItemSpacing.x;
+        columnWidths[0] = availableColumnWidth * 0.44f;
+        columnWidths[1] = availableColumnWidth - columnWidths[0];
+    }
     bool useColumns = columns > 1;
     if (!useColumns || (headerSearch && menuSearchText.length() > 0)) {
         ImGui::SameLine();
@@ -907,7 +913,7 @@ void Menu::DrawElement() {
         for (size_t i = 0; i < columnFuncs; i++) {
             std::string sectionId = fmt::format("{} Column {}", sectionMenuId, i);
             if (useColumns) {
-                ImGui::BeginChild(sectionId.c_str(), { columnWidth, columnHeight }, ImGuiChildFlags_None,
+                ImGui::BeginChild(sectionId.c_str(), { columnWidths[i], columnHeight }, ImGuiChildFlags_None,
                                   ImGuiWindowFlags_NoTitleBar);
             }
             // for (auto& entryName : sidebar->at(sectionIndex).sidebarOrder) {
