@@ -27,13 +27,6 @@ extern std::shared_ptr<SohMenu> mSohMenu;
 extern std::shared_ptr<SohModalWindow> mModalWindow;
 using namespace UIWidgets;
 
-static std::map<int32_t, const char*> imguiScaleOptions = {
-    { 0, "Small" },
-    { 1, "Normal" },
-    { 2, "Large" },
-    { 3, "X-Large" },
-};
-
 static const std::map<int32_t, const char*> menuThemeOptions = {
     { UIWidgets::Colors::Red, "Red" },
     { UIWidgets::Colors::DarkRed, "Dark Red" },
@@ -328,14 +321,17 @@ void SohMenu::AddMenuSettings() {
         .CVar(CVAR_SETTING("A11yNoJabuWobble"))
         .RaceDisable(false)
         .Options(CheckboxOptions().Tooltip("Disable the geometry wobble and camera distortion inside Jabu."));
-    AddWidget(path, "EXPERIMENTAL", WIDGET_SEPARATOR_TEXT).Options(TextOptions().Color(Colors::Orange));
-    AddWidget(path, "ImGui Menu Scaling", WIDGET_CVAR_COMBOBOX)
-        .CVar(CVAR_SETTING("ImGuiScale"))
+    AddWidget(path, "Menu Scale: %.2fx", WIDGET_CVAR_SLIDER_FLOAT)
+        .CVar(CVAR_SETTING("ImGuiScale.Value"))
         .RaceDisable(false)
-        .Options(ComboboxOptions()
-                     .ComboMap(imguiScaleOptions)
-                     .Tooltip("Changes the scaling of the ImGui menu elements.")
-                     .DefaultIndex(1)
+        .Options(FloatSliderOptions()
+                     .Min(0.65f)
+                     .Max(2.5f)
+                     .Step(0.05f)
+                     .DefaultValue(defaultImGuiScale)
+                     .Format("%.2fx")
+                     .Tooltip("Changes the scaling of the menu elements.")
+                     .ShowButtons(true)
                      .ComponentAlignment(ComponentAlignments::Right)
                      .LabelPosition(LabelPositions::Far))
         .Callback([](WidgetInfo& info) { OTRGlobals::Instance->ScaleImGui(); });

@@ -37,10 +37,12 @@ extern std::unordered_map<std::string, ExtensionEntry> ExtensionCache;
 
 const std::string appShortName = "soh";
 
-#ifdef __WIIU__
-const uint32_t defaultImGuiScale = 3;
+#ifdef __ANDROID__
+const float defaultImGuiScale = 1.0f;
+#elif defined(__WIIU__)
+const float defaultImGuiScale = 2.0f;
 #else
-const uint32_t defaultImGuiScale = 1;
+const float defaultImGuiScale = 1.0f;
 #endif
 
 const float imguiScaleOptionToValue[4] = { 0.75f, 1.0f, 1.5f, 2.0f };
