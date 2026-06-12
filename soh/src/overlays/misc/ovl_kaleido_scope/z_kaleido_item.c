@@ -27,6 +27,7 @@ static s16 sAllAmmoVtxOffset[] = {
 };
 
 extern const char* _gAmmoDigit0Tex[];
+extern void BombArrows_HandleSetupItemEquip(PlayState* play, u16* item, u16* slot);
 
 s8 ItemInSlotUsesAmmo(s16 slot) {
     s16 item = gSaveContext.inventory.items[slot];
@@ -844,6 +845,8 @@ void KaleidoScope_SetupItemEquip(PlayState* play, u16 item, u16 slot, s16 animX,
             pauseCtx->equipTargetCBtn = 6;
         }
     }
+
+    BombArrows_HandleSetupItemEquip(play, &item, &slot);
 
     pauseCtx->equipTargetItem = item;
     pauseCtx->equipTargetSlot = slot;
