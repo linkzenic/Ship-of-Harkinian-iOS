@@ -15,6 +15,8 @@ extern PlayState* gPlayState;
 u8 BombArrows_CanCycleArrow(void);
 u8 BombArrows_IsButtonBombArrow(s16 buttonIndex);
 void BombArrows_SetArrowCycleButton(PlayState* play, s16 buttonIndex, u8 enabled);
+void BombArrows_ClearOtherBowFamilyButtons(PlayState* play, s16 targetButtonIndex);
+void BombArrows_UpdateArrowCycleArrow(Actor* arrowActor, u8 enabled);
 }
 
 #define CVAR_ARROW_CYCLE_NAME CVAR_ENHANCEMENT("BowArrowCycle")
@@ -131,34 +133,27 @@ static void UpdateButtonAlpha(s16 flashAlpha, bool isButtonBow, u16* buttonAlpha
     }
 }
 
-static void UpdateEquippedBow(PlayState* play, s16 arrowType) {
+static void UpdateEquippedBow(PlayState* play, s16 arrowType, s16 targetButtonIndex) {
+    if (targetButtonIndex < 1 || targetButtonIndex > 7) {
+        return;
+    }
+
     bool isBombArrow = arrowType == PLAYER_IA_BOW_BOMB_ARROW;
     s32 bowItem = GetBowItemForArrow(arrowType);
-    bool dpadEnabled = CVarGetInteger(CVAR_ENHANCEMENT("DpadEquips"), 0);
-    s32 maxButton = dpadEnabled ? 7 : 3;
 
-    for (s32 i = 1; i <= maxButton; i++) {
-        if ((gSaveContext.equips.buttonItems[i] == ITEM_BOW) ||
-            (gSaveContext.equips.buttonItems[i] >= ITEM_BOW_ARROW_FIRE &&
-             gSaveContext.equips.buttonItems[i] <= ITEM_BOW_ARROW_LIGHT) ||
-            BombArrows_IsButtonBombArrow(i)) {
-            BombArrows_SetArrowCycleButton(play, i, isBombArrow);
-            if (isBombArrow) {
-                continue;
-            }
-
-            gSaveContext.equips.buttonItems[i] = bowItem;
-            if (i <= 3) {
-                gSaveContext.equips.cButtonSlots[i - 1] = SLOT_BOW;
-            }
-
-            if (i <= 3) {
-                Interface_LoadItemIcon1(play, i);
-            }
-
-            gSaveContext.buttonStatus[i] = BTN_ENABLED;
-        }
+    BombArrows_ClearOtherBowFamilyButtons(play, targetButtonIndex);
+    BombArrows_SetArrowCycleButton(play, targetButtonIndex, isBombArrow);
+    if (isBombArrow) {
+        return;
     }
+
+    gSaveContext.equips.buttonItems[targetButtonIndex] = bowItem;
+    if (targetButtonIndex <= 3) {
+        gSaveContext.equips.cButtonSlots[targetButtonIndex - 1] = SLOT_BOW;
+        Interface_LoadItemIcon1(play, targetButtonIndex);
+    }
+
+    gSaveContext.buttonStatus[targetButtonIndex] = BTN_ENABLED;
 }
 
 bool ArrowCycleMain() {
@@ -187,8 +182,9 @@ bool ArrowCycleMain() {
             arrow->child = NULL;
         }
         arrow->params = GetArrowTypeForArrow(nextArrow);
-        UpdateEquippedBow(gPlayState, nextArrow);
+        UpdateEquippedBow(gPlayState, nextArrow, player->heldItemButton);
         EnArrow_Init(arrow, gPlayState);
+        BombArrows_UpdateArrowCycleArrow(arrow, nextArrow == PLAYER_IA_BOW_BOMB_ARROW);
         return true;
     }
     return false;
