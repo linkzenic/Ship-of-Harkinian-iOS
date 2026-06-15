@@ -1,125 +1,83 @@
-![Ship of Harkinian](docs/shiptitle.darkmode.png#gh-dark-mode-only)
-![Ship of Harkinian](docs/shiptitle.lightmode.png#gh-light-mode-only)
+# Ship of Harkinian Android
 
-A port of Ship of Harkinian for Android.
+Android port of Ship of Harkinian, based on the HarbourMasters project.
 
-Current Android release: `v9.2.3-android.5`
+Original repository: https://github.com/HarbourMasters/Shipwright
 
-## Website
+Current Android release: **v9.2.3-android.5**
 
-Official Website: https://www.shipofharkinian.com/
+Supported: Android 7+ with OpenGL ES 3.0+
 
-## Discord
+Tested on: Android 15
+
+Official website: https://www.shipofharkinian.com/
 
 Official Discord: https://discord.com/invite/shipofharkinian
 
-If you're having any trouble after reading through this `README`, feel free to ask for help in the Support text channels. Please keep in mind that we do not condone piracy.
+## Installation
 
-# Quick Start
+1. Verify that you have a supported, legally obtained Ocarina of Time ROM. You can use the compatibility checker at https://ship.equipment/ or compare your ROM's `sha1` hash against [docs/supportedHashes.json](docs/supportedHashes.json).
+2. Install the APK from the releases page: https://github.com/linkzenic/Shipwright-Android/releases
+3. Open the app once so it can create the data folder and copy bundled support files.
+4. When prompted, allow setup and select your ROM so the app can generate the required `.otr` or `.o2r` game data.
+5. If you have a Master Quest ROM, choose to extract another ROM when prompted. Otherwise, continue into the game.
+6. Subsequent launches should start directly into the game.
 
-The Ship does not include any copyrighted assets. You are required to provide a supported copy of the game.
+Use the Back, Select, or minus controller button, or the Android back gesture/button, to open the Ship of Harkinian menu. Use touch controls or a controller to navigate menus.
 
-### 1. Verify your ROM dump
-You can verify you have dumped a supported copy of the game by using the compatibility checker at https://ship.equipment/. If you'd prefer to manually validate your ROM dump, you can cross-reference its `sha1` hash with the hashes [here](docs/supportedHashes.json).
+## Data Folder
 
-### 2. Install the APK
-Download and install the APK from the [Releases](https://github.com/linkzenic/Shipwright-Android/releases) page.
+The app stores user data in the selected `SOH` data folder. You can view the current folder and change it from Settings > General.
 
-### 3. Set up the game
+Mods and user files should be placed in the relevant folders inside the selected data folder. Mods use `.otr` or `.o2r` files and can be enabled from Settings > Mod Menu.
 
-1. Open the app and allow all file permissions. It will ask to set up files, let it finish.
+## FAQ
 
-2. When prompted, select "Yes" to generate an OTR and "Yes" to look for a ROM. Navigate to your ROM and select it. Extraction will begin.
+**Why is it immediately crashing?**
 
-3. When asked whether to extract another ROM, select "Yes" if you have a Master Quest ROM or "No" to start the game.
+Try deleting and regenerating your extracted `.otr` or `.o2r` game data from your own ROM.
 
-4. On subsequent launches the game starts directly. To get the ROM selection dialog back, delete the `.otr` files in the `SOH` folder at the root of your device storage.
+**The game opened once but now shows a black screen.**
 
-Use the *Back/Select/-* button on your controller to open the **Enhancements menu**. Use touch controls or a controller to navigate menus.
+Try deleting `imgui.ini` from your `SOH` folder. If it still happens, set MSAA to 1 in Settings > Graphics.
 
-### 4. Play!
+**My controller is not doing anything.**
 
-Congratulations, you are now sailing with the Ship of Harkinian! Have fun!
+Open the menu and check Settings > Controls to confirm the controller is detected and mapped. If this happens immediately after first setup, close and reopen the app once.
 
-# FAQ
+**Can I hide the on-screen touch controls?**
 
-**Q: How do I add mods?**
+Yes. Use Settings > General > Disable Touch Controls.
 
-A: Place mod `.otr` and `.o2r` files in the `SOH` folder at the root of your device storage. Then enable them in the Enhancements menu under Mods.
+**Can I resize the menu?**
 
-**Q: The game crashes immediately on launch.**
+Yes. Use Settings > General > Menu Scale.
 
-A: Delete the `SOH` folder and let the app set up its files again. Be patient during black screens; extraction can take a minute.
+**How do I add mods?**
 
-**Q: The game opened once but now shows a black screen.**
+Place mod `.otr` or `.o2r` files in the `mods` folder inside your selected `SOH` data folder, then enable them from Settings > Mod Menu.
 
-A: Delete `imgui.ini` from your `SOH` folder. Also ensure MSAA is set to 1 in the graphics settings, as higher values cause a black screen on many devices.
+## Known Issues
 
-**Q: My controller's menu button isn't opening the Enhancements menu.**
+External Bluetooth controller rumble is not currently supported. Device vibration is used as a fallback on supported handhelds.
 
-A: This is a known first-launch issue caused by Android's input device registration. Close and reopen the app; the controller will work correctly on the second launch.
+Touch overlay and physical controller button mappings share the same slot per port, so you cannot assign different actions to the same button on each.
 
-**Q: D-pad doesn't navigate the menu on first launch.**
+Some pre-rendered backgrounds are limited by upstream Ship of Harkinian behavior and may not fill widescreen viewports.
 
-A: Same cause as above. Close and reopen the app after the initial ROM extraction completes.
+## Build Notes
 
-**Q: Touch overlay buttons aren't remappable in the controls editor.**
+Android builds are produced through GitHub Actions. The APK bundles `soh.o2r` support data, but does not bundle extracted game data; users generate the required `.otr` or `.o2r` files from their own ROM.
 
-A: Open the controls editor (Enhancements menu) and look for the "Touch Controls" section under the Link tab. Touch overlay buttons appear as "Touch Overlay" in the device list and can be remapped there.
+Building locally requires Docker or another OCI-compatible container tool on Linux. Windows users should use WSL2 and clone the repository to a native Linux path rather than a Windows-mounted path.
 
-**Q: Rumble doesn't work with my Bluetooth controller.**
-
-A: External Bluetooth controller rumble is not currently supported. Rumble works via device vibration on handheld devices (e.g. Retroid Pocket). A fix for Bluetooth controller rumble is planned.
-
-# Known Bugs
-
-- External Bluetooth controller rumble is not supported. Device vibration is used as a fallback.
-- Touch overlay and physical controller button mappings share the same slot per port, so you cannot assign different actions to the same button on each.
-
-# Build
-
-### Build Tools
-
-- [Ubuntu Noble Numbat | 24.04.2 LTS](https://releases.ubuntu.com/noble/)
-- [CMake 3.31.5](https://github.com/Kitware/CMake/releases)
-- [OpenJDK 17](https://jdk.java.net/archive/)
-- Android SDK 31
-- Android NDK 26.0.10792818
-- Android Gradle Plugin (AGP) 8.10.1
-- Gradle 8.11.1
-
-### Build Instructions
-
-Building requires [Docker](https://docs.docker.com/get-docker/) (or any OCI-compatible tool such as Podman) on a Linux environment. Windows users should use WSL2 and clone the repository to a native Linux path (e.g. `~/Shipwright`) rather than a Windows-mounted path (e.g. `/mnt/c/...`), as NTFS mounts can cause build issues.
-
-1. Clone the repository and submodules:
-
-    ```bash
-    git clone https://github.com/linkzenic/Shipwright-Android.git
-    cd Shipwright-Android
-    git submodule update --init --recursive
-    ```
-
-2. Pull the build container:
-
-    ```bash
-    cd docker
-    make setup
-    ```
-
-    If you prefer not to use the published image, you can build it locally from the included `Containerfile` instead:
-
-    ```bash
-    cd docker
-    make create_container
-    ```
-
-3. Build the APK:
-
-    ```bash
-    make build_release
-    ```
+```bash
+git clone https://github.com/linkzenic/Shipwright-Android.git
+cd Shipwright-Android
+git submodule update --init --recursive
+cd docker
+make setup
+make build_release
+```
 
 The resulting APK will be at `Android/app/build/outputs/apk/release/`.
-
-`make setup` only needs to be run once. On subsequent builds, `make build_release` is all that's needed.
