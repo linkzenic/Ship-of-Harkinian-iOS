@@ -11,6 +11,10 @@ s32 func_808351D4(Player* thisx, PlayState* play); // Arrow nocked
 void EnArrow_Init(Actor* thisx, PlayState* play);
 
 extern PlayState* gPlayState;
+
+u8 BombArrows_CanCycleArrow(void);
+u8 BombArrows_IsButtonBombArrow(s16 buttonIndex);
+void BombArrows_SetArrowCycleButton(PlayState* play, s16 buttonIndex, u8 enabled);
 }
 
 #define CVAR_ARROW_CYCLE_NAME CVAR_ENHANCEMENT("BowArrowCycle")
@@ -19,8 +23,11 @@ extern PlayState* gPlayState;
 
 static const s16 sMagicArrowCosts[] = { 4, 4, 8 };
 
-static const PlayerItemAction sArrowCycleOrder[] = {
+static const s16 PLAYER_IA_BOW_BOMB_ARROW = -1;
+
+static const s16 sArrowCycleOrder[] = {
     PLAYER_IA_BOW,
+    PLAYER_IA_BOW_BOMB_ARROW,
     PLAYER_IA_BOW_FIRE,
     PLAYER_IA_BOW_ICE,
     PLAYER_IA_BOW_LIGHT,
@@ -38,8 +45,10 @@ static bool IsAimingBow(Player* player) {
     return IsHoldingBow(player) && ((player->unk_6AD == 2) || (player->upperActionFunc == func_808351D4));
 }
 
-static bool HasArrowType(PlayerItemAction itemAction) {
+static bool HasArrowType(s16 itemAction) {
     switch (itemAction) {
+        case PLAYER_IA_BOW_BOMB_ARROW:
+            return BombArrows_CanCycleArrow();
         case PLAYER_IA_BOW:
             return true;
         case PLAYER_IA_BOW_FIRE:
@@ -53,7 +62,7 @@ static bool HasArrowType(PlayerItemAction itemAction) {
     }
 }
 
-static s32 GetBowItemForArrow(PlayerItemAction itemAction) {
+static s32 GetBowItemForArrow(s16 itemAction) {
     switch (itemAction) {
         case PLAYER_IA_BOW_FIRE:
             return ITEM_BOW_ARROW_FIRE;
@@ -66,7 +75,7 @@ static s32 GetBowItemForArrow(PlayerItemAction itemAction) {
     }
 }
 
-static ArrowType GetArrowTypeForArrow(s8 itemAction) {
+static ArrowType GetArrowTypeForArrow(s16 itemAction) {
     switch (itemAction) {
         case PLAYER_IA_BOW_FIRE:
             return ARROW_FIRE;
@@ -86,10 +95,18 @@ static bool CanCycleArrows() {
            !(player->stateFlags1 & PLAYER_STATE1_ON_HORSE) && player->rideActor == NULL &&
            INV_CONTENT(SLOT_BOW) == ITEM_BOW &&
            (INV_CONTENT(ITEM_ARROW_FIRE) == ITEM_ARROW_FIRE || INV_CONTENT(ITEM_ARROW_ICE) == ITEM_ARROW_ICE ||
-            INV_CONTENT(ITEM_ARROW_LIGHT) == ITEM_ARROW_LIGHT);
+            INV_CONTENT(ITEM_ARROW_LIGHT) == ITEM_ARROW_LIGHT || BombArrows_CanCycleArrow());
 }
 
-static s8 GetNextArrowType(s8 currentArrowType) {
+static s16 GetCurrentArrowType(Player* player) {
+    if (BombArrows_IsButtonBombArrow(player->heldItemButton)) {
+        return PLAYER_IA_BOW_BOMB_ARROW;
+    }
+
+    return player->heldItemAction;
+}
+
+static s16 GetNextArrowType(s16 currentArrowType) {
     int currentIndex = 0;
     for (int i = 0; i < (int)ARRAY_COUNT(sArrowCycleOrder); i++) {
         if (sArrowCycleOrder[i] == currentArrowType) {
@@ -114,17 +131,26 @@ static void UpdateButtonAlpha(s16 flashAlpha, bool isButtonBow, u16* buttonAlpha
     }
 }
 
-static void UpdateEquippedBow(PlayState* play, s8 arrowType) {
-    s32 bowItem = GetBowItemForArrow((PlayerItemAction)arrowType);
+static void UpdateEquippedBow(PlayState* play, s16 arrowType) {
+    bool isBombArrow = arrowType == PLAYER_IA_BOW_BOMB_ARROW;
+    s32 bowItem = GetBowItemForArrow(arrowType);
     bool dpadEnabled = CVarGetInteger(CVAR_ENHANCEMENT("DpadEquips"), 0);
     s32 maxButton = dpadEnabled ? 7 : 3;
 
     for (s32 i = 1; i <= maxButton; i++) {
         if ((gSaveContext.equips.buttonItems[i] == ITEM_BOW) ||
             (gSaveContext.equips.buttonItems[i] >= ITEM_BOW_ARROW_FIRE &&
-             gSaveContext.equips.buttonItems[i] <= ITEM_BOW_ARROW_LIGHT)) {
+             gSaveContext.equips.buttonItems[i] <= ITEM_BOW_ARROW_LIGHT) ||
+            BombArrows_IsButtonBombArrow(i)) {
+            BombArrows_SetArrowCycleButton(play, i, isBombArrow);
+            if (isBombArrow) {
+                continue;
+            }
+
             gSaveContext.equips.buttonItems[i] = bowItem;
-            gSaveContext.equips.cButtonSlots[i - 1] = SLOT_BOW;
+            if (i <= 3) {
+                gSaveContext.equips.cButtonSlots[i - 1] = SLOT_BOW;
+            }
 
             if (i <= 3) {
                 Interface_LoadItemIcon1(play, i);
@@ -151,9 +177,9 @@ bool ArrowCycleMain() {
         // reset magic state to IDLE before cycling to prevent error sound
         gSaveContext.magicState = MAGIC_STATE_IDLE;
 
-        s8 nextArrow = GetNextArrowType(player->heldItemAction);
-        player->heldItemAction = nextArrow;
-        player->itemAction = nextArrow;
+        s16 nextArrow = GetNextArrowType(GetCurrentArrowType(player));
+        player->heldItemAction = nextArrow == PLAYER_IA_BOW_BOMB_ARROW ? PLAYER_IA_BOW : nextArrow;
+        player->itemAction = player->heldItemAction;
         Actor* arrow = player->heldActor;
 
         if (arrow->child != NULL) {
@@ -161,8 +187,8 @@ bool ArrowCycleMain() {
             arrow->child = NULL;
         }
         arrow->params = GetArrowTypeForArrow(nextArrow);
-        EnArrow_Init(arrow, gPlayState);
         UpdateEquippedBow(gPlayState, nextArrow);
+        EnArrow_Init(arrow, gPlayState);
         return true;
     }
     return false;
