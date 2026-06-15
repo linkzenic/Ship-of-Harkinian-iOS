@@ -3,6 +3,8 @@
 
 A port of Ship of Harkinian for Android.
 
+Current Android release: `v9.2.3-android.5`
+
 ## Website
 
 Official Website: https://www.shipofharkinian.com/
