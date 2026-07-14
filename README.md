@@ -6,10 +6,11 @@ Original repository: https://github.com/HarbourMasters/Shipwright
 
 Current Android release: **v9.2.3-android.5**
 
-This repository provides two editions that can be installed together:
+This repository provides three forks that can be installed together:
 
-- **Standard SOH** — the regular Android port, using the package `com.linkzenic.soh` and the `SOH` data folder.
-- **SOHCS** — the Android port of Roborich's cel-shading fork, using the package `com.linkzenic.sohcs` and the separate `SOHCS` data folder.
+- **Standard SOH** — the regular Android port.
+- **SOHCS** — the Android port of Roborich's cel-shading fork.
+- **SOHNEI** - the Android port of Skijer's Not Enough Items Fork.
 
 Supported: Android 7+ with OpenGL ES 3.0+
 
