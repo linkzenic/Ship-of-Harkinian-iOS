@@ -69,10 +69,12 @@ Yes. Use Settings > General > Menu Scale.
 
 Place mod `.otr` or `.o2r` files in the `mods` folder inside the selected edition's data folder, then enable them from Settings > Mod Menu.
 
-**Cel-Shaded Fork**
+##  **Cel-Shaded Fork**
+
 The cel-shaded edition, based on Roborich's 9.2.3-celshade0.5 fork. It uses the /SOHCS data folder.
 On first launch, SOHCS asks whether to import existing saves, settings, controller configuration, and compatible archives from /SOH. Choose No to keep both installations completely independent. The original /SOH files are never moved or deleted.
 
-**Skijer's Not Enough Items Fork**
+##  **Skijer's Not Enough Items Fork**
+
 This is a beta fork, based on Skijer's Not Enough Items fork. It uses the /SOHNEI data folder.
 On first launch, SOHNEI offers to import existing SOH data from /SOH and mm.o2r from /2S2H. It will also import relevant 3DS textures from 2S2H of available. The original files are never moved or deleted.
