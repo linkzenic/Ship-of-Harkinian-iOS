@@ -24,8 +24,6 @@ Official Discord: https://discord.com/invite/shipofharkinian
 
 [Ship of Harkinian](https://github.com/HarbourMasters/Shipwright) is developed by Harbour Masters and its contributors.
 
-SOHCS is an Android port of [Roborich's Ship of Harkinian cel-shading fork](https://github.com/roborich/Shipwright/releases/tag/9.2.3-celshade0.5). Roborich created and maintains the original cel-shading fork and its renderer changes. This repository carries that work onto Android and integrates it with the Android-specific features of this port.
-
 ## Installation
 
 1. Verify that you have a supported, legally obtained Ocarina of Time ROM. You can use the compatibility checker at https://ship.equipment/ or compare your ROM's `sha1` hash against [docs/supportedHashes.json](docs/supportedHashes.json).
