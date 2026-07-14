@@ -8,7 +8,7 @@ Current Android release: **v9.2.3-android.5**
 
 This repository provides three forks that can be installed together:
 
-- **Standard SOH** — the standard Android port that most closely follows upstream from Harbour Masters.
+- **Ship of Harkinian** — the standard Android port that most closely follows upstream from Harbour Masters.
 - **SOHCS** — the Android port of Roborich's cel-shading fork.
 - **SOHNEI** - the Android port of Skijer's Not Enough Items Fork.
 
