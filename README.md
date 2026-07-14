@@ -76,5 +76,5 @@ On first launch, SOHCS asks whether to import existing saves, settings, controll
 
 ##  **Skijer's Not Enough Items Fork**
 
-This is a beta fork, based on Skijer's Not Enough Items fork. It uses the /SOHNEI data folder.
+This is a beta fork, based on [Skijer's Not Enough Items fork](https://github.com/skijer/Shipwright/releases/tag/Alpha_3). It uses the /SOHNEI data folder.
 On first launch, SOHNEI offers to import existing SOH data from /SOH and mm.o2r from /2S2H. It will also import relevant 3DS textures from 2S2H of available. The original files are never moved or deleted.
