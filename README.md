@@ -70,27 +70,10 @@ Yes. Use Settings > General > Menu Scale.
 
 Place mod `.otr` or `.o2r` files in the `mods` folder inside the selected edition's data folder, then enable them from Settings > Mod Menu.
 
-## Known Issues
+**Cel-Shaded Fork**
+The cel-shaded edition, based on Roborich's 9.2.3-celshade0.5 fork. It uses the /SOHCS data folder.
+On first launch, SOHCS asks whether to import existing saves, settings, controller configuration, and compatible archives from /SOH. Choose No to keep both installations completely independent. The original /SOH files are never moved or deleted.
 
-External Bluetooth controller rumble is not currently supported. Device vibration is used as a fallback on supported handhelds.
-
-Touch overlay and physical controller button mappings share the same slot per port, so you cannot assign different actions to the same button on each.
-
-Some pre-rendered backgrounds are limited by upstream Ship of Harkinian behavior and may not fill widescreen viewports.
-
-## Build Notes
-
-Android builds are produced through GitHub Actions. The APK bundles `soh.o2r` support data, but does not bundle extracted game data; users generate the required `.otr` or `.o2r` files from their own ROM.
-
-Building locally requires Docker or another OCI-compatible container tool on Linux. Windows users should use WSL2 and clone the repository to a native Linux path rather than a Windows-mounted path.
-
-```bash
-git clone https://github.com/linkzenic/Shipwright-Android.git
-cd Shipwright-Android
-git submodule update --init --recursive
-cd docker
-make setup
-make build_release
-```
-
-The resulting APK will be at `Android/app/build/outputs/apk/release/`.
+**Skijer's Not Enough Items Fork**
+This is a beta fork, based on Skijer's Not Enough Items fork. It uses the /SOHNEI data folder.
+On first launch, SOHNEI offers to import existing SOH data from /SOH and mm.o2r from /2S2H. It will also import relevant 3DS textures from 2S2H of available. The original files are never moved or deleted.
