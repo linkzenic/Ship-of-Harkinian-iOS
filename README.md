@@ -44,6 +44,15 @@ scripts/build-ios.sh --device
 scripts/package-ios-unsigned.sh
 ```
 
+Build and package an unsigned Apple TV IPA with:
+
+```sh
+scripts/build-ios.sh --tvos-device
+scripts/package-ios-unsigned.sh \
+  "build-tvos-device/soh/Release-appletvos/Ship of Harkinian.app" \
+  "dist/Ship-of-Harkinian-tvOS-unsigned.ipa"
+```
+
 The packaging step rejects executables containing a local `/Users/` build path
 and removes any stale code signature or embedded provisioning profile.
 
