@@ -37,6 +37,16 @@ service before installation.
 See [docs/IOS_PORT.md](docs/IOS_PORT.md) for the current build and platform
 notes. Xcode and the Apple platform SDKs are required.
 
+Build and package an unsigned iPhone IPA with:
+
+```sh
+scripts/build-ios.sh --device
+scripts/package-ios-unsigned.sh
+```
+
+The packaging step rejects executables containing a local `/Users/` build path
+and removes any stale code signature or embedded provisioning profile.
+
 ## Project Attribution
 
 Ship of Harkinian is developed by Harbour Masters and its contributors. This is
