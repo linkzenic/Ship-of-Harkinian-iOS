@@ -5,7 +5,9 @@
 #pragma comment(lib, "Shlwapi.lib")
 #endif
 #include "Extract.h"
+#if !defined(__TVOS__)
 #include "portable-file-dialogs.h"
+#endif
 #include <ship/utils/binarytools/BitConverter.h>
 #include "soh/ShipUtils.h"
 #include "variables.h"
@@ -272,6 +274,27 @@ void Extractor::GetRoms(std::vector<std::string>& roms) {
     // if (h != nullptr) {
     //    CloseHandle(h);
     //}
+#elif defined(__IOS__)
+    // A tvOS data container can be temporarily unavailable while its protection
+    // state changes (for example immediately after an install). Do not let a
+    // directory scan exception terminate the app; the transfer UI can remain
+    // available and a later rescan will discover the uploaded ROM.
+    std::error_code error;
+    std::filesystem::directory_iterator iterator(mSearchPath, error);
+    const std::filesystem::directory_iterator end;
+    while (!error && iterator != end) {
+        const auto& file = *iterator;
+        std::error_code entryError;
+        if (file.is_directory(entryError)) {
+            iterator.increment(error);
+            continue;
+        }
+        const auto extension = file.path().extension();
+        if (extension == ".n64" || extension == ".z64" || extension == ".v64") {
+            roms.push_back(file.path().string());
+        }
+        iterator.increment(error);
+    }
 #elif defined(__ANDROID__)
     DIR* adir;
     struct dirent* aentry;
@@ -372,6 +395,10 @@ bool Extractor::GetRomPathFromBox() {
     mCurrentRomPath = javaRomPath;
     free((void*)javaRomPath);
     javaRomPath = NULL;
+#elif defined(__TVOS__)
+    // tvOS has no system file picker. ROM and O2R files are imported by the
+    // local-network transfer server and discovered by the normal rescan path.
+    return false;
 #else
     auto selection = pfd::open_file("Select a file", mSearchPath, { "N64 Roms", "*.z64 *.n64 *.v64" }).result();
 
@@ -713,7 +740,7 @@ bool Extractor::CallZapd(std::string installPath, std::string exportdir, std::at
     // Work this out in the temporary folder
     std::string tempdir = Mkdtemp();
     std::string curdir = std::filesystem::current_path().string();
-#if defined(_WIN32) || defined(__ANDROID__)
+#if defined(_WIN32) || defined(__ANDROID__) || defined(__IOS__)
     std::filesystem::copy(installPath + "/assets", tempdir + "/assets",
                           std::filesystem::copy_options::recursive | std::filesystem::copy_options::update_existing);
 #else

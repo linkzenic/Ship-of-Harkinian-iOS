@@ -517,6 +517,11 @@ static void RunFrame() {
 
 void Graph_ThreadEntry(void* arg0) {
     while (WindowIsRunning()) {
+#ifdef __IOS__
+        if (!WindowIsFrameReady()) {
+            continue;
+        }
+#endif
         RunFrame();
     }
 }

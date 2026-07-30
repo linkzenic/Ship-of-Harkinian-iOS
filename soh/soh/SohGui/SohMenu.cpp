@@ -3,6 +3,9 @@
 #include <ship/window/gui/GuiElement.h>
 #include <ship/utils/StringHelper.h>
 #include <spdlog/fmt/fmt.h>
+#if defined(__IOS__) && !defined(__TVOS__)
+#include "ios/SOHiOSTouchControls.h"
+#endif
 
 extern "C" {
 extern PlayState* gPlayState;
@@ -166,7 +169,15 @@ void SohMenu::InitElement() {
 }
 
 void SohMenu::UpdateElement() {
+#if defined(__IOS__) && !defined(__TVOS__)
+    if (SOHiOS_ConsumeMenuToggleRequest()) {
+        ToggleVisibility();
+    }
+#endif
     Ship::Menu::UpdateElement();
+#if defined(__IOS__) && !defined(__TVOS__)
+    SOHiOS_SetTouchControlsMenuVisible(IsVisible());
+#endif
 }
 
 void SohMenu::Draw() {

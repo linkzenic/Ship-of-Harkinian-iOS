@@ -658,6 +658,31 @@ void Menu::DrawElement() {
     ImGui::PushFont(OTRGlobals::Instance->fontStandardLargest);
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10.0f, 8.0f));
     std::string headerIndex = CVarGetString(headerCvar, "Settings");
+#ifdef __TVOS__
+    static bool tvosSidebarNavigation = false;
+    if (freshOpen) {
+        tvosSidebarNavigation = false;
+    }
+
+    // Child windows prevent ImGui's spatial navigation from crossing between
+    // the menu header, sidebar, and settings content. Shoulder buttons provide
+    // a predictable tvOS shortcut between top-level menu headers.
+    const bool previousHeader = ImGui::IsKeyPressed(ImGuiKey_GamepadL1, false);
+    const bool nextHeader = ImGui::IsKeyPressed(ImGuiKey_GamepadR1, false);
+    if ((previousHeader || nextHeader) && !menuOrder.empty()) {
+        auto current = std::find(menuOrder.begin(), menuOrder.end(), headerIndex);
+        size_t index = current == menuOrder.end() ? 0 : static_cast<size_t>(current - menuOrder.begin());
+        if (previousHeader) {
+            index = (index + menuOrder.size() - 1) % menuOrder.size();
+        } else {
+            index = (index + 1) % menuOrder.size();
+        }
+        headerIndex = menuOrder.at(index);
+        CVarSetString(headerCvar, headerIndex.c_str());
+        CVarSave();
+        tvosSidebarNavigation = true;
+    }
+#endif
     ImVec2 pos = window->DC.CursorPos;
     std::vector<ImVec2> headerSizes;
     float headerWidth = 0.0f;
@@ -826,6 +851,44 @@ void Menu::DrawElement() {
     if (!sidebar->contains(sectionIndex)) {
         sectionIndex = menuEntries.at(headerIndex).sidebarOrder.at(0);
     }
+#ifdef __TVOS__
+    const bool enterSidebar =
+        ImGui::IsKeyPressed(ImGuiKey_GamepadDpadLeft, false) ||
+        ImGui::IsKeyPressed(ImGuiKey_GamepadLStickLeft, false);
+    const bool leaveSidebar =
+        ImGui::IsKeyPressed(ImGuiKey_GamepadDpadRight, false) ||
+        ImGui::IsKeyPressed(ImGuiKey_GamepadLStickRight, false) ||
+        ImGui::IsKeyPressed(ImGuiKey_GamepadFaceDown, false);
+    bool focusSectionContent = false;
+    if (enterSidebar) {
+        tvosSidebarNavigation = true;
+    } else if (tvosSidebarNavigation && leaveSidebar) {
+        tvosSidebarNavigation = false;
+        focusSectionContent = true;
+    }
+
+    if (tvosSidebarNavigation && !menuEntries.at(headerIndex).sidebarOrder.empty()) {
+        const bool previousSection =
+            ImGui::IsKeyPressed(ImGuiKey_GamepadDpadUp, false) ||
+            ImGui::IsKeyPressed(ImGuiKey_GamepadLStickUp, false);
+        const bool nextSection =
+            ImGui::IsKeyPressed(ImGuiKey_GamepadDpadDown, false) ||
+            ImGui::IsKeyPressed(ImGuiKey_GamepadLStickDown, false);
+        if (previousSection || nextSection) {
+            auto& order = menuEntries.at(headerIndex).sidebarOrder;
+            auto current = std::find(order.begin(), order.end(), sectionIndex);
+            size_t index = current == order.end() ? 0 : static_cast<size_t>(current - order.begin());
+            if (previousSection) {
+                index = (index + order.size() - 1) % order.size();
+            } else {
+                index = (index + 1) % order.size();
+            }
+            sectionIndex = order.at(index);
+            CVarSetString(sidebarCvar, sectionIndex.c_str());
+            CVarSave();
+        }
+    }
+#endif
     float sectionCenterX = pos.x + (sidebarWidth / 2);
     float topY = pos.y;
     ImGui::BeginChild((menuEntries.at(headerIndex).label + " Section").c_str(), { sidebarWidth, columnHeight },
@@ -853,6 +916,13 @@ void Menu::DrawElement() {
         }
     }
     ImGui::EndChild();
+#ifdef __TVOS__
+    if (tvosSidebarNavigation) {
+        ImGui::GetWindowDrawList()->AddRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(),
+                                            ImGui::GetColorU32(UIWidgets::ColorValues.at(menuThemeIndex)), 5.0f, 0,
+                                            4.0f);
+    }
+#endif
     ImGui::PopFont();
 
     pos = ImVec2{ sectionCenterX + (sidebarWidth / 2), topY } + style.ItemSpacing * 2;
@@ -879,6 +949,11 @@ void Menu::DrawElement() {
         ImGui::SameLine();
         ImGui::BeginChild(sectionMenuId.c_str(), { sectionWidth, columnHeight }, ImGuiChildFlags_None,
                           ImGuiWindowFlags_NoTitleBar);
+#ifdef __TVOS__
+        if (focusSectionContent) {
+            ImGui::SetWindowFocus();
+        }
+#endif
     }
     if (headerSearch && menuSearchText.length() > 0) {
         ImGui::AlignTextToFramePadding();
@@ -915,6 +990,11 @@ void Menu::DrawElement() {
             if (useColumns) {
                 ImGui::BeginChild(sectionId.c_str(), { columnWidths[i], columnHeight }, ImGuiChildFlags_None,
                                   ImGuiWindowFlags_NoTitleBar);
+#ifdef __TVOS__
+                if (focusSectionContent && i == 0) {
+                    ImGui::SetWindowFocus();
+                }
+#endif
             }
             // for (auto& entryName : sidebar->at(sectionIndex).sidebarOrder) {
             for (auto& entry : sidebar->at(sectionIndex).columnWidgets.at(i)) {

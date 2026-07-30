@@ -26,6 +26,10 @@
 #include <array>
 #include <mutex>
 
+#if defined(__IOS__)
+#include "ios/SOHiCloudSync.h"
+#endif
+
 extern "C" SaveContext gSaveContext;
 using namespace std::string_literals;
 
@@ -414,6 +418,11 @@ void SaveManager::SaveRandomizer(SaveContext* saveContext, int sectionID, bool f
 void SaveManager::Init() {
     // Wait on saves that snuck through the Wait in OnExitGame
     ThreadPoolWait();
+#if defined(__IOS__)
+    if (CVarGetInteger(CVAR_SETTING("iCloudSync.Saves"), 0)) {
+        SOHiCloudSync_PrepareSaves();
+    }
+#endif
     const std::filesystem::path sSavePath(Ship::Context::GetPathRelativeToAppDirectory("Save"));
     const std::filesystem::path sGlobalPath = sSavePath / std::string("global.sav");
     auto sOldSavePath = Ship::Context::GetPathRelativeToAppDirectory("oot_save.sav");
@@ -1204,6 +1213,11 @@ void SaveManager::SaveFileThreaded(int fileNum, SaveContext* saveContext, int se
     InitMeta(fileNum);
     GameInteractor::Instance->ExecuteHooks<GameInteractor::OnSaveFile>(fileNum, sectionID);
     SPDLOG_INFO("Save File Finish - fileNum: {}", fileNum);
+#if defined(__IOS__)
+    if (CVarGetInteger(CVAR_SETTING("iCloudSync.Saves"), 0)) {
+        SOHiCloudSync_LocalSaveChanged(fileName.string().c_str());
+    }
+#endif
     saveMtx.unlock();
 }
 
@@ -1244,6 +1258,12 @@ void SaveManager::SaveGlobal() {
 
     std::ofstream output(sGlobalPath);
     output << std::setw(1) << globalBlock << std::endl;
+    output.close();
+#if defined(__IOS__)
+    if (CVarGetInteger(CVAR_SETTING("iCloudSync.Saves"), 0)) {
+        SOHiCloudSync_LocalSaveChanged(sGlobalPath.string().c_str());
+    }
+#endif
 }
 
 void SaveManager::LoadFile(int fileNum) {
@@ -2425,17 +2445,28 @@ void SaveManager::CopyZeldaFile(int from, int to) {
     fileMetaInfo[to].filenameLanguage = fileMetaInfo[from].filenameLanguage;
     SohUtils::CopyStringToCharArray(fileMetaInfo[to].buildVersion, fileMetaInfo[from].buildVersion,
                                     ARRAY_COUNT(fileMetaInfo[to].buildVersion));
+#if defined(__IOS__)
+    if (CVarGetInteger(CVAR_SETTING("iCloudSync.Saves"), 0)) {
+        SOHiCloudSync_LocalSaveChanged(GetFileName(to).string().c_str());
+    }
+#endif
 }
 
 void SaveManager::DeleteZeldaFile(int fileNum) {
-    if (std::filesystem::exists(GetFileName(fileNum))) {
-        std::filesystem::remove(GetFileName(fileNum));
+    const std::filesystem::path fileName = GetFileName(fileNum);
+    if (std::filesystem::exists(fileName)) {
+        std::filesystem::remove(fileName);
     }
     fileMetaInfo[fileNum].valid = false;
     fileMetaInfo[fileNum].randoSave = false;
     fileMetaInfo[fileNum].requiresMasterQuest = false;
     fileMetaInfo[fileNum].requiresOriginal = false;
     GameInteractor::Instance->ExecuteHooks<GameInteractor::OnDeleteFile>(fileNum);
+#if defined(__IOS__)
+    if (CVarGetInteger(CVAR_SETTING("iCloudSync.Saves"), 0)) {
+        SOHiCloudSync_LocalSaveDeleted(fileName.string().c_str());
+    }
+#endif
 }
 
 bool SaveManager::IsRandoFile() {

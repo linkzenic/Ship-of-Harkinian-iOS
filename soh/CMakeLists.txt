@@ -1,12 +1,16 @@
 cmake_minimum_required(VERSION 3.26.0 FATAL_ERROR)
 
-set(CMAKE_SYSTEM_VERSION 10.0 CACHE STRING "" FORCE)
+if(CMAKE_SYSTEM_NAME MATCHES "iOS|tvOS")
+    set(CMAKE_SYSTEM_VERSION "${DEPLOYMENT_TARGET}" CACHE STRING "" FORCE)
+else()
+    set(CMAKE_SYSTEM_VERSION 10.0 CACHE STRING "" FORCE)
+endif()
 
 project(soh LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 20 CACHE STRING "The C++ standard to use")
 set(CMAKE_C_STANDARD 23 CACHE STRING "The C standard to use")
 
-if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+if (CMAKE_SYSTEM_NAME MATCHES "Darwin|iOS|tvOS")
     enable_language(OBJCXX)
     set(CMAKE_OBJC_FLAGS "${CMAKE_OBJC_FLAGS} -fobjc-arc")
     set(CMAKE_OBJCXX_FLAGS "${CMAKE_OBJCXX_FLAGS} -fobjc-arc")
@@ -127,6 +131,15 @@ file(GLOB_RECURSE soh__ RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "soh/*.c" "soh/*.cp
 list(APPEND soh__ ${CMAKE_CURRENT_SOURCE_DIR}/soh/Enhancements/savestates_extern.inc)
 list(APPEND soh__ ${CMAKE_CURRENT_SOURCE_DIR}/soh/Enhancements/speechsynthesizer/DarwinSpeechSynthesizer.mm)
 
+if(CMAKE_SYSTEM_NAME MATCHES "iOS|tvOS")
+    list(APPEND soh__ ${CMAKE_CURRENT_SOURCE_DIR}/ios/SOHiCloudSync.mm)
+    if(SOH_APPLE_TARGET STREQUAL "tvos")
+        list(APPEND soh__ ${CMAKE_CURRENT_SOURCE_DIR}/ios/SOHTVOSFileServer.mm)
+    else()
+        list(APPEND soh__ ${CMAKE_CURRENT_SOURCE_DIR}/ios/SOHiOSTouchControls.mm)
+    endif()
+endif()
+
 # Create source groups that match the real file directory paths
 foreach(source IN LISTS soh__)
     get_filename_component(source_path "${source}" PATH)
@@ -152,14 +165,14 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Android")
 endif()
 
 # handle Network removals
-if (!BUILD_REMOTE_CONTROL)
+if (!BUILD_REMOTE_CONTROL AND NOT CMAKE_SYSTEM_NAME MATCHES "iOS|tvOS")
     list(FILTER soh__ EXCLUDE REGEX "soh/Enhancements/crowd-control/")
 endif()
 
 # handle speechsynthesizer removals
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
     list(FILTER soh__ EXCLUDE REGEX "soh/Enhancements/speechsynthesizer/Darwin")
-elseif (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+elseif (CMAKE_SYSTEM_NAME MATCHES "Darwin|iOS|tvOS")
     list(FILTER soh__ EXCLUDE REGEX "soh/Enhancements/speechsynthesizer/SAPI")
 else()
     list(FILTER soh__ EXCLUDE REGEX "soh/Enhancements/speechsynthesizer/(Darwin|SAPI)")
@@ -238,6 +251,16 @@ else()
     add_library(${PROJECT_NAME} SHARED ${ALL_FILES})
 endif()
 
+if(CMAKE_SYSTEM_NAME MATCHES "iOS|tvOS")
+    set_source_files_properties(
+        "${CMAKE_CURRENT_SOURCE_DIR}/ios/Assets.xcassets"
+        PROPERTIES MACOSX_PACKAGE_LOCATION Resources
+    )
+    target_sources(${PROJECT_NAME} PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}/ios/Assets.xcassets"
+    )
+endif()
+
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
 use_props(${PROJECT_NAME} "${CMAKE_CONFIGURATION_TYPES}" "${DEFAULT_CXX_PROPS}")
 endif()
@@ -262,6 +285,49 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
         XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES
         OUTPUT_NAME "soh-macos"
     )
+elseif(CMAKE_SYSTEM_NAME MATCHES "iOS|tvOS")
+    set(SOH_APPLE_TARGET "ios" CACHE STRING "Apple mobile target: ios or tvos")
+    set(SOH_ICLOUD_CONTAINER_ID "iCloud.com.shipofharkinian.shared" CACHE STRING
+        "Shared CloudKit container for iPhone, iPad, tvOS, and macOS")
+    configure_file(
+        "${CMAKE_CURRENT_SOURCE_DIR}/ios/SOHiOS.entitlements.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/SOHiOS.entitlements"
+        @ONLY
+    )
+    if(SOH_APPLE_TARGET STREQUAL "tvos")
+        set(SOH_APPLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/ios/Info-tvOS.plist.in")
+        set(SOH_APPLE_DEVICE_FAMILY "3")
+    else()
+        set(SOH_APPLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/ios/Info.plist.in")
+        set(SOH_APPLE_DEVICE_FAMILY "1,2")
+    endif()
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+        MACOSX_BUNDLE TRUE
+        MACOSX_BUNDLE_GUI_IDENTIFIER "${BUNDLE_ID}"
+        MACOSX_BUNDLE_INFO_PLIST "${SOH_APPLE_INFO_PLIST}"
+        OUTPUT_NAME "Ship of Harkinian"
+        XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES
+        XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${CMAKE_CURRENT_BINARY_DIR}/SOHiOS.entitlements"
+        XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER "${BUNDLE_ID}"
+        XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "${SOH_APPLE_DEVICE_FAMILY}"
+    )
+    if(SOH_APPLE_TARGET STREQUAL "tvos")
+        set_target_properties(${PROJECT_NAME} PROPERTIES
+            XCODE_ATTRIBUTE_ASSETCATALOG_COMPILER_APPICON_NAME "AppIconTV"
+        )
+    else()
+        set_target_properties(${PROJECT_NAME} PROPERTIES
+            XCODE_ATTRIBUTE_ASSETCATALOG_COMPILER_APPICON_NAME "AppIcon"
+        )
+    endif()
+    target_compile_definitions(${PROJECT_NAME} PRIVATE
+        SOH_ICLOUD_CONTAINER_ID="${SOH_ICLOUD_CONTAINER_ID}"
+        "$<$<STREQUAL:${SOH_APPLE_TARGET},tvos>:__TVOS__>"
+    )
+    target_link_libraries(${PROJECT_NAME} PRIVATE "-framework CloudKit")
+    if(SOH_APPLE_TARGET STREQUAL "tvos")
+        target_link_libraries(${PROJECT_NAME} PRIVATE "-framework Network")
+    endif()
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     set_target_properties(${PROJECT_NAME} PROPERTIES
     OUTPUT_NAME "soh.elf"
@@ -366,7 +432,7 @@ find_package(SDL2)
 endif()
 set(SDL2-INCLUDE ${SDL2_INCLUDE_DIRS})
 
-if (BUILD_REMOTE_CONTROL)
+if (BUILD_REMOTE_CONTROL AND NOT CMAKE_SYSTEM_NAME MATCHES "iOS|tvOS")
     if (CMAKE_SYSTEM_NAME STREQUAL "Android")
         FetchContent_Declare(
             SDL2_net
@@ -474,6 +540,17 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
             NOMINMAX
         )
     endif()
+elseif (CMAKE_SYSTEM_NAME MATCHES "iOS|tvOS")
+    target_compile_definitions(${PROJECT_NAME} PRIVATE
+        "$<$<CONFIG:Debug>:_DEBUG>"
+        "$<$<CONFIG:Release>:NDEBUG>"
+        "__IOS__;"
+        "F3DEX_GBI_2;"
+        "_CONSOLE;"
+        "_CRT_SECURE_NO_WARNINGS;"
+        SPDLOG_ACTIVE_LEVEL=${SPDLOG_MIN_CUTOFF}
+        LOG_LEVEL_GAME_PRINTS=${SPDLOG_LEVEL_OFF}
+    )
 elseif (CMAKE_SYSTEM_NAME STREQUAL "CafeOS")
     target_compile_definitions(${PROJECT_NAME} PRIVATE
         "$<$<CONFIG:Debug>:"
@@ -583,7 +660,7 @@ if(MSVC)
 endif()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
-    if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    if (CMAKE_SYSTEM_NAME MATCHES "Darwin|iOS|tvOS")
         target_compile_options(${PROJECT_NAME} PRIVATE
             -Wall -Wextra -Wno-error
             -Wformat-security
@@ -716,11 +793,13 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
         ${CPU_OPTION}
         )
 
-        target_link_options(${PROJECT_NAME} PRIVATE
-            -pthread
+        target_link_options(${PROJECT_NAME} PRIVATE -pthread)
+        if(NOT CMAKE_SYSTEM_NAME MATCHES "iOS|tvOS")
+            target_link_options(${PROJECT_NAME} PRIVATE
                 #-fsanitize=address
-            -Wl,-export-dynamic
-        )
+                -Wl,-export-dynamic
+            )
+        endif()
     endif()
 endif()
 ################################################################################
@@ -743,6 +822,26 @@ if(NOT CMAKE_SYSTEM_NAME MATCHES "NintendoSwitch|CafeOS|Android")
         COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different ${CMAKE_SOURCE_DIR}/soh/assets/xml $<TARGET_FILE_DIR:soh>/assets/xml
         COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_FILE_DIR:soh>/assets/symbols
     #    COMMAND ${VS_COPY_ASSETS_CMD}
+    )
+endif()
+if(CMAKE_SYSTEM_NAME MATCHES "iOS|tvOS")
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/soh.o2r")
+        add_custom_command(
+            TARGET ${PROJECT_NAME}
+            POST_BUILD
+            COMMENT "Copying ROM-free port archive..."
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${CMAKE_CURRENT_SOURCE_DIR}/soh.o2r"
+                "$<TARGET_FILE_DIR:soh>/soh.o2r"
+        )
+    endif()
+    add_custom_command(
+        TARGET ${PROJECT_NAME}
+        POST_BUILD
+        COMMENT "Copying controller mappings..."
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_BINARY_DIR}/gamecontrollerdb.txt"
+            "$<TARGET_FILE_DIR:soh>/gamecontrollerdb.txt"
     )
 endif()
 ################################################################################
@@ -823,6 +922,22 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "CafeOS")
     target_include_directories(${PROJECT_NAME} PRIVATE
         ${DEVKITPRO}/portlibs/wiiu/include/
     )
+elseif(CMAKE_SYSTEM_NAME MATCHES "iOS|tvOS")
+    set(THREADS_PREFER_PTHREAD_FLAG ON)
+    find_package(Threads REQUIRED)
+    set(ADDITIONAL_LIBRARY_DEPENDENCIES
+        "libultraship;"
+        "ZAPDLib;"
+        SDL2::SDL2-static
+        SDL2::SDL2main
+        Ogg::ogg
+        Vorbis::vorbis
+        Vorbis::vorbisenc
+        Vorbis::vorbisfile
+        Opus::opus
+        OpusFile::opusfile
+        Threads::Threads
+    )
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Android")
     set(THREADS_PREFER_PTHREAD_FLAG ON)
     find_package(Threads REQUIRED)
@@ -863,7 +978,7 @@ else()
     )
 endif()
 
-if(NOT CMAKE_SYSTEM_NAME MATCHES "Darwin|NintendoSwitch|CafeOS")
+if(NOT CMAKE_SYSTEM_NAME MATCHES "Darwin|iOS|tvOS|NintendoSwitch|CafeOS")
 INSTALL(TARGETS soh DESTINATION . COMPONENT ship)
 endif()
 
@@ -872,10 +987,18 @@ INSTALL(FILES $<TARGET_PDB_FILE:soh> DESTINATION ./debug COMPONENT ship)
 INSTALL(FILES ${CMAKE_BINARY_DIR}/soh/soh.o2r DESTINATION . COMPONENT ship)
 endif()
 
-if(NOT CMAKE_SYSTEM_NAME STREQUAL "Android")
 find_program(CURL NAMES curl DOC "Path to the curl program.  Used to download files.")
-execute_process(COMMAND ${CURL} -sSfL https://raw.githubusercontent.com/mdqinc/SDL_GameControllerDB/master/gamecontrollerdb.txt -o ${CMAKE_BINARY_DIR}/gamecontrollerdb.txt OUTPUT_VARIABLE RESULT)
+if(CMAKE_SYSTEM_NAME MATCHES "iOS|tvOS")
+    set(CONTROLLER_DB_COMMIT "03d390c37b1342fcb7d8d294cd9621ab9d640bb3")
+    set(CONTROLLER_DB_URL
+        "https://raw.githubusercontent.com/mdqinc/SDL_GameControllerDB/${CONTROLLER_DB_COMMIT}/gamecontrollerdb.txt"
+    )
+else()
+    set(CONTROLLER_DB_URL
+        "https://raw.githubusercontent.com/mdqinc/SDL_GameControllerDB/master/gamecontrollerdb.txt"
+    )
 endif()
+execute_process(COMMAND ${CURL} -sSfL ${CONTROLLER_DB_URL} -o ${CMAKE_BINARY_DIR}/gamecontrollerdb.txt OUTPUT_VARIABLE RESULT)
 
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
 configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/macosx/Info.plist.in ${CMAKE_BINARY_DIR}/macosx/Info.plist @ONLY)

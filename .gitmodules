@@ -1,9 +1,11 @@
 [submodule "libultraship"]
 	path = libultraship
-	url = https://github.com/please-be-nice/libultraship.git
+	url = https://github.com/linkzenic/libultraship.git
+	branch = ios-port
 [submodule "ZAPDTR"]
 	path = ZAPDTR
-	url = https://github.com/please-be-nice/ZAPDTR
+	url = https://github.com/linkzenic/ZAPDTR.git
+	branch = ios-port
 [submodule "OTRExporter"]
 	path = OTRExporter
 	url = https://github.com/please-be-nice/OTRExporter
