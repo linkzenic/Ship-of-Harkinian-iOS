@@ -1,5 +1,6 @@
 #include <libultraship/bridge.h>
 #include "soh/Enhancements/game-interactor/GameInteractor.h"
+#include "soh/Enhancements/ResetHotKey.h"
 #include "soh/ShipInit.hpp"
 #include "functions.h"
 #include "soh/OTRGlobals.h"
@@ -28,6 +29,15 @@ static void OnGameStateMainStartResetHotkey() {
             consoleWin->Dispatch("reset");
         }
     }
+}
+
+extern "C" bool SohResetToFileSelectWithoutSaving(void) {
+    if (gGameState == nullptr) {
+        return false;
+    }
+    SET_NEXT_GAMESTATE(gGameState, TitleSetup_Init, GameState);
+    gGameState->running = false;
+    return true;
 }
 
 static void RegisterResetHotkey() {
