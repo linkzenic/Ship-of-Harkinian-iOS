@@ -30,6 +30,7 @@ service before installation.
 - Controller-first Apple TV navigation
 - Local-network game-data transfer for Apple TV
 - Optional CloudKit synchronization for save files
+- Option to sync save files via [Linkzenic Save Bridge](https://github.com/linkzenic/linkzenic-save-bridge) via Bonjour
 - Local storage for settings, mods, archives, and device-specific configuration
 
 ## Building
@@ -55,6 +56,36 @@ scripts/package-ios-unsigned.sh \
 
 The packaging step rejects executables containing a local `/Users/` build path
 and removes any stale code signature or embedded provisioning profile.
+
+## iCloud saves
+
+The source includes CloudKit save synchronization for both iOS and tvOS. It is
+not a shared service supplied by this repository, and it does not work merely
+because an unsigned IPA was downloaded and signed.
+
+To enable it, a self-builder needs:
+
+- an active Apple Developer Program membership
+- separate iOS and tvOS App IDs registered to their development team
+- a CloudKit container created under that same team and associated with both App IDs
+- provisioning profiles containing the iCloud/CloudKit entitlement
+- both builds configured with the same container identifier
+
+Configure both targets with the builder's own container:
+
+```sh
+SOH_ICLOUD_CONTAINER_ID=iCloud.example.your-container \
+DEVELOPMENT_TEAM=YOUR_TEAM_ID \
+scripts/build-ios.sh --device
+
+SOH_ICLOUD_CONTAINER_ID=iCloud.example.your-container \
+DEVELOPMENT_TEAM=YOUR_TEAM_ID \
+scripts/build-ios.sh --tvos-device
+```
+
+Apps signed by unrelated development teams cannot access or share another
+team's private CloudKit container. Local saves and Save Bridge continue to work
+when CloudKit is unavailable.
 
 ## Project Attribution
 
