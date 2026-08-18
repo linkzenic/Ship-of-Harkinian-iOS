@@ -613,18 +613,12 @@ typedef NS_ENUM(NSInteger, SOHAndroidButtonShape) {
 - (void)setSOHFaceButtonLayout:(NSInteger)layout {
     self.faceButtonLayout = std::clamp<NSInteger>(layout, 0, 2);
 
-    // Match Linkzenic Android's positional SDL mappings exactly.
-    if (self.faceButtonLayout == 0) {
-        self.buttonA.controllerButton = kButtonB;
-        self.buttonB.controllerButton = kButtonA;
-        self.buttonX.controllerButton = kButtonY;
-        self.buttonY.controllerButton = kButtonX;
-    } else {
-        self.buttonA.controllerButton = kButtonA;
-        self.buttonB.controllerButton = kButtonB;
-        self.buttonX.controllerButton = kButtonX;
-        self.buttonY.controllerButton = kButtonY;
-    }
+    // Layout selection only moves the buttons. A button displaying a letter must
+    // always emit that same logical SDL button, regardless of its screen position.
+    self.buttonA.controllerButton = kButtonA;
+    self.buttonB.controllerButton = kButtonB;
+    self.buttonX.controllerButton = kButtonX;
+    self.buttonY.controllerButton = kButtonY;
     [self setNeedsLayout];
 }
 
