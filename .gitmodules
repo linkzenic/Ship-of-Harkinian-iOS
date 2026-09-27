@@ -1,7 +1,7 @@
 [submodule "libultraship"]
 	path = libultraship
-	url = https://github.com/linkzenic/libultraship.git
-	branch = ios-port
+	url = https://github.com/acwilan/libultraship.git
+	branch = tvos-device-validation
 [submodule "ZAPDTR"]
 	path = ZAPDTR
 	url = https://github.com/linkzenic/ZAPDTR.git
