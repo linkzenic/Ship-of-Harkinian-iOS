@@ -37,8 +37,25 @@
     </array>
     <key>NSLocalNetworkUsageDescription</key>
     <string>Ship of Harkinian uses your local network to transfer game data and mods to Apple TV.</string>
+    <key>UIApplicationSceneManifest</key>
+    <dict>
+        <key>UIApplicationSupportsMultipleScenes</key>
+        <false/>
+        <key>UISceneConfigurations</key>
+        <dict>
+            <key>UIWindowSceneSessionRoleApplication</key>
+            <array>
+                <dict>
+                    <key>UISceneConfigurationName</key>
+                    <string>SDLSceneConfiguration</string>
+                    <key>UISceneDelegateClassName</key>
+                    <string>SDLUIKitSceneDelegate</string>
+                </dict>
+            </array>
+        </dict>
+    </dict>
     <key>SOHCloudKitProvisionedBuild</key>
-    <true/>
+    <@SOH_CLOUDKIT_PROVISIONED@/>
     <key>UIApplicationSupportsIndirectInputEvents</key>
     <true/>
     <key>UILaunchScreen</key>

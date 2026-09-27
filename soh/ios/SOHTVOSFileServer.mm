@@ -11,6 +11,7 @@
 #include <sys/socket.h>
 
 #include <atomic>
+#include <climits>
 #include <cstring>
 
 namespace {
@@ -55,16 +56,46 @@ NSString* TransferURL() {
     }
 
     NSString* result = nil;
+    int resultScore = INT_MIN;
     for (struct ifaddrs* current = interfaces; current != nullptr; current = current->ifa_next) {
         if (current->ifa_addr == nullptr || current->ifa_addr->sa_family != AF_INET ||
             (current->ifa_flags & IFF_UP) == 0 || (current->ifa_flags & IFF_LOOPBACK) != 0) {
             continue;
         }
+
+        const char* interfaceName = current->ifa_name != nullptr ? current->ifa_name : "";
+        // Prefer the physical Wi-Fi/Ethernet interfaces. Tunnel, peer-to-peer,
+        // and cellular interfaces can expose addresses that are not reachable
+        // from the Mac on the same home LAN.
+        if (strncmp(interfaceName, "utun", 4) == 0 || strncmp(interfaceName, "ipsec", 5) == 0 ||
+            strncmp(interfaceName, "ppp", 3) == 0 || strncmp(interfaceName, "pdp_ip", 6) == 0 ||
+            strncmp(interfaceName, "awdl", 4) == 0 || strncmp(interfaceName, "llw", 3) == 0) {
+            continue;
+        }
+
+        int score = 0;
+        if (strcmp(interfaceName, "en0") == 0) {
+            score = 100;
+        } else if (strcmp(interfaceName, "en1") == 0) {
+            score = 90;
+        } else if (strncmp(interfaceName, "bridge", 6) == 0) {
+            score = 70;
+        }
+
+        const uint32_t address = ntohl(
+            reinterpret_cast<struct sockaddr_in*>(current->ifa_addr)->sin_addr.s_addr);
+        const bool isPrivateAddress =
+            (address >> 24) == 10 || (address >> 16) == 0xC0A8 ||
+            (address & 0xFFF00000U) == 0xAC100000U;
+        score += isPrivateAddress ? 20 : -20;
+
         char host[NI_MAXHOST] = {};
         if (getnameinfo(current->ifa_addr, sizeof(struct sockaddr_in), host, sizeof(host),
                         nullptr, 0, NI_NUMERICHOST) == 0) {
-            result = [NSString stringWithFormat:@"http://%s:8080", host];
-            break;
+            if (result == nil || score > resultScore) {
+                result = [NSString stringWithFormat:@"http://%s:8080", host];
+                resultScore = score;
+            }
         }
     }
     freeifaddrs(interfaces);
@@ -145,9 +176,22 @@ void SendAndClose(nw_connection_t connection, NSData* response) {
     memcpy(bytes, response.bytes, response.length);
     dispatch_data_t payload =
         dispatch_data_create(bytes, response.length, ServerQueue(), DISPATCH_DATA_DESTRUCTOR_FREE);
+    NSLog(@"[SoH tvOS transfer] Sending HTTP response (%lu bytes)", (unsigned long)response.length);
     nw_connection_send(connection, payload, NW_CONNECTION_DEFAULT_MESSAGE_CONTEXT, true,
                        ^(nw_error_t error) {
-                           nw_connection_cancel(connection);
+                           if (error != nullptr) {
+                               NSLog(@"[SoH tvOS transfer] HTTP response failed: %@", error);
+                               nw_connection_cancel(connection);
+                               return;
+                           }
+                           NSLog(@"[SoH tvOS transfer] HTTP response sent");
+                           // Give the TCP stack a short opportunity to flush the
+                           // response before closing. Safari waits for this
+                           // response before completing XMLHttpRequest.onload.
+                           dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 250 * NSEC_PER_MSEC),
+                                          ServerQueue(), ^{
+                               nw_connection_cancel(connection);
+                           });
                        });
 }
 
@@ -362,6 +406,8 @@ void SendAndClose(nw_connection_t connection, NSData* response) {
         return NO;
     }
     self.headersComplete = YES;
+    NSLog(@"[SoH tvOS transfer] Receiving %@ (%llu bytes) into %@",
+          self.displayName, self.contentLength, self.destinationPath);
     WriteStatus([NSString stringWithFormat:@"Receiving %@ — 0%%", filename]);
     return YES;
 }
@@ -383,6 +429,7 @@ void SendAndClose(nw_connection_t connection, NSData* response) {
     NSInteger percent = (NSInteger)((self.receivedLength * 100) / self.contentLength);
     WriteStatus([NSString stringWithFormat:@"Receiving %@ — %ld%%", self.displayName, (long)percent]);
     if (self.receivedLength == self.contentLength) {
+        NSLog(@"[SoH tvOS transfer] Received complete body for %@", self.displayName);
         [self finishUpload];
     }
 }
@@ -413,6 +460,8 @@ void SendAndClose(nw_connection_t connection, NSData* response) {
                                                    @"The file arrived but could not be installed."));
         return;
     }
+
+    NSLog(@"[SoH tvOS transfer] Installed %@", self.destinationPath);
 
     if (self.uploadedSave) {
         SOHiCloudSync_LocalSaveChanged(self.destinationPath.UTF8String);
