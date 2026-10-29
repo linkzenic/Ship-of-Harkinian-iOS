@@ -24,7 +24,7 @@ devices.
 
 **Older releases:** [This repository's release archive](https://github.com/linkzenic/Ship-of-Harkinian-iOS/releases).
 
-The unified release is being prepared; check its release notes for platform availability.
+The [unified Android, iOS, and tvOS release is available here](https://github.com/linkzenic/Shipwright-Ports/releases/tag/v9.3.1-ports.1).
 
 Public IPA files do not contain copyrighted game data. A legally obtained,
 supported Ocarina of Time ROM is required. Depending on the release type, users
