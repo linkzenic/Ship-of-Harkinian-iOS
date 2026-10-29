@@ -1,5 +1,16 @@
 # Ship of Harkinian - iOS
 
+> **New releases have moved to [Shipwright-Ports](https://github.com/linkzenic/Shipwright-Ports).**
+> Android, iOS, and tvOS are now maintained together in one unified repository.
+> Visit the [new Releases page](https://github.com/linkzenic/Shipwright-Ports/releases)
+> for future iPhone, iPad, and Apple TV downloads, and use the
+> [new issue tracker](https://github.com/linkzenic/Shipwright-Ports/issues) for support.
+>
+> This repository and its older releases remain available for reference. The
+> documentation below describes this older codebase; consult the
+> [Shipwright-Ports README](https://github.com/linkzenic/Shipwright-Ports#readme)
+> for current features, installation instructions, and release status.
+
 Linkzenic's iPhone, iPad, and Apple TV port of
 [Ship of Harkinian](https://github.com/HarbourMasters/Shipwright).
 
@@ -9,8 +20,11 @@ devices.
 
 ## Downloads
 
-Test builds are published on the
-[Releases page](https://github.com/linkzenic/Ship-of-Harkinian-iOS/releases).
+**New releases:** [Shipwright-Ports Releases](https://github.com/linkzenic/Shipwright-Ports/releases).
+
+**Older releases:** [This repository's release archive](https://github.com/linkzenic/Ship-of-Harkinian-iOS/releases).
+
+The unified release is being prepared; check its release notes for platform availability.
 
 Public IPA files do not contain copyrighted game data. A legally obtained,
 supported Ocarina of Time ROM is required. Depending on the release type, users
